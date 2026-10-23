@@ -1,0 +1,129 @@
+node_modules
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+.next/
+.nuxt/
+.output/
+.vite/
+.turbo/
+.parcel-cache/
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.*
+!.env.example
+!.env.liff-mock.example
+!.env.docker.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime
+*.pid
+*.seed
+*.pid.lock
+
+# Emergency database snapshots (may contain production data)
+server/backups/
+
+# Local file uploads
+uploads/
+server/uploads/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Claude Code
+.claude/
+CLAUDE.md
+
+# Cache
+.cache/
+.eslintcache
+.stylelintcache
+.prettiercache
+
+# TypeScript
+*.tsbuildinfo
+
+# PlantUML generated output
+docs/VI/Diagram/picture/*.png
+docs/VI/Diagram/picture/*.svg
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime
+*.pid
+*.seed
+*.pid.lock
+
+# Emergency database snapshots (may contain production data)
+server/backups/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Claude Code
+.claude/
+CLAUDE.md
+
+# Cache
+.cache/
+.eslintcache
+.stylelintcache
+.prettiercache
+
+# TypeScript
+*.tsbuildinfo
+
+# PlantUML generated output
+docs/VI/Diagram/picture/*.png
+docs/VI/Diagram/picture/*.svg
+!docs/VI/Diagram/picture/.gitkeep
+
+# Postman exports (collections / environments) for API testing
+docs/Design/API/postman_collections/
+docs/Design/API/*.postman_collection.json
+
+.agents/
+
+# Standalone Portable Design System Kit
+design-system-kit/
+client/design-system-kit/
+
+templates/*
