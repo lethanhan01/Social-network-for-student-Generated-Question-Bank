@@ -120,8 +120,6 @@ docs/VI/Diagram/picture/*.svg
 docs/Design/API/postman_collections/
 docs/Design/API/*.postman_collection.json
 
-.agents/
-
 # Standalone Portable Design System Kit
 design-system-kit/
 client/design-system-kit/
