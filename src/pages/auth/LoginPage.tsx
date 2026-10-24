@@ -5,13 +5,14 @@ import { Card } from '@/components/ui/data-display'
 import { Form, FormField, Input } from '@/components/ui/forms'
 import { SubmitButton } from '@/components/ui/actions'
 import { Heading, Text } from '@/components/ui/typography'
-import { useAuthStore, type Role } from '@/stores/authStore'
+import { useAuthStore } from '@/stores/authStore'
 import { authService } from '@/services/auth.service'
 import { toast } from '@/lib/toast'
+import { getApiError } from '@/lib/api-error'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('an.lt235631@sis.hust.edu.vn')
-  const [password, setPassword] = useState('Hust@123456')
+  const [password, setPassword] = useState('20235631')
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
   const setAuth = useAuthStore((s) => s.setAuth)
@@ -30,24 +31,28 @@ export default function LoginPage() {
     setLoading(true)
     try {
       const res = await authService.login({ email, password })
-      setAuth(res.user, res.token)
-      toast.success('Đăng nhập thành công!', { description: `Chào mừng trở lại, ${res.user.fullName}` })
+      setAuth(
+        {
+          user_id: res.user_id,
+          username: res.username,
+          role: res.role,
+          avatar_url: res.avatar_url,
+          cover_url: res.cover_url,
+          frame_url: res.frame_url,
+          verified: res.verified,
+          profile_completed: res.profile_completed,
+          fullName: res.username,
+          email: res.username,
+        },
+        res.access_token || '',
+        res.refresh_token
+      )
+      toast.success('Đăng nhập thành công!', { description: `Chào mừng trở lại, ${res.username}` })
       navigate('/dashboard')
     } catch (err: unknown) {
-      // Mock login fallback if backend isn't reachable during offline dev
-      const mockUser = {
-        userId: 'u_hust_01',
-        email: email,
-        fullName: 'Lê Thành An',
-        roles: ['student'] as Role[],
-        studentId: '20235631',
-        department: 'Trường Công nghệ Thông tin & Truyền thông',
-      }
-      setAuth(mockUser, 'mock_token_sqb_hust')
-      toast.info('Đang sử dụng phiên đăng nhập demo (Backend offline)', {
-        description: 'Đã cấp quyền truy cập tài khoản sinh viên thành công.',
-      })
-      navigate('/dashboard')
+      const errorMsg = getApiError(err, 'Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.')
+      setErrors({ password: errorMsg })
+      toast.error('Lỗi đăng nhập', { description: errorMsg })
     } finally {
       setLoading(false)
     }
@@ -74,6 +79,8 @@ export default function LoginPage() {
           required
         >
           <Input
+            id="login-email"
+            aria-label="Email SIS HUST"
             type="email"
             placeholder="an.lt235631@sis.hust.edu.vn"
             value={email}
@@ -92,6 +99,8 @@ export default function LoginPage() {
           required
         >
           <Input
+            id="login-password"
+            aria-label="Mật khẩu"
             type="password"
             placeholder="••••••••"
             value={password}
@@ -115,5 +124,3 @@ export default function LoginPage() {
     </Card>
   )
 }
-
-
