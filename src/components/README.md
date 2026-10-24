@@ -1,9 +1,10 @@
-# RoGym Design System & Components Architecture (README)
+# SQB HUST Design System & Components Architecture (README)
 
-> **Tiêu chuẩn Kỹ thuật Frontend Doanh nghiệp RoGym (client/src/components/)**  
-> *Phiên bản:* 2.2.0 (Strict Enterprise, Maximum Internal Reusability & Refactoring Blueprint)  
-> *Cập nhật lần cuối:* 2026-10-18  
-> *Phạm vi áp dụng:* Toàn bộ lập trình viên frontend khi tạo mới, chỉnh sửa, hoặc tái cấu trúc giao diện trong RoGym Management System. Phục vụ chuyên biệt cho hai phân hệ cốt lõi: UI Primitives ([`ui/`](ui/)) và Application Composites ([`shared/`](shared/)).
+> **Tiêu chuẩn Kỹ thuật Frontend Doanh nghiệp SQB HUST (src/components/)**  
+> *Phiên bản:* 2.0.0 (Strict Enterprise Standard, Semantic Tokens & W3C A11y APG)  
+> *Cập nhật lần cuối:* 2026-10-25  
+> *Phạm vi áp dụng:* Toàn bộ lập trình viên frontend khi tạo mới, chỉnh sửa, hoặc tái cấu trúc giao diện trong hệ thống Mạng xã hội Ngân hàng Đề thi SQB HUST. Phục vụ chuyên biệt cho ba phân hệ cốt lõi: UI Primitives ([`ui/`](ui/)), Shared Application Composites ([`shared/`](shared/)) và Layout Templates ([`layouts/`](layouts/)).  
+> *Tài liệu liên quan:* [Cổng Quy Chuẩn Master Frontend](../../FRONTEND_CONVENTIONS.md) | [Chuyên Đề 01: Kiến Trúc & Cấu Trúc Thư Mục](../../docs/01-architecture-and-structure.md) | [Chuyên Đề 04: Component Patterns](../../docs/04-component-patterns.md) | [Chuyên Đề 06: Styling & Design Tokens](../../docs/06-styling-and-design-tokens.md) | [Chuyên Đề 08: Hệ Thống Thiết Kế Ngữ Nghĩa](../../docs/08-semantic-design-system.md)
 
 ---
 
@@ -21,6 +22,7 @@
    - [4.1 Bảng Nhận Diện 6 Anti-Patterns & Code Smells](#41-bảng-nhận-diện-6-anti-patterns-code-smells)
    - [4.2 Bốn Công Thức Chuyển Đổi Refactoring Chuẩn Vercel](#42-bốn-công-thức-chuyển-đổi-refactoring-chuẩn-vercel)
    - [4.3 Ma Trận Lộ Trình Refactor 3 Giai Đoạn](#43-ma-trận-lộ-trình-refactor-3-giai-đoạn)
+   - [4.4 Quick-Start Code Recipe: Tạo Mới Một Component Chuẩn SQB HUST (3 Bước)](#44-quick-start-code-recipe-tạo-mới-một-component-chuẩn-sqb-hust-3-bước)
 5. [Chương 5: Cây Quyết Định Chọn Component (10 Decision Trees)](#chương-5-cây-quyết-định-chọn-component-10-decision-trees)
    - [5.1 Cây 1: Chọn Nút Bấm & Bộ Điều Hướng (Actions & Navigation)](#51-cây-1-chọn-nút-bấm-bộ-điều-hướng-actions-navigation)
    - [5.2 Cây 2: Hiển Thị Dữ Liệu Bảng & Danh Sách (Tables & Grids)](#52-cây-2-hiển-thị-dữ-liệu-bảng-danh-sách-tables-grids)
@@ -54,15 +56,22 @@
 
 ## CHƯƠNG 1: KIẾN TRÚC THƯ VIỆN COMPONENT & MÔ HÌNH TÁI SỬ DỤNG NỘI BỘ 3 CẤP
 
-Hệ thống thành phần giao diện RoGym được xây dựng trên nền tảng **Design System 2 lớp (Two-Layer Token System)**, tuân thủ chuẩn tiếp cận **W3C WAI-ARIA Authoring Practices Guide (APG)** và áp dụng triệt để mô hình **Tái sử dụng nội bộ tối đa (Maximum Internal Composition & Reusability)**.
+Hệ thống thành phần giao diện SQB HUST được xây dựng trên nền tảng **Design System 2 lớp (Two-Layer Token System)**, tuân thủ chuẩn tiếp cận **W3C WAI-ARIA Authoring Practices Guide (APG)** và áp dụng triệt để mô hình **Tái sử dụng nội bộ tối đa (Maximum Internal Composition & Reusability)**.
+
+### Vai Trò & Sứ Mệnh Kiến Trúc Của `src/components/` Trong SQB HUST
+
+Thư mục `src/components/` là trung tâm hiển thị thị giác của toàn bộ dự án, được phân cấp thành 3 tầng độc lập:
+1. **Cấp 1: UI Primitives (`ui/`):** Các thành phần giao diện nguyên tử, phi nghiệp vụ (Zero domain logic), bọc trọn gói Semantic Tokens và CVA variants, đảm bảo khả năng tiếp cận WCAG 2.1 AA.
+2. **Cấp 2: Shared Composites (`shared/`):** Khung sườn ứng dụng SQB HUST dùng chung (Thanh điều hướng Sidebar học tập/đề thi, Thanh tiêu đề Topbar, Hộp thông báo NotificationUI, Bọc bảo vệ Route, Bắt lỗi ErrorBoundary).
+3. **Cấp 3: Layout Templates (`layouts/`):** Bộ khung bố cục trang màn hình lớn: `DashboardGrid`, `AnalyticsPanel`, `SplitPane`.
 
 ```mermaid
 graph TD
     subgraph "Internal Reusability & Composition Hierarchy"
         L1["Cấp 1: Atomic UI Primitives (@/components/ui)<br/>- Button, Input, Badge, Icon, Avatar, Skeleton, Separator<br/>- Radix UI Headless Accessible Primitives<br/>- 100% Semantic Tokens, Zero Business Logic"]
         L2["Cấp 2: Molecular & Compound Primitives (@/components/ui)<br/>- SearchToolbar, FilterBar, ConfirmDialog, ResponsiveTable<br/>- Accordion, Card, Tabs, Modal, ThemeSegmentedControl<br/>- TÁI SỬ DỤNG các Primitives Cấp 1 qua relative import"]
-        L3["Cấp 3: Application Shells & Composites (@/components/shared)<br/>- Sidebar, Topbar, BottomNav, NotificationBell, NotificationUI<br/>- ProtectedRoute, SubscriptionRequired, ErrorBoundary<br/>- TÁI SỬ DỤNG Primitives Cấp 1, Cấp 2 và tái sử dụng lẫn nhau"]
-        L4["Tầng Tiêu Thụ: Pages & Domain Features (@/pages/**, @/components/{domain})<br/>- Views, Routing, TanStack Query, Zustand, Forms, Tables"]
+        L3["Cấp 3: Application Shells & Composites (@/components/shared & layouts)<br/>- Sidebar (Điều hướng học tập/đề thi), Topbar, NotificationUI<br/>- ProtectedRoute, ErrorBoundary, PageLoader, DashboardGrid<br/>- TÁI SỬ DỤNG Primitives Cấp 1, Cấp 2 và tái sử dụng lẫn nhau"]
+        L4["Tầng Tiêu Thụ: Pages & Domain Features (@/pages/**: Dashboard, Exams, Questions, Feed)<br/>- Views, Routing, TanStack Query, Zustand, Forms, Tables"]
     end
     L1 -->|"Tái sử dụng nội bộ (Relative Import)"| L2
     L1 -->|"Import từ @/components/ui"| L3
@@ -90,12 +99,12 @@ graph TD
    - Các component trong `shared/` có thể tái sử dụng lẫn nhau: [`Topbar`](shared/topbar/Topbar.tsx) tái sử dụng `NotificationBell`; `NotificationBell` tái sử dụng [`NotificationUI`](shared/notification/NotificationUI.tsx) (`NotificationPanel`).
 
 4. **Kiến Trúc Token 2 Lớp (2-Layer Token Architecture):**
-   - **Layer 1: Primitive Tokens (`tokens/primitive.css`)**: Nơi duy nhất định nghĩa các giá trị màu HEX vật lý thuần túy (ví dụ: `--rogym-green: #06c384`).
-   - **Layer 2: Semantic Tokens (`tokens/semantic.css` & `theme.css`)**: Ánh xạ Layer 1 sang vai trò ngữ cảnh (ví dụ: `--color-action-primary: var(--rogym-green)`, class `bg-action-primary`, `text-fg-primary`).
+   - **Layer 1: Primitive Tokens (`tokens/primitive.css`)**: Nơi duy nhất định nghĩa các giá trị màu HEX vật lý thuần túy (ví dụ: `--primitive-green-500: #06c384`).
+   - **Layer 2: Semantic Tokens (`tokens/semantic.css` & `theme.css`)**: Ánh xạ Layer 1 sang vai trò ngữ cảnh (ví dụ: `--color-action-primary: var(--primitive-green-500)`, class `bg-action-primary`, `text-fg-primary`).
    - **Nguyên tắc:** Toàn bộ components (cả trong `ui/` lẫn `shared/`) **CHỈ ĐƯỢC PHÉP tiêu thụ Semantic Tokens ở Layer 2**, tự động tương thích 100% Dark/Light Mode.
 
 ### 1.2 Danh Sách Cấm Tuyệt Đối (Strictly Banned HTML Elements on Pages)
-Theo quy ước phát triển RoGym Frontend, việc viết thẻ HTML tương tác trần trụi (Raw Interactive Elements) trên các trang (`client/src/pages/**`) bị nghiêm cấm hoàn toàn qua hệ thống Static Audit:
+Theo quy ước phát triển SQB HUST Frontend, việc viết thẻ HTML tương tác trần trụi (Raw Interactive Elements) trên các trang (`src/pages/**`) bị nghiêm cấm hoàn toàn qua hệ thống Static Audit:
 
 | Raw HTML Element | Mức độ vi phạm | Nguyên nhân cấm | Giải pháp thay thế bắt buộc |
 | :--- | :---: | :--- | :--- |
@@ -262,11 +271,11 @@ import { Sidebar } from '@/components/shared/sidebar/Sidebar'
 // ❌ SAI: Nhồi nhét vô số boolean props tạo component "God Object" khó mở rộng
 <Card
   hasHeader
-  title="Thông Tin Học Viên"
+  title="Đề Thi Cuối Kỳ Giải Tích 1"
   showRibbon
-  ribbonText="VIP"
+  ribbonText="SAMI"
   hasMedia
-  mediaSrc="/gym.jpg"
+  mediaSrc="/assets/exam-cover.png"
   showFooter
   hasAction
   actionText="Chỉnh sửa"
@@ -279,14 +288,14 @@ import { Sidebar } from '@/components/shared/sidebar/Sidebar'
 // ✅ ĐÚNG: Linh hoạt, tường minh, tự do sắp xếp qua các Compound Subcomponents
 
 <Card as="article" variant="compact">
-  <CardRibbon tone="accent">VIP</CardRibbon>
-  <CardMedia src="/gym.jpg" alt="Phòng tập RoGym" aspectRatio="video" />
+  <CardRibbon tone="accent">SAMI</CardRibbon>
+  <CardMedia src="/assets/exam-cover.png" alt="Đề thi Cuối kỳ Giải tích 1 - Viện SAMI HUST" aspectRatio="video" />
   <CardHeader>
-    <CardTitle as="h2" size="md">Thông Tin Học Viên</CardTitle>
+    <CardTitle as="h2" size="md">Đề Thi Cuối Kỳ Giải Tích 1</CardTitle>
     <CardDescription>Cập nhật lần cuối: Hôm nay</CardDescription>
   </CardHeader>
   <CardContent>
-    <p className="text-sm text-fg-secondary">Nội dung chi tiết...</p>
+    <p className="text-sm text-fg-secondary">Tổng hợp câu hỏi trắc nghiệm và tự luận kỳ 2024.1...</p>
   </CardContent>
   <CardFooter align="end">
     <Button variant="primary" size="sm">Chỉnh Sửa</Button>
@@ -305,7 +314,7 @@ import { Sidebar } from '@/components/shared/sidebar/Sidebar'
 
 // ✅ ĐÚNG: Explicit multi-axis variants qua CVA
 <Button variant="danger" size="lg">Xóa Bản Ghi</Button>
-<Alert tone="warning" emphasis="subtle">Gói tập sắp hết hạn!</Alert>
+<Alert tone="warning" emphasis="subtle">Hạn đóng góp câu hỏi sắp kết thúc!</Alert>
 <ProgressBar tone="accent" size="md" value={75} />
 ```
 
@@ -361,7 +370,7 @@ export function LargeAttendanceLogView({ records }: { records: AttendanceRecord[
 
 ## CHƯƠNG 4: CẨM NANG & LỘ TRÌNH REFACTOR TÁI CẤU TRÚC TOÀN DIỆN
 
-Để hệ thống component RoGym luôn đáp ứng tiêu chuẩn Enterprise và loại bỏ hoàn toàn nợ kỹ thuật (Technical Debt), toàn bộ các đợt tái cấu trúc (Refactoring) cho `ui/` và `shared/` phải tuân theo cẩm nang và lộ trình dưới đây:
+Để hệ thống component SQB HUST luôn đáp ứng tiêu chuẩn Enterprise và loại bỏ hoàn toàn nợ kỹ thuật (Technical Debt), toàn bộ các đợt tái cấu trúc (Refactoring) cho `ui/` và `shared/` phải tuân theo cẩm nang và lộ trình dưới đây:
 
 ### 4.1 Bảng Nhận Diện 6 Anti-Patterns & Code Smells
 
@@ -398,7 +407,7 @@ export function Sidebar() {
 // ✅ SAU REFACTOR: Phân rã Compound Subcomponents, tái sử dụng Badge
 
 export function Sidebar({ children }: { children: ReactNode }) {
-  return <aside className="rogym-sidebar">{children}</aside>
+  return <aside className="sqb-sidebar">{children}</aside>
 }
 
 Sidebar.Nav = function SidebarNav({ children }: { children: ReactNode }) {
@@ -407,7 +416,7 @@ Sidebar.Nav = function SidebarNav({ children }: { children: ReactNode }) {
 
 Sidebar.Item = function SidebarItem({ to, icon, label, badgeCount }: SidebarItemProps) {
   return (
-    <NavLink to={to} className="rogym-sidebar__item">
+    <NavLink to={to} className="sqb-sidebar__item">
       {icon}
       <span>{label}</span>
       {badgeCount > 0 && <Badge tone="danger" size="sm">{badgeCount}</Badge>}
@@ -440,7 +449,7 @@ return (
   </DropdownMenuTrigger>
   <DropdownMenuContent align="end" className="w-56">
     <DropdownMenuItem onClick={goProfile}>Hồ sơ cá nhân</DropdownMenuItem>
-    <DropdownMenuItem onClick={goPayment}>Tài khoản thanh toán</DropdownMenuItem>
+    <DropdownMenuItem onClick={goQuestions}>Kho câu hỏi đóng góp</DropdownMenuItem>
     <DropdownMenuSeparator />
     <DropdownMenuItem onClick={handleLogout} className="text-status-danger-fg">
       Đăng xuất
@@ -513,6 +522,93 @@ graph TD
 | **P1** | **`SearchToolbar`** | [`ui/SearchToolbar.tsx`](ui/forms/SearchToolbar.tsx) | [`SearchInput`](ui/forms/SearchInput.tsx), [`Button`](ui/actions/Button.tsx), [`FilterDropdown`](ui/forms/FilterDropdown.tsx) | Đồng bộ debounce 300ms, chống lag Main Thread (INP tối ưu). |
 | **P2** | **`OwnerDateRangeFilter`** | `shared/OwnerDateRangeFilter.tsx` (Đã xóa) | — | Đã xóa bỏ dead-code vi phạm quy chuẩn khỏi codebase. |
 | **P2** | **`VirtualDataTable`** | [`ui/VirtualDataTable.tsx`](ui/data-display/VirtualDataTable.tsx) | `React.lazy` | Đưa vào Dynamic Import trên các view quản lý lớn, giảm Initial Bundle ~40KB. |
+
+---
+
+### 4.4 Quick-Start Code Recipe: Tạo Mới Một Component Chuẩn SQB HUST (3 Bước)
+
+Khi được yêu cầu tạo mới một component giao diện (ví dụ: `QuestionCard`, `ExamFilterBar`, `SubjectBadge`), hãy thực hiện nghiêm ngặt theo 3 bước:
+
+#### Bước 1: Xác định cấp độ phân tầng & Khởi tạo cấu trúc file
+- **UI Primitive:** Nếu là thành phần giao diện thuần túy, không phụ thuộc business logic/API ➔ đặt tại `src/components/ui/<category>/`.
+- **Shared Composite:** Nếu là layout shell hoặc component dùng chung đa domain ➔ đặt tại `src/components/shared/<name>/`.
+- Bắt buộc tạo đồng thời file component `.tsx` và file kiểm thử `.test.tsx`:
+  - `src/components/ui/data-display/QuestionCard.tsx`
+  - `src/components/ui/data-display/QuestionCard.test.tsx`
+
+#### Bước 2: Hiện thực Component với Semantic Tokens & CVA Variants
+- Tuyệt đối dùng Semantic Tailwind tokens (`bg-surface-card`, `text-fg-primary`, `border-line-subtle`) hoặc CSS variables (`var(--rogym-*)`).
+- Tuyệt đối **CẤM** mã màu thô (`#...`, `rgb(...)`, `bg-[#...]`).
+- Khai báo CVA variants đa trục (`variant`, `tone`, `size`), hỗ trợ `asChild` (Radix Slot) nếu là wrapper tương tác:
+
+```tsx
+import { forwardRef, type HTMLAttributes } from 'react'
+import { cva, type VariantProps } from 'class-variance-authority'
+import { cn } from '@/utils/cn'
+
+const questionCardVariants = cva(
+  'rounded-xl border transition-colors duration-150 p-4',
+  {
+    variants: {
+      tone: {
+        default: 'bg-surface-card border-line-subtle text-fg-primary',
+        highlight: 'bg-surface-hover border-line-default text-fg-primary',
+        verified: 'bg-status-success-subtle border-status-success-line text-status-success-fg',
+      },
+      size: {
+        sm: 'p-3 text-sm',
+        md: 'p-4 text-base',
+        lg: 'p-6 text-lg',
+      },
+    },
+    defaultVariants: {
+      tone: 'default',
+      size: 'md',
+    },
+  }
+)
+
+export interface QuestionCardProps
+  extends HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof questionCardVariants> {
+  as?: 'article' | 'section' | 'div'
+}
+
+export const QuestionCard = forwardRef<HTMLDivElement, QuestionCardProps>(
+  ({ as: Component = 'article', tone, size, className, children, ...props }, ref) => {
+    return (
+      <Component
+        ref={ref}
+        className={cn(questionCardVariants({ tone, size }), className)}
+        {...props}
+      >
+        {children}
+      </Component>
+    )
+  }
+)
+QuestionCard.displayName = 'QuestionCard'
+```
+
+#### Bước 3: Đảm bảo WAI-ARIA Accessibility & Viết Unit Tests
+- Touch target tối thiểu **44x44px** (`min-h-[44px]`) cho các phần tử tương tác.
+- Cung cấp đầy đủ `role`, `aria-label`, hoặc `aria-expanded` khi cần thiết.
+- Viết unit test xác thực accessible role và các variants render:
+
+```tsx
+import { render, screen } from '@testing-library/react'
+import { describe, it, expect } from 'vitest'
+import { QuestionCard } from './QuestionCard'
+
+describe('QuestionCard Component', () => {
+  it('renders semantic article tag by default with proper tone', () => {
+    render(<QuestionCard tone="verified">Câu hỏi Giải tích 1</QuestionCard>)
+    const article = screen.getByRole('article')
+    expect(article).toBeInTheDocument()
+    expect(article).toHaveTextContent('Câu hỏi Giải tích 1')
+  })
+})
+```
 
 ---
 
@@ -651,8 +747,8 @@ graph TD
 ```mermaid
 graph TD
     Start(["Cần hiển thị hình ảnh hoặc phương tiện?"]) --> MediaType{Đối tượng hiển thị?}
-    MediaType -->|"Ảnh bài tập, thiết bị, phòng gym (CLS = 0)"| M1["Image (aspectRatio: 16/9 / 1/1 / 4/3, fit, radius, fallback)"]
-    MediaType -->|"Chân dung người dùng, HLV có Initials fallback"| M2["Avatar / AvatarGroup (src, name, size)"]
+    MediaType -->|"Ảnh bìa đề thi, sơ đồ giải tích, ảnh đại diện (CLS = 0)"| M1["Image (aspectRatio: 16/9 / 1/1 / 4/3, fit, radius, fallback)"]
+    MediaType -->|"Chân dung sinh viên, giảng viên có Initials fallback"| M2["Avatar / AvatarGroup (src, name, size)"]
     MediaType -->|"Biểu tượng vector tương tác / trạng thái"| M3["Icon / LineIcon (size, tone)"]
 ```
 
@@ -661,7 +757,7 @@ graph TD
 ```mermaid
 graph TD
     Start(["Cần hiển thị thông tin chi tiết / thuộc tính?"]) --> DisplayType{Cấu trúc dữ liệu?}
-    DisplayType -->|"Cặp nhãn - giá trị (Key-Value: BMI, Hạn gói, Cơ bắp)"| D1["DescriptionList (layout: grid / horizontal / vertical, items)"]
+    DisplayType -->|"Cặp nhãn - giá trị (Key-Value: Mã đề thi, Học kỳ, Viện đào tạo, Số tín chỉ)"| D1["DescriptionList (layout: grid / horizontal / vertical, items)"]
     DisplayType -->|"Danh sách dữ liệu nhiều dòng nhiều cột"| D2{Khối lượng dữ liệu?}
     D2 -->|"Dữ liệu thường < 100 dòng"| D3["ResponsiveTable hoặc TableContainer + Table"]
     D2 -->|"Cực lớn > 500 dòng (Windowing)"| D4["VirtualDataTable (React.lazy)"]
@@ -697,7 +793,7 @@ import { Plus } from 'lucide-react'
   leftIcon={<Plus size={16} />}
   onClick={handleCreate}
 >
-  Tạo Buổi Tập Mới
+  Tạo Câu Hỏi Mới
 </Button>
 ```
 
@@ -739,7 +835,7 @@ import { Plus } from 'lucide-react'
 
 #### 2. `Input`, `NumberInput`, `OtpInput` & `Textarea`
 - **File nguồn:** [`ui/Input.tsx`](ui/forms/Input.tsx), [`ui/NumberInput.tsx`](ui/forms/NumberInput.tsx), [`ui/OtpInput.tsx`](ui/forms/OtpInput.tsx), [`ui/Textarea.tsx`](ui/forms/Textarea.tsx)
-- **Vai trò:** Input văn bản, số tiền, mã OTP 6 số và textarea chuẩn Design Token, chống vỡ giao diện trên Safari iOS (zoom-prevention 16px font-size) và hiển thị focus-ring xanh thương hiệu RoGym.
+- **Vai trò:** Input văn bản, số tiền, mã OTP 6 số và textarea chuẩn Design Token, chống vỡ giao diện trên Safari iOS (zoom-prevention 16px font-size) và hiển thị focus-ring xanh thương hiệu SQB HUST.
 
 #### 3. `Select` & `Combobox`
 - **File nguồn:** [`ui/Select.tsx`](ui/forms/Select.tsx), [`ui/Combobox.tsx`](ui/forms/Combobox.tsx)
@@ -778,16 +874,16 @@ import { Plus } from 'lucide-react'
 <Modal
   open={isOpen}
   onClose={() => setIsOpen(false)}
-  title="Gán Giáo Án Tập Luyện"
+  title="Tạo Đề Thi Mới"
   size="md"
   footer={
     <ModalFooter>
       <Button variant="outline-white" onClick={() => setIsOpen(false)}>Hủy</Button>
-      <SubmitButton form="assign-plan-form" loading={isAssigning}>Xác Nhận</SubmitButton>
+      <SubmitButton form="create-exam-form" loading={isAssigning}>Xác Nhận</SubmitButton>
     </ModalFooter>
   }
 >
-  <Form id="assign-plan-form" onSubmit={handleAssign}>
+  <Form id="create-exam-form" onSubmit={handleCreateExam}>
     {/* Form Fields */}
   </Form>
 </Modal>
@@ -795,7 +891,7 @@ import { Plus } from 'lucide-react'
 
 #### 2. `ConfirmDialog`
 - **File nguồn:** [`ui/ConfirmDialog.tsx`](ui/overlay/ConfirmDialog.tsx)
-- **Vai trò:** Hộp thoại xác nhận nhanh các thao tác nguy hiểm (Xóa tài khoản, Hủy buổi tập, Gỡ ảnh đại diện, Đăng xuất) với nút xác nhận màu đỏ khi `variant="danger"`. Tái sử dụng [`Button`](ui/actions/Button.tsx).
+- **Vai trò:** Hộp thoại xác nhận nhanh các thao tác nguy hiểm (Xóa tài khoản, Hủy đề thi, Gỡ ảnh đại diện, Đăng xuất) với nút xác nhận màu đỏ khi `variant="danger"`. Tái sử dụng [`Button`](ui/actions/Button.tsx).
 
 #### 3. `Sheet`, `DropdownMenu`, `Popover`, `Tooltip`
 - **File nguồn:** [`ui/Sheet.tsx`](ui/overlay/Sheet.tsx), [`ui/DropdownMenu.tsx`](ui/overlay/DropdownMenu.tsx), [`ui/Popover.tsx`](ui/overlay/Popover.tsx), [`ui/Tooltip.tsx`](ui/overlay/Tooltip.tsx)
@@ -807,7 +903,7 @@ import { Plus } from 'lucide-react'
 
 #### 1. `Card` & Toàn bộ Compound Subcomponents
 - **File nguồn:** [`ui/Card.tsx`](ui/data-display/Card.tsx)
-- **Vai trò:** Khung hiển thị nội dung khối chuẩn RoGym với viền `border-line-subtle`, nền `bg-surface-card` và border-radius bo tròn chuẩn mực.
+- **Vai trò:** Khung hiển thị nội dung khối chuẩn SQB HUST với viền `border-line-subtle`, nền `bg-surface-card` và border-radius bo tròn chuẩn mực.
 - **Subcomponents đầy đủ:**
   - `CardHeader`: Khối tiêu đề đầu thẻ
   - `CardTitle`: Thẻ tiêu đề hỗ trợ prop `as` (`h1` - `h6`) và kích cỡ `size`
@@ -827,7 +923,7 @@ import { Plus } from 'lucide-react'
 - **Vai trò:** Smart Unified Primitive hiển thị nhãn phân loại, từ khóa hoặc trạng thái hệ thống tự động suy luận tone và đa ngôn ngữ i18n theo domain.
 - **Props & Cấu hình chính:**
   - `status?: string | null`: Mã trạng thái nghiệp vụ (ví dụ: `active`, `pending`, `expired`, `in_progress`...).
-  - `domain?: 'member' | 'payment' | 'session' | 'subscription' | 'equipment' | 'general'`: Phân vùng nghiệp vụ để tự động suy luận Semantic Tone và text dịch đa ngôn ngữ i18n.
+  - `domain?: 'question' | 'exam' | 'review' | 'user' | 'general'`: Phân vùng nghiệp vụ để tự động suy luận Semantic Tone và text dịch đa ngôn ngữ i18n.
   - `tone?: 'success' | 'warning' | 'danger' | 'info' | 'neutral' | 'accent'`: Ghi đè màu sắc ngữ nghĩa thủ công khi không dùng status.
   - `emphasis?: 'solid' | 'subtle' | 'outline'`: Độ nổi bật của nhãn (mặc định `'subtle'`).
   - `variant?: 'pill' | 'rounded'`: Kiểu dáng bo tròn hoàn toàn (`pill`, mặc định) hoặc bo góc (`rounded`).
@@ -839,12 +935,12 @@ import { Plus } from 'lucide-react'
 ```tsx
 
 // 1. Shorthand Status Badge tự động suy luận tone & text tiếng Việt theo domain
-<Badge status={member.status} domain="member" />
-<Badge status={session.status} domain="session" dot pulse />
+<Badge status={question.status} domain="question" />
+<Badge status={exam.status} domain="exam" dot pulse />
 
 // 2. Tag / Nhãn phân loại tùy biến
-<Badge tone="accent" emphasis="subtle" size="sm">Hội viên VIP</Badge>
-<Badge tone="success" variant="rounded" dot>Đang tập</Badge>
+<Badge tone="accent" emphasis="subtle" size="sm">Đã kiểm duyệt</Badge>
+<Badge tone="success" variant="rounded" dot>Đang làm bài</Badge>
 
 // 3. Cú pháp Compound Sub-components
 <Badge tone="warning">
@@ -875,7 +971,7 @@ import { Plus } from 'lucide-react'
 
 #### 5. `Avatar` & `AvatarGroup`
 - **File nguồn:** [`ui/Avatar.tsx`](ui/data-display/Avatar.tsx)
-- **Vai trò:** Hiển thị ảnh đại diện học viên / HLV với fallback ký tự chữ cái đầu tiên (Initials) và viền chuẩn.
+- **Vai trò:** Hiển thị ảnh đại diện sinh viên / giảng viên với fallback ký tự chữ cái đầu tiên (Initials) và viền chuẩn.
 
 ---
 
@@ -912,8 +1008,8 @@ import { Plus } from 'lucide-react'
 
 <Accordion type="single" variant="card" defaultValue="faq-1">
   <AccordionItem value="faq-1">
-    <AccordionTrigger>Quy định bảo lưu gói tập thế nào?</AccordionTrigger>
-    <AccordionContent>Hội viên được bảo lưu tối đa 30 ngày mỗi năm...</AccordionContent>
+    <AccordionTrigger>Quy định duyệt câu hỏi đóng góp thế nào?</AccordionTrigger>
+    <AccordionContent>Câu hỏi cần ít nhất 2 đánh giá đồng thuận từ Giảng viên hoặc Sinh viên kiểm duyệt...</AccordionContent>
   </AccordionItem>
 </Accordion>
 ```
@@ -947,7 +1043,7 @@ import { Plus } from 'lucide-react'
 
 #### 6. `LanguageSwitcher`
 - **File nguồn:** [`ui/LanguageSwitcher.tsx`](ui/typography/LanguageSwitcher.tsx)
-- **Vai trò:** Nút chuyển đổi nhanh ngôn ngữ i18n giữa Tiếng Việt (`vi`) và Tiếng Nhật (`ja`).
+- **Vai trò:** Nút chuyển đổi nhanh ngôn ngữ i18n giữa Tiếng Việt (`vi`) và Tiếng Anh (`en`).
 
 ---
 
@@ -1149,15 +1245,15 @@ import { Plus } from 'lucide-react'
   columns={2}
   size="sm"
   items={[
-    { term: 'Nhóm cơ chính', details: exercise.targetMuscle?.name ?? '—' },
-    { term: 'Thiết bị yêu cầu', details: exercise.equipment?.name ?? '—' },
+    { term: 'Môn học', details: exam.subjectName ?? '—' },
+    { term: 'Học kỳ', details: exam.semester ?? '—' },
   ]}
 />
 
 // 2. Cú pháp Compound Subcomponents tùy biến cao
 <DescriptionList layout="horizontal">
   <DescriptionList.Item>
-    <DescriptionList.Term>Hạn sử dụng gói:</DescriptionList.Term>
+    <DescriptionList.Term>Hạn nộp câu hỏi:</DescriptionList.Term>
     <DescriptionList.Details>31/12/2026</DescriptionList.Details>
   </DescriptionList.Item>
 </DescriptionList>
@@ -1167,23 +1263,21 @@ import { Plus } from 'lucide-react'
 
 ## CHƯƠNG 7: CATALOG SHARED COMPOSITES & APPLICATION SHELLS (`shared/`)
 
-Tất cả các thành phần trong `client/src/components/shared/` phục vụ mục đích xây dựng khung ứng dụng (Shells) và tái sử dụng đa vai trò (Multi-role composites):
+Tất cả các thành phần trong `src/components/shared/` phục vụ mục đích xây dựng khung ứng dụng (Shells) và tái sử dụng đa vai trò (Multi-role composites):
 
 | Component | File nguồn | Vai trò chính | Cách áp dụng chuẩn |
 | :--- | :--- | :--- | :--- |
-| **`Sidebar`** | [`shared/sidebar/Sidebar.tsx`](shared/sidebar/Sidebar.tsx) | Shell thanh điều hướng cạnh bên màn hình lớn cho Owner, Staff, Trainer | Đặt trong Layout chính của Desktop |
+| **`Sidebar`** | [`shared/sidebar/Sidebar.tsx`](shared/sidebar/Sidebar.tsx) | Shell thanh điều hướng cạnh bên màn hình lớn cho Sinh viên & Giảng viên | Đặt trong Layout chính của Desktop |
 | **`Topbar`** | [`shared/topbar/Topbar.tsx`](shared/topbar/Topbar.tsx) | Shell thanh tiêu đề đỉnh ứng dụng chứa Avatar, ThemeToggle, Chuông thông báo | Đặt trên cùng của mọi trang Dashboard |
-| **`BottomNav`** | `shared/bottom-nav/BottomNav.tsx` | Shell thanh điều hướng đáy ứng dụng trên di động & LINE LIFF | Tự động hiển thị trên thiết bị `< 768px` |
-| **`ProtectedRoute`** | [`shared/protected-route/ProtectedRoute.tsx`](shared/protected-route/ProtectedRoute.tsx) | Bọc bảo vệ Route: Kiểm tra hydrate store, vai trò `allowedRoles` và redirect LINE an toàn | `<ProtectedRoute allowedRoles={['owner', 'staff']}><Page /></ProtectedRoute>` |
+| **`ProtectedRoute`** | [`shared/protected-route/ProtectedRoute.tsx`](shared/protected-route/ProtectedRoute.tsx) | Bọc bảo vệ Route: Kiểm tra hydrate store, vai trò `allowedRoles` (`STUDENT`, `LECTURER`, `ADMIN`) và chuyển hướng an toàn | `<ProtectedRoute allowedRoles={['STUDENT', 'LECTURER']}><Page /></ProtectedRoute>` |
 | **`NotificationUI`** | [`shared/notification/NotificationUI.tsx`](shared/notification/NotificationUI.tsx) | Hệ thống thành phần hiển thị thông báo: `NotificationToast`, `NotificationAlert`, `NotificationPanel` | Sử dụng trong hệ thống Toast & Notification Dropdown |
-| **`NotificationBell`** | `shared/notification/NotificationBell.tsx` | Chuông thông báo Realtime tích hợp Supabase WebSocket | Đặt trên Topbar ứng dụng |
+| **`NotificationBell`** | `shared/notification/NotificationBell.tsx` | Chuông thông báo Realtime tích hợp WebSocket STOMP | Đặt trên Topbar ứng dụng |
 | **`PageLoader`** | [`shared/spinner/Spinner.tsx`](shared/spinner/Spinner.tsx) | Spinner tải dữ liệu toàn màn hình hoặc khối Suspense fallback | `<Suspense fallback={<PageLoader />}>` |
-| **`SubscriptionRequired`** | `shared/subscription-required/SubscriptionRequired.tsx` | Khóa màn hình nếu học viên chưa có gói tập hợp lệ | Bọc quanh nội dung trang tập luyện của Member |
 | **`ErrorBoundary`** | [`shared/error-boundary/ErrorBoundary.tsx`](shared/error-boundary/ErrorBoundary.tsx) | Bắt lỗi Runtime React, chống sập ứng dụng trắng màn hình | Bọc ở cấp Router hoặc Layout |
 
 > [!CAUTION]
 > **Lưu ý về Tách biệt Phạm vi (Scope Boundary):**  
-> Thư mục `client/src/components/shared/` chỉ chứa các thành phần đa vai trò (Multi-role) đã được kiểm duyệt. Các file mang tính chất dead-code hoặc vi phạm đặt tên role trong shared (như `OwnerDateRangeFilter.tsx`) đã bị loại trừ khỏi catalog chính thức và được lên kế hoạch dọn dẹp ở Giai đoạn 3 (P2).
+> Thư mục `src/components/shared/` chỉ chứa các thành phần đa vai trò (Multi-role) đã được kiểm duyệt. Các logic chuyên biệt cho từng trang hoặc nghiệp vụ riêng lẻ phải nằm trong thư mục features/domain tương ứng, không được đưa vào `shared/`.
 
 ---
 
@@ -1194,9 +1288,9 @@ Tất cả các thành phần trong `client/src/components/shared/` phục vụ 
 > [!CAUTION]
 > **QUY TẮC BẤT KHẢ XÂM PHẠM:**
 > 1. **Tra cứu trước khi Code (Search First, Code Later):** Trước khi tạo bất kỳ thẻ tương tác hoặc khối giao diện nào, bạn BẮT BUỘC phải tra cứu xem thành phần đó đã có trong `@/components/ui` hoặc `@/components/shared` hay chưa.
-> 2. **Nghiêm Cấm Tạo Facade Proxy:** Tuyệt đối KHÔNG tạo các file trung gian re-export đổi tên (như `MemberUI.tsx`, `TrainerUI.tsx`, `OwnerUI.tsx`, `StaffUI.tsx`). Tất cả import phải trực tiếp từ Category Barrels `@/components/ui/<category>`.
+> 2. **Nghiêm Cấm Tạo Facade Proxy:** Tuyệt đối KHÔNG tạo các file trung gian re-export đổi tên (như `StudentUI.tsx`, `LecturerUI.tsx`, `AdminUI.tsx`). Tất cả import phải trực tiếp từ Category Barrels `@/components/ui/<category>`.
 > 3. **Nghiêm Cấm Trùng Logic / Trùng Mục Đích:** Nếu một component đã có khả năng hiển thị bằng cách cấu hình Props/Variants (ví dụ: `Button` có 10+ variants, `Card` có 8+ subcomponents, `Accordion` có 3 variants), NGHIÊM CẤM tạo một component mới có cùng mục đích (ví dụ: cấm tạo `CustomButton`, `CustomCard`, `MyAccordion`).
-> 4. **Tách Rời Rạch Ròi Business Logic Khỏi Primitives:** Nếu component có logic nghiệp vụ (như query API, dropdown chứa danh sách học viên PT), nó PHẢI nằm trong thư mục domain tương ứng (ví dụ: `@/components/trainer/StudentCombobox.tsx`), KHÔNG ĐƯỢC nhét vào `@/components/ui`.
+> 4. **Tách Rời Rạch Ròi Business Logic Khỏi Primitives:** Nếu component có logic nghiệp vụ (như query API, dropdown danh sách môn học Viện CNTT), nó PHẢI nằm trong thư mục domain tương ứng (ví dụ: `@/components/exam/SubjectSelect.tsx`), KHÔNG ĐƯỢC nhét vào `@/components/ui`.
 > 5. **Quy Trình 4 Bước Đóng Góp Component Mới:** Nếu thực sự phát sinh một UI Primitive mới chưa từng có trong hệ thống, phải thực hiện đúng quy trình kiểm định tại mục 8.2.
 
 ### 8.2 Quy Trình 4 Bước Đóng Góp Component Mới (Contribution Workflow)
@@ -1214,7 +1308,7 @@ graph TD
 
 ## CHƯƠNG 9: QUY CHUẨN NGHIÊM CẤM & CẢNH BÁO LẠM DỤNG (ANTI-ABUSE DIRECTIVES & SEVERE SYSTEM CONSEQUENCES)
 
-Tài liệu này là **hợp đồng kỹ thuật tối thượng** bắt buộc tuân thủ khi xây dựng mới hoặc tái cấu trúc các components trong RoGym. Việc lạm dụng bừa bãi hoặc áp dụng sai mục đích sẽ gây ra suy thoái nghiêm trọng về trải nghiệm người dùng, khả năng tiếp cận (A11y) và hiệu năng của toàn hệ thống.
+Tài liệu này là **hợp đồng kỹ thuật tối thượng** bắt buộc tuân thủ khi xây dựng mới hoặc tái cấu trúc các components trong SQB HUST. Việc lạm dụng bừa bãi hoặc áp dụng sai mục đích sẽ gây ra suy thoái nghiêm trọng về trải nghiệm người dùng, khả năng tiếp cận (A11y) và hiệu năng của toàn hệ thống.
 
 ### 9.1 Bảng Ma Trận Quy Tắc Cấm & Đo Lường Hậu Quả Hệ Thống
 
@@ -1234,17 +1328,17 @@ Tài liệu này là **hợp đồng kỹ thuật tối thượng** bắt buộc
 ```
 ❌ GIAO DIỆN BỊ NHIỄU LOẠN NÚT BẤM (BUTTON CLUTTER)
 ┌─────────────────────────────────────────────────────────────┐
-│ HỘI VIÊN: NGUYỄN VĂN A                           [Gói VIP]  │
+│ SINH VIÊN: NGUYỄN VĂN A                 [MSSV: 20210001]    │
 │                                                             │
-│ [Gia Hạn Ngay]   [Đổi Gói]   [Xem Lịch Sử]   [In Hóa Đơn]   │ <── 4 nút bấm cùng kích thước, cùng tone màu
+│ [Làm Bài Thi]    [Tải Về]     [Xem Lời Giải]   [In Đề Thi]   │ <── 4 nút bấm cùng kích thước, cùng tone màu
 │ (Primary Solid)  (Primary)    (Primary)      (Primary)      │     gây tranh chấp thị giác gay gắt!
 └─────────────────────────────────────────────────────────────┘
 
 ✅ GIAO DIỆN PHÂN CẤP RÕ RÀNG (CLEAR HIERARCHY)
 ┌─────────────────────────────────────────────────────────────┐
-│ HỘI VIÊN: NGUYỄN VĂN A                           [Gói VIP]  │
+│ SINH VIÊN: NGUYỄN VĂN A                 [MSSV: 20210001]    │
 │                                                             │
-│ [Gia Hạn Ngay (Primary CTA)]    [Xem Chi Tiết (Ghost)]  [⋮] │ <── 1 Primary CTA duy nhất, các thao tác phụ
+│ [Làm Bài Thi (Primary CTA)]    [Xem Chi Tiết (Ghost)]   [⋮] │ <── 1 Primary CTA duy nhất, các thao tác phụ
 │                                                             │     được đưa vào DropdownMenu tinh gọn
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -1266,43 +1360,43 @@ Tài liệu này là **hợp đồng kỹ thuật tối thượng** bắt buộc
 
 ### 9.3 Công Thức Tái Cấu Trúc Thực Chiến (Refactoring Recipes)
 
-#### Recipe 1: Khắc Phục Button Proliferation Trên Hàng Bảng Biểu (`MemberTableRow`)
+#### Recipe 1: Khắc Phục Button Proliferation Trên Hàng Bảng Biểu (`QuestionTableRow`)
 ```tsx
 // ❌ TRƯỚC REFACTOR: Dàn trải nhiều nút, lạm dụng Button để chuyển trang, vỡ responsive
-export function MemberTableRow({ member }: { member: Member }) {
+export function QuestionTableRow({ question }: { question: QuestionRecord }) {
   const navigate = useNavigate()
   return (
     <tr>
-      <td>{member.fullName}</td>
+      <td>{question.title}</td>
       <td className="flex gap-2">
-        <Button tone="primary" size="sm" onClick={() => navigate(`/members/${member.id}`)}>Xem</Button>
-        <Button tone="primary" size="sm" onClick={() => handleRenew(member.id)}>Gia hạn</Button>
-        <Button tone="danger" size="sm" onClick={() => handleDelete(member.id)}>Xóa</Button>
+        <Button tone="primary" size="sm" onClick={() => navigate(`/questions/${question.id}`)}>Xem</Button>
+        <Button tone="primary" size="sm" onClick={() => handleVerify(question.id)}>Duyệt</Button>
+        <Button tone="danger" size="sm" onClick={() => handleDelete(question.id)}>Xóa</Button>
       </td>
     </tr>
   )
 }
 
 // ✅ SAU REFACTOR: Dùng ButtonLink ngữ nghĩa và DropdownMenu tinh gọn
-export function MemberTableRow({ member }: { member: Member }) {
+export function QuestionTableRow({ question }: { question: QuestionRecord }) {
   return (
     <tr>
-      <td>{member.fullName}</td>
+      <td>{question.title}</td>
       <td className="text-right">
         <div className="flex items-center justify-end gap-2">
-          <ButtonLink to={`/members/${member.id}`} variant="outline" size="sm">
+          <ButtonLink to={`/questions/${question.id}`} variant="outline" size="sm">
             Xem
           </ButtonLink>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" aria-label={`Thao tác cho hội viên ${member.fullName}`}>
+              <Button variant="ghost" size="sm" aria-label={`Thao tác cho câu hỏi ${question.title}`}>
                 <Icon name="MoreHorizontal" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => handleRenew(member.id)}>Gia hạn hợp đồng</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleVerify(question.id)}>Duyệt câu hỏi</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem tone="danger" onClick={() => handleDelete(member.id)}>Xóa hội viên</DropdownMenuItem>
+              <DropdownMenuItem tone="danger" onClick={() => handleDelete(question.id)}>Xóa câu hỏi</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -1315,7 +1409,7 @@ export function MemberTableRow({ member }: { member: Member }) {
 #### Recipe 2: Khắc Phục Lỗi Inline Component Definition Gây Mất Focus Bàn Phím
 ```tsx
 // ❌ TRƯỚC REFACTOR: Component con bị remount liên tục mỗi khi gõ phím
-export function MemberSearchFilter() {
+export function QuestionSearchFilter() {
   const [keyword, setKeyword] = useState('')
 
   // LỖI NGUY HIỂM: Function này bị tạo mới ở MỖI lần render, React remount toàn bộ input!
@@ -1337,12 +1431,12 @@ function FilterInput({ value, onChange }: FilterInputProps) {
     <Input
       value={value ?? ''}
       onChange={(e) => onChange(e.target.value)}
-      placeholder="Tìm kiếm hội viên..."
+      placeholder="Tìm kiếm câu hỏi, đề thi..."
     />
   )
 }
 
-export function MemberSearchFilter() {
+export function QuestionSearchFilter() {
   const [keyword, setKeyword] = useState('')
   return <FilterInput value={keyword} onChange={setKeyword} />
 }
@@ -1354,7 +1448,7 @@ export function MemberSearchFilter() {
 <div className="bg-surface-card border border-line-default p-6 rounded-xl">
   <div className="border border-line-subtle p-4 rounded-lg">
     <Card className="p-4 border border-line-default">
-      <h3>Thông tin buổi tập</h3>
+      <h3>Thông tin đề thi</h3>
     </Card>
   </div>
 </div>
@@ -1362,10 +1456,10 @@ export function MemberSearchFilter() {
 // ✅ SAU REFACTOR: Chỉ 1 Card bao bọc duy nhất, bên trong dùng layout spacing
 <Card as="article" padding="lg">
   <CardHeader>
-    <Heading level={3}>Thông tin buổi tập</Heading>
+    <Heading level={3}>Thông tin đề thi</Heading>
   </CardHeader>
   <CardContent className="space-y-4">
-    <p>Nội dung buổi tập tinh gọn, thoáng đãng</p>
+    <p>Nội dung đề thi tinh gọn, chuẩn bố cục W3C APG</p>
   </CardContent>
 </Card>
 ```
@@ -1429,7 +1523,7 @@ Khi muốn hiện thực một tác vụ giao diện, hãy tra cứu nhanh bản
 | Thanh tiến trình định lượng % | `ProgressBar` | `import { ProgressBar } from '@/components/ui/feedback'` |
 | Nút chuyển đổi Dark/Light theme | `ThemeToggle` | `import { ThemeToggle } from '@/components/ui/navigation'` |
 | Bộ chọn theme Dark/Light/System | `ThemeSegmentedControl` | `import { ThemeSegmentedControl } from '@/components/ui/navigation'` |
-| Nút chuyển ngôn ngữ giao diện (VI/JA) | `LanguageSwitcher` | `import { LanguageSwitcher } from '@/components/ui/typography'` |
+| Nút chuyển ngôn ngữ giao diện (VI/EN) | `LanguageSwitcher` | `import { LanguageSwitcher } from '@/components/ui/typography'` |
 | Bảng dữ liệu tự co giãn trên mobile | `ResponsiveTable` | `import { ResponsiveTable } from '@/components/ui/data-display'` |
 | Bảng dữ liệu HTML semantic chuẩn | `TableContainer`, `Table` | `import { TableContainer, Table } from '@/components/ui/data-display'` |
 | Bảng dữ liệu cực lớn > 500 dòng | `VirtualDataTable` *(Lazy load)* | `const VirtualDataTable = lazy(...)` |
@@ -1445,9 +1539,8 @@ Khi muốn hiện thực một tác vụ giao diện, hãy tra cứu nhanh bản
 | Cặp dữ liệu Key-Value metadata chuẩn dl | `DescriptionList` | `import { DescriptionList } from '@/components/ui/data-display'` |
 | Khung ứng dụng: Sidebar cạnh bên | `Sidebar` | `import { Sidebar } from '@/components/shared/sidebar/Sidebar'` |
 | Khung ứng dụng: Topbar đỉnh màn hình | `Topbar` | `import { Topbar } from '@/components/shared/topbar/Topbar'` |
-| Khung ứng dụng: BottomNav đáy mobile | `BottomNav` | `import { BottomNav } from '@/components/shared/bottom-nav/BottomNav'` |
 | Bọc bảo vệ route theo role & hydrate | `ProtectedRoute` | `import { ProtectedRoute } from '@/components/shared/protected-route/ProtectedRoute'` |
-| Nhãn trạng thái nghiệp vụ (Học viên, PT, Gói tập, Thanh toán) | `Badge` (status, domain) | `import { Badge } from '@/components/ui/data-display'` |
+| Nhãn trạng thái nghiệp vụ (Sinh viên, Đề thi, Câu hỏi, Kiểm duyệt) | `Badge` (status, domain) | `import { Badge } from '@/components/ui/data-display'` |
 | Nhãn trạng thái hệ thống chung | `StatusBadge` | `import { StatusBadge } from '@/components/ui/data-display'` |
 | Chuông thông báo Realtime | `NotificationBell` | `import { NotificationBell } from '@/components/shared/notification/NotificationBell'` |
 | Thông báo toast / panel thông báo | `NotificationUI` | `import { NotificationToast } from '@/components/shared/notification/NotificationUI'` |
