@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Navigate } from 'react-router-dom'
 import { GraduationCap, Lock, Mail } from 'lucide-react'
 import { Card } from '@/components/ui/data-display'
 import { Form, FormField, Input } from '@/components/ui/forms'
@@ -15,10 +15,18 @@ export default function LoginPage() {
   const [password, setPassword] = useState('20235631')
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
+  const currentUser = useAuthStore((s) => s.user)
   const setAuth = useAuthStore((s) => s.setAuth)
   const navigate = useNavigate()
 
-  async function handleSubmit() {
+  // Auto-redirect if already authenticated
+  if (isAuthenticated && currentUser) {
+    return <Navigate to={currentUser.role === 'ADMIN' ? '/admin/users' : '/feed'} replace />
+  }
+
+  async function handleSubmit(e?: React.SubmitEvent) {
+    e?.preventDefault()
     const newErrors: { email?: string; password?: string } = {}
     if (!email.trim()) newErrors.email = 'Vui lòng nhập email SIS HUST'
     if (!password) newErrors.password = 'Vui lòng nhập mật khẩu'
@@ -48,7 +56,11 @@ export default function LoginPage() {
         res.refresh_token
       )
       toast.success('Đăng nhập thành công!', { description: `Chào mừng trở lại, ${res.username}` })
-      navigate('/dashboard')
+      if (res.role === 'ADMIN') {
+        navigate('/admin/users', { replace: true })
+      } else {
+        navigate('/feed', { replace: true })
+      }
     } catch (err: unknown) {
       const errorMsg = getApiError(err, 'Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.')
       setErrors({ password: errorMsg })
@@ -59,7 +71,7 @@ export default function LoginPage() {
   }
 
   return (
-    <Card className="p-8 bg-surface border-line-subtle shadow-card rounded-2xl">
+    <Card className="p-4 sm:p-6 lg:p-8 bg-surface border-line-subtle shadow-card rounded-2xl">
       <div className="text-center mb-8">
         <div className="mx-auto w-14 h-14 rounded-2xl bg-action-accent flex items-center justify-center text-text-inverse mb-4 shadow-sm">
           <GraduationCap size={32} />

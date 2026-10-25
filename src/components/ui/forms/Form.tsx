@@ -3,11 +3,11 @@ import {
   useCallback,
   useEffect,
   useRef,
-  type FormEvent,
+  type SubmitEvent,
   type FormHTMLAttributes,
   type KeyboardEvent,
 } from 'react'
-import { cn } from '@/utils'
+import { cn } from '@/utils/cn'
 
 export interface FormProps extends FormHTMLAttributes<HTMLFormElement> {
   /**
@@ -94,7 +94,10 @@ export const Form = forwardRef<HTMLFormElement, FormProps>(
       }
     }, [])
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
+      if (!props.action) {
+        e.preventDefault()
+      }
       onSubmit?.(e as Parameters<NonNullable<FormProps['onSubmit']>>[0])
     }
 

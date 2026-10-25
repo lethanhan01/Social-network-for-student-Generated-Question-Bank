@@ -262,5 +262,18 @@
     "switchToDark": "Chuyển sang giao diện tối",
     "appearanceTitle": "Giao diện & Hiển thị",
     "appearanceDesc": "Tùy chỉnh chế độ sáng, tối hoặc tự động đồng bộ theo hệ điều hành."
+  },
+  "feed": {
+    "title": "Bảng tin & Hoạt động",
+    "network_badge": "Mạng Xã Hội Học Tập",
+    "semester_badge": "Kỳ 2024.1 HUST",
+    "create_post": "Đăng bài viết mới",
+    "create_post_placeholder": "Bạn muốn thảo luận bài tập hoặc chia sẻ tài liệu gì hôm nay?",
+    "loading": "Đang tải dữ liệu bài viết từ máy chủ SQB HUST...",
+    "tabs": {
+      "all": "Tất cả bảng tin",
+      "my_subjects": "Môn học của tôi",
+      "lecturers": "Ghi chú Giảng viên"
+    }
   }
 }

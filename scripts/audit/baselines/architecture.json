@@ -95,9 +95,6 @@
   "src/components/ui/forms/FilterDropdown.tsx": {
     "NO_BARREL_IMPORT_UTILS": 1
   },
-  "src/components/ui/forms/Form.tsx": {
-    "NO_BARREL_IMPORT_UTILS": 1
-  },
   "src/components/ui/forms/FormField.tsx": {
     "NO_BARREL_IMPORT_UTILS": 1
   },
@@ -232,9 +229,6 @@
   },
   "src/pages/dashboard/DashboardPage.tsx": {
     "NO_UNLOCKED_TIMEZONE": 1
-  },
-  "src/services/auth.service.ts": {
-    "NO_BYPASS_ABORT_SIGNAL": 1
   },
   "src/utils/cn.ts": {
     "NO_BARREL_IMPORT_UTILS": 1

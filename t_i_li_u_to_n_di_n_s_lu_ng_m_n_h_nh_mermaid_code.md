@@ -364,38 +364,54 @@ flowchart TD
 
 Bảng đối chiếu toàn diện giữa 26 Màn hình chính, 07 Hộp thoại ngữ cảnh và đầy đủ 33 Use Cases trong hệ thống:
 
-| Mã Giao Diện | Tên Màn Hình / Hộp Thoại Ngữ Cảnh | Đường Dẫn Tuyến (Route Path) | Tác Nhân (Actor) | Ánh Xạ Use Case Trực Tiếp |
-| :--- | :--- | :--- | :--- | :--- |
-| **SCR-01** | Màn hình Đăng nhập hệ thống | `/login` | Public / Guest | [`UC01`](requirements.md#uc01-dang-nhap-he-thong) |
-| **SCR-02** | Màn hình Xác thực OTP & Kích hoạt | `/verify-otp` | Public / Pending User | [`UC01`](requirements.md#uc01-dang-nhap-he-thong), [`UC02`](requirements.md#uc02-quan-tri-vien-tao-tai-khoan--kich-hoat-qua-otp) |
-| **SCR-03** | Trang Bảng tin & Hoạt động mạng xã hội | `/feed` | All Users | [`UC05`](requirements.md#uc05-dang-bai-viet-moi), [`UC15`](requirements.md#uc15-xem-dong-hoat-dong-activity-feed) |
-| **MODAL-05** | Hộp thoại Soạn bài viết & Upload Media R2 | *(Contextual Modal)* | All Users | [`UC05`](requirements.md#uc05-dang-bai-viet-moi), [`UC32`](requirements.md#uc32-tai-len-tep-va-hinh-anh-cloudflare-r2-media) |
-| **SCR-04** | Chi tiết Bài viết & Thảo luận phân cấp | `/posts/:id` | All Users | [`UC07`](requirements.md#uc07-binh-luan-tren-bai-viet), [`UC08`](requirements.md#uc08-tha--bo-cam-xuc-reactions) |
-| **MODAL-01** | Hộp thoại Ghi chú chuyên môn Giảng viên | *(Contextual Modal)* | Lecturer | [`UC06`](requirements.md#uc06-giang-vien-cap-nhat-ghi-chu-chuyen-mon) |
-| **SCR-05** | Trang Cá nhân & Bộ sưu tập Huy hiệu | `/profile/:userId` | All Users | [`UC04`](requirements.md#uc04-quan-ly-ho-so-ca-nhan), [`UC27`](requirements.md#uc27-quan-ly-va-cap-phat-huy-hieu-danh-hieu) |
-| **SCR-06** | Trung tâm Bạn bè & Khối kết nối | `/friends` | All Users (Peer-only) | [`UC09`](requirements.md#uc09-quan-ly-moi-quan-he-ban-be-friendships), [`UC10`](requirements.md#uc10-chan-nguoi-dung-blocks) |
-| **SCR-07** | Hộp thư Trò chuyện & Hội thoại | `/messages` | All Users | [`UC11`](requirements.md#uc11-tro-chuyen-truc-tiep--nhom-chat) |
-| **MODAL-02** | Hộp thoại Quản trị nhóm chat | *(Drawer / Modal)* | Group Admin / Leaders | [`UC12`](requirements.md#uc12-quan-tri-nhom-chat) |
-| **MODAL-04** | Hộp thoại Mã PIN Kho ẩn (Tạo mới / Mở khóa) | *(Contextual Modal)* | All Users | [`UC13`](requirements.md#uc13-quan-ly-kho-hoi-thoai-an-bang-ma-pin) |
-| **SCR-08** | Kho Hội thoại ẩn Bảo mật mã PIN | `/messages/hidden-vault` | All Users | [`UC13`](requirements.md#uc13-quan-ly-kho-hoi-thoai-an-bang-ma-pin) |
-| **SCR-09** | Tìm kiếm Toàn cục Đa thực thể | `/search` | All Users | [`UC30`](requirements.md#uc30-tim-kiem-toan-van-full-text-search) |
-| **SCR-10** | Cài đặt Cá nhân & Phiên thiết bị | `/settings` | All Users | [`UC10`](requirements.md#uc10-chan-nguoi-dung-blocks), [`UC14`](requirements.md#uc14-quan-ly-thong-bao), [`UC33`](requirements.md#uc33-quan-ly-thiet-bi-dang-nhap-va-phien-lam-viec-devices) |
-| **SCR-11** | Trung tâm Thông báo | `/notifications` | All Users | [`UC14`](requirements.md#uc14-quan-ly-thong-bao) |
-| **MODAL-03** | Hộp thoại Gửi Báo cáo Vi phạm | *(Contextual Modal)* | All Users | [`UC31`](requirements.md#uc31-gui-bao-cao-vi-pham-reports) |
-| **SCR-12** | Danh mục Môn học & Tra cứu | `/subjects` | All Users | [`UC17`](requirements.md#uc17-quan-tri-danh-muc-mon-hoc-subjects) |
-| **SCR-13** | Quản lý Phiên đề xuất Câu hỏi | `/proposals` | Student, Lecturer | [`UC19`](requirements.md#uc19-quan-ly-phien-de-xuat-cau-hoi-trac-nghiem-sessions) |
-| **SCR-14** | Không gian Luyện tập Trắc nghiệm | `/practice/:sessionId` | Student, Lecturer | [`UC21`](requirements.md#uc21-luyen-tap-va-nop-cau-tra-loi) |
-| **MODAL-07** | Hộp thoại Đánh giá & Báo lỗi Câu hỏi (Game 5) | *(Contextual Modal)* | Student, Lecturer | [`UC22`](requirements.md#uc22-danh-gia-chat-luong-cau-hoi), [`UC26`](requirements.md#uc26-tham-gia-minigame-du-doan-hoc-thuat) |
-| **SCR-15** | Thống kê & Phân tích Chất lượng Câu hỏi | `/questions/:id/analytics` | Student, Lecturer | [`UC21`](requirements.md#uc21-luyen-tap-va-nop-cau-tra-loi), [`UC22`](requirements.md#uc22-danh-gia-chat-luong-cau-hoi) |
-| **SCR-16** | Điểm danh & Bảng vinh danh | `/gamification/leaderboard` | Student, Admin | [`UC25`](requirements.md#uc25-diem-danh-chuyen-can-va-bang-xep-hang) |
-| **SCR-17** | Đấu trường Minigame Dự đoán | `/gamification/minigames` | Student, Lecturer | [`UC26`](requirements.md#uc26-tham-gia-minigame-du-doan-hoc-thuat) |
-| **SCR-18** | Cửa hàng Vật phẩm & Túi đồ | `/shop` | All Users | [`UC28`](requirements.md#uc28-cua-hang-va-trang-bi-vat-pham-ca-nhan-hoa) |
-| **SCR-19** | Quản lý Lớp học phần | `/lecturer/classes` | Lecturer, Admin | [`UC18`](requirements.md#uc18-quan-ly-lop-hoc-phan-course-classes) |
-| **SCR-20** | Trung tâm Thẩm định & Duyệt báo lỗi Game 5 | `/lecturer/reviews` | Lecturer, Admin | [`UC20`](requirements.md#uc20-tham-dinh-va-duyet-cau-hoi-question-review), [`UC26`](requirements.md#uc26-tham-gia-minigame-du-doan-hoc-thuat), [`UC29`](requirements.md#uc29-tro-ly-ai-va-tinh-chinh-cau-hoi-hoc-thuat) |
-| **MODAL-06** | Hộp thoại Trợ lý AI Tinh chỉnh & Check ảo giác | *(Contextual Modal)* | Lecturer, Admin | [`UC29`](requirements.md#uc29-tro-ly-ai-va-tinh-chinh-cau-hoi-hoc-thuat) |
-| **SCR-21** | Tạo & Xuất đề thi tự động | `/lecturer/exams` | Lecturer | [`UC23`](requirements.md#uc23-quan-ly-va-tao-de-thi-tu-dong), [`UC24`](requirements.md#uc24-xuat-de-thi-va-ngan-hang-cau-hoi) |
-| **SCR-22** | Quản trị Người dùng & Bulk Import | `/admin/users` | Admin | [`UC02`](requirements.md#uc02-quan-tri-vien-tao-tai-khoan--kich-hoat-qua-otp), [`UC03`](requirements.md#uc03-nhap-tai-khoan-hang-loat-bulk-import), [`UC04`](requirements.md#uc04-quan-ly-ho-so-ca-nhan) |
-| **SCR-23** | Quản trị Đào tạo (Học kỳ & Môn học) | `/admin/academic` | Admin | [`UC16`](requirements.md#uc16-quan-ly-hoc-ky-semesters), [`UC17`](requirements.md#uc17-quan-tri-danh-muc-mon-hoc-subjects), [`UC18`](requirements.md#uc18-quan-ly-lop-hoc-phan-course-classes) |
-| **SCR-24** | Quản lý Danh hiệu & Rebuild Cache | `/admin/badges` | Admin | [`UC25`](requirements.md#uc25-diem-danh-chuyen-can-va-bang-xep-hang), [`UC27`](requirements.md#uc27-quan-ly-va-cap-phat-huy-hieu-danh-hieu) |
-| **SCR-25** | Quản trị Báo cáo Vi phạm & Kiểm duyệt | `/admin/reports` | Admin | [`UC31`](requirements.md#uc31-gui-bao-cao-vi-pham-reports) |
-| **SCR-26** | Trợ lý Quản trị AI | `/admin/ai-assistant` | Admin | [`UC29`](requirements.md#uc29-tro-ly-ai-va-tinh-chinh-cau-hoi-hoc-thuat) |
+| Mã Giao Diện | Tên Màn Hình / Hộp Thoại Ngữ Cảnh | Đường Dẫn Tuyến (Route Path) | Tác Nhân (Actor) | Ánh Xạ Use Case Trực Tiếp | Trạng Thái Triển Khai |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **SCR-01** | Màn hình Đăng nhập hệ thống | `/login` | Public / Guest | [`UC01`](requirements.md#uc01-dang-nhap-he-thong) | `HOÀN THÀNH (COMPLETED)` |
+| **SCR-02** | Màn hình Xác thực OTP & Kích hoạt | `/verify-otp` | Public / Pending User | [`UC01`](requirements.md#uc01-dang-nhap-he-thong), [`UC02`](requirements.md#uc02-quan-tri-vien-tao-tai-khoan--kich-hoat-qua-otp) | `Đang chờ (PENDING)` |
+| **SCR-03** | Trang Bảng tin & Hoạt động mạng xã hội | `/feed` | All Users | [`UC05`](requirements.md#uc05-dang-bai-viet-moi), [`UC15`](requirements.md#uc15-xem-dong-hoat-dong-activity-feed) | `HOÀN THÀNH (COMPLETED)` |
+| **MODAL-05** | Hộp thoại Soạn bài viết & Upload Media R2 | *(Contextual Modal)* | All Users | [`UC05`](requirements.md#uc05-dang-bai-viet-moi), [`UC32`](requirements.md#uc32-tai-len-tep-va-hinh-anh-cloudflare-r2-media) | `HOÀN THÀNH (COMPLETED)` |
+| **SCR-04** | Chi tiết Bài viết & Thảo luận phân cấp | `/posts/:id` | All Users | [`UC07`](requirements.md#uc07-binh-luan-tren-bai-viet), [`UC08`](requirements.md#uc08-tha--bo-cam-xuc-reactions) | `Đang chờ (PENDING)` |
+| **MODAL-01** | Hộp thoại Ghi chú chuyên môn Giảng viên | *(Contextual Modal)* | Lecturer | [`UC06`](requirements.md#uc06-giang-vien-cap-nhat-ghi-chu-chuyen-mon) | `HOÀN THÀNH (COMPLETED)` |
+| **SCR-05** | Trang Cá nhân & Bộ sưu tập Huy hiệu | `/profile/:userId` | All Users | [`UC04`](requirements.md#uc04-quan-ly-ho-so-ca-nhan), [`UC27`](requirements.md#uc27-quan-ly-va-cap-phat-huy-hieu-danh-hieu) | `Đang chờ (PENDING)` |
+| **SCR-06** | Trung tâm Bạn bè & Khối kết nối | `/friends` | All Users (Peer-only) | [`UC09`](requirements.md#uc09-quan-ly-moi-quan-he-ban-be-friendships), [`UC10`](requirements.md#uc10-chan-nguoi-dung-blocks) | `Đang chờ (PENDING)` |
+| **SCR-07** | Hộp thư Trò chuyện & Hội thoại | `/messages` | All Users | [`UC11`](requirements.md#uc11-tro-chuyen-truc-tiep--nhom-chat) | `Đang chờ (PENDING)` |
+| **MODAL-02** | Hộp thoại Quản trị nhóm chat | *(Drawer / Modal)* | Group Admin / Leaders | [`UC12`](requirements.md#uc12-quan-tri-nhom-chat) | `Đang chờ (PENDING)` |
+| **MODAL-04** | Hộp thoại Mã PIN Kho ẩn (Tạo mới / Mở khóa) | *(Contextual Modal)* | All Users | [`UC13`](requirements.md#uc13-quan-ly-kho-hoi-thoai-an-bang-ma-pin) | `Đang chờ (PENDING)` |
+| **SCR-08** | Kho Hội thoại ẩn Bảo mật mã PIN | `/messages/hidden-vault` | All Users | [`UC13`](requirements.md#uc13-quan-ly-kho-hoi-thoai-an-bang-ma-pin) | `Đang chờ (PENDING)` |
+| **SCR-09** | Tìm kiếm Toàn cục Đa thực thể | `/search` | All Users | [`UC30`](requirements.md#uc30-tim-kiem-toan-van-full-text-search) | `Đang chờ (PENDING)` |
+| **SCR-10** | Cài đặt Cá nhân & Phiên thiết bị | `/settings` | All Users | [`UC10`](requirements.md#uc10-chan-nguoi-dung-blocks), [`UC14`](requirements.md#uc14-quan-ly-thong-bao), [`UC33`](requirements.md#uc33-quan-ly-thiet-bi-dang-nhap-va-phien-lam-viec-devices) | `Đang chờ (PENDING)` |
+| **SCR-11** | Trung tâm Thông báo | `/notifications` | All Users | [`UC14`](requirements.md#uc14-quan-ly-thong-bao) | `Đang chờ (PENDING)` |
+| **MODAL-03** | Hộp thoại Gửi Báo cáo Vi phạm | *(Contextual Modal)* | All Users | [`UC31`](requirements.md#uc31-gui-bao-cao-vi-pham-reports) | `HOÀN THÀNH (COMPLETED)` |
+| **SCR-12** | Danh mục Môn học & Tra cứu | `/subjects` | All Users | [`UC17`](requirements.md#uc17-quan-tri-danh-muc-mon-hoc-subjects) | `Đang chờ (PENDING)` |
+| **SCR-13** | Quản lý Phiên đề xuất Câu hỏi | `/proposals` | Student, Lecturer | [`UC19`](requirements.md#uc19-quan-ly-phien-de-xuat-cau-hoi-trac-nghiem-sessions) | `Đang chờ (PENDING)` |
+| **SCR-14** | Không gian Luyện tập Trắc nghiệm | `/practice/:sessionId` | Student, Lecturer | [`UC21`](requirements.md#uc21-luyen-tap-va-nop-cau-tra-loi) | `Đang chờ (PENDING)` |
+| **MODAL-07** | Hộp thoại Đánh giá & Báo lỗi Câu hỏi (Game 5) | *(Contextual Modal)* | Student, Lecturer | [`UC22`](requirements.md#uc22-danh-gia-chat-luong-cau-hoi), [`UC26`](requirements.md#uc26-tham-gia-minigame-du-doan-hoc-thuat) | `Đang chờ (PENDING)` |
+| **SCR-15** | Thống kê & Phân tích Chất lượng Câu hỏi | `/questions/:id/analytics` | Student, Lecturer | [`UC21`](requirements.md#uc21-luyen-tap-va-nop-cau-tra-loi), [`UC22`](requirements.md#uc22-danh-gia-chat-luong-cau-hoi) | `Đang chờ (PENDING)` |
+| **SCR-16** | Điểm danh & Bảng vinh danh | `/gamification/leaderboard` | Student, Admin | [`UC25`](requirements.md#uc25-diem-danh-chuyen-can-va-bang-xep-hang) | `Đang chờ (PENDING)` |
+| **SCR-17** | Đấu trường Minigame Dự đoán | `/gamification/minigames` | Student, Lecturer | [`UC26`](requirements.md#uc26-tham-gia-minigame-du-doan-hoc-thuat) | `Đang chờ (PENDING)` |
+| **SCR-18** | Cửa hàng Vật phẩm & Túi đồ | `/shop` | All Users | [`UC28`](requirements.md#uc28-cua-hang-va-trang-bi-vat-pham-ca-nhan-hoa) | `Đang chờ (PENDING)` |
+| **SCR-19** | Quản lý Lớp học phần | `/lecturer/classes` | Lecturer, Admin | [`UC18`](requirements.md#uc18-quan-ly-lop-hoc-phan-course-classes) | `Đang chờ (PENDING)` |
+| **SCR-20** | Trung tâm Thẩm định & Duyệt báo lỗi Game 5 | `/lecturer/reviews` | Lecturer, Admin | [`UC20`](requirements.md#uc20-tham-dinh-va-duyet-cau-hoi-question-review), [`UC26`](requirements.md#uc26-tham-gia-minigame-du-doan-hoc-thuat), [`UC29`](requirements.md#uc29-tro-ly-ai-va-tinh-chinh-cau-hoi-hoc-thuat) | `Đang chờ (PENDING)` |
+| **MODAL-06** | Hộp thoại Trợ lý AI Tinh chỉnh & Check ảo giác | *(Contextual Modal)* | Lecturer, Admin | [`UC29`](requirements.md#uc29-tro-ly-ai-va-tinh-chinh-cau-hoi-hoc-thuat) | `Đang chờ (PENDING)` |
+| **SCR-21** | Tạo & Xuất đề thi tự động | `/lecturer/exams` | Lecturer | [`UC23`](requirements.md#uc23-quan-ly-va-tao-de-thi-tu-dong), [`UC24`](requirements.md#uc24-xuat-de-thi-va-ngan-hang-cau-hoi) | `Đang chờ (PENDING)` |
+| **SCR-22** | Quản trị Người dùng & Bulk Import | `/admin/users` | Admin | [`UC02`](requirements.md#uc02-quan-tri-vien-tao-tai-khoan--kich-hoat-qua-otp), [`UC03`](requirements.md#uc03-nhap-tai-khoan-hang-loat-bulk-import), [`UC04`](requirements.md#uc04-quan-ly-ho-so-ca-nhan) | `Đang chờ (PENDING)` |
+| **SCR-23** | Quản trị Đào tạo (Học kỳ & Môn học) | `/admin/academic` | Admin | [`UC16`](requirements.md#uc16-quan-ly-hoc-ky-semesters), [`UC17`](requirements.md#uc17-quan-tri-danh-muc-mon-hoc-subjects), [`UC18`](requirements.md#uc18-quan-ly-lop-hoc-phan-course-classes) | `Đang chờ (PENDING)` |
+| **SCR-24** | Quản lý Danh hiệu & Rebuild Cache | `/admin/badges` | Admin | [`UC25`](requirements.md#uc25-diem-danh-chuyen-can-va-bang-xep-hang), [`UC27`](requirements.md#uc27-quan-ly-va-cap-phat-huy-hieu-danh-hieu) | `Đang chờ (PENDING)` |
+| **SCR-25** | Quản trị Báo cáo Vi phạm & Kiểm duyệt | `/admin/reports` | Admin | [`UC31`](requirements.md#uc31-gui-bao-cao-vi-pham-reports) | `Đang chờ (PENDING)` |
+| **SCR-26** | Trợ lý Quản trị AI | `/admin/ai-assistant` | Admin | [`UC29`](requirements.md#uc29-tro-ly-ai-va-tinh-chinh-cau-hoi-hoc-thuat) | `Đang chờ (PENDING)` |
+
+---
+
+## PHẦN VI: BẢNG THEO DÕI TIẾN ĐỘ TRIỂN KHAI FRONTEND (IMPLEMENTATION TRACKING)
+
+Bảng tổng hợp tiến độ thực tế triển khai các màn hình và hộp thoại giao diện:
+
+| STT | Mã Giao Diện | Tên Thành Phần | Tệp Mã Nguồn Chính | Trạng Thái | Ghi Chú Kỹ Thuật |
+| :---: | :--- | :--- | :--- | :---: | :--- |
+| 1 | **SCR-01** | Màn hình Đăng nhập | [`src/pages/auth/LoginPage.tsx`](src/pages/auth/LoginPage.tsx) | `COMPLETED` | Đã tích hợp API `/auth/login`, On-input error clearing, điều hướng tự động vào `/feed` cho Sinh viên/Giảng viên. |
+| 2 | **SCR-03** | Bảng tin & Hoạt động MXH | [`src/pages/feed/FeedPage.tsx`](src/pages/feed/FeedPage.tsx) | `COMPLETED` | Bố cục 3 cột chuẩn Facebook clone tích hợp `DashboardLayout`, binding 100% database live API (`/activity-feeds`, `/posts`). |
+| 3 | **MODAL-05** | Soạn bài & Upload Media | [`src/components/social/CreatePostModal.tsx`](src/components/social/CreatePostModal.tsx) | `COMPLETED` | Bộ ba Form Primitive (`<Form>`, `<FormField>`, `<SubmitButton>`), chọn học phần live `/subjects`, gọi API `postService.createPost`. |
+| 4 | **MODAL-01** | Ghi chú chuyên môn GV | [`src/components/social/PostCard.tsx`](src/components/social/PostCard.tsx) | `COMPLETED` | Box ghi chú chuyên môn thẩm định từ giảng viên theo Use Case [`UC06`](requirements.md#uc06-giang-vien-cap-nhat-ghi-chu-chuyen-mon). |
+| 5 | **MODAL-03** | Hộp thoại Báo cáo vi phạm | [`src/components/social/ReportPostModal.tsx`](src/components/social/ReportPostModal.tsx) | `COMPLETED` | Phân loại lý do vi phạm theo Use Case [`UC31`](requirements.md#uc31-gui-bao-cao-vi-pham-reports). |
+| 6 | **SHELL-NAV** | Luồng Đăng xuất an toàn | [`src/components/shared/topbar/TopbarAvatarDropdown.tsx`](src/components/shared/topbar/TopbarAvatarDropdown.tsx) | `COMPLETED` | Thu hồi session server `/auth/logout`, `clearAuth()`, phát tín hiệu `notifyLogout()`, toast và chuyển hướng an toàn về `/login`. |
+
