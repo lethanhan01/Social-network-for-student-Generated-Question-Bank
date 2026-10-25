@@ -1,6 +1,6 @@
 {
   "eyebrow": "Gamification & Phần thưởng",
-  "coins": "{{count}} SQB Coins",
+  "coins": "{{amount}} SQB Coins",
   "leaderboard": {
     "title": "Điểm danh & Bảng vinh danh",
     "description": "Điểm danh mỗi ngày để giữ chuỗi chuyên cần, nhận SQB Coins và leo hạng trên bảng vinh danh toàn trường.",

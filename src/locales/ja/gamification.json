@@ -1,6 +1,6 @@
 {
   "eyebrow": "ゲーミフィケーション & 報酬",
-  "coins": "{{count}} SQBコイン",
+  "coins": "{{amount}} SQBコイン",
   "leaderboard": {
     "title": "出席チェック & ランキング",
     "description": "毎日チェックインして連続記録を維持し、SQBコインを獲得して全校ランキングを上がりましょう。",

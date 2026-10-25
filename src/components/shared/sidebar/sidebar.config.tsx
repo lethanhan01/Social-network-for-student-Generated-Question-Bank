@@ -6,6 +6,7 @@ import {
   Sparkles,
   Settings,
   CalendarCheck,
+  ShoppingBag,
 } from 'lucide-react'
 import type { NavSection } from './sidebar.types'
 
@@ -43,6 +44,11 @@ export function getSQBNavSections(): NavSection[] {
           label: 'Điểm danh & Vinh danh',
           to: '/gamification/leaderboard',
           icon: <CalendarCheck size={20} />,
+        },
+        {
+          label: 'Cửa hàng & Túi đồ',
+          to: '/shop',
+          icon: <ShoppingBag size={20} />,
         },
       ],
     },
