@@ -6,6 +6,8 @@ import { useAuthStore } from '@/stores/authStore'
 import { Avatar } from '@/components/ui/data-display'
 import { ThemeSegmentedControl } from '@/components/ui/navigation'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/overlay'
+import { authService } from '@/services/auth.service'
+import { toast } from '@/lib/toast'
 import { cn } from '@/utils/cn'
 
 export function TopbarAvatarDropdown() {
@@ -24,10 +26,17 @@ export function TopbarAvatarDropdown() {
     navigate('/profile')
   }
 
-  function handleLogout() {
+  async function handleLogout() {
     setOpen(false)
-    clearAuth()
-    navigate('/login', { replace: true })
+    try {
+      await authService.logout()
+    } catch {
+      // Ignore network errors during logout
+    } finally {
+      clearAuth()
+      toast.success('Đã đăng xuất thành công')
+      navigate('/login', { replace: true })
+    }
   }
 
   return (

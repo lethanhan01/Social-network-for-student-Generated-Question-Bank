@@ -128,9 +128,6 @@
     "NO_BYPASS_PORTAL_OVERLAYS": 1,
     "NO_MAGIC_DIMENSIONS": 6
   },
-  "src/components/ui/forms/Form.tsx": {
-    "NO_BARREL_IMPORT_UTILS": 1
-  },
   "src/components/ui/forms/FormField.tsx": {
     "NO_BARREL_IMPORT_UTILS": 1
   },
@@ -282,9 +279,7 @@
     "SEMANTIC_CLICK": 1
   },
   "src/pages/auth/LoginPage.tsx": {
-    "FORMS_LABEL_ASSOC": 2,
-    "NO_NONSEMANTIC_TAGS": 2,
-    "NO_PADDING_OVERFLOW_DRIFT": 1
+    "NO_NONSEMANTIC_TAGS": 2
   },
   "src/pages/dashboard/DashboardPage.tsx": {
     "NO_NONSEMANTIC_TAGS": 9,
@@ -297,9 +292,6 @@
     "NO_NONSEMANTIC_TAGS": 13,
     "NO_PRIMITIVE_IN_COMPONENT": 1,
     "NO_RAW_INTERACTIVE_ELEMENTS": 1
-  },
-  "src/services/auth.service.ts": {
-    "NO_BYPASS_ABORT_SIGNAL": 1
   },
   "src/utils/cn.ts": {
     "NO_BARREL_IMPORT_UTILS": 1

@@ -1,14 +1,22 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type Role = 'student' | 'teacher' | 'admin' | 'user'
+export type Role = 'STUDENT' | 'LECTURER' | 'ADMIN' | 'student' | 'teacher' | 'admin' | 'user'
 
 export interface AuthUser {
-  userId: string
-  email: string
-  fullName: string
+  user_id?: number
+  userId?: string
+  username?: string
+  email?: string
+  fullName?: string
+  role?: 'STUDENT' | 'LECTURER' | 'ADMIN'
   roles: Role[]
+  avatar_url?: string | null
   avatarUrl?: string | null
+  cover_url?: string | null
+  frame_url?: string | null
+  verified?: boolean
+  profile_completed?: boolean
   studentId?: string | null
   department?: string | null
   memberId?: string | null
@@ -37,10 +45,12 @@ export function notifyLogout(): void {
 interface AuthState {
   user: AuthUser | null
   token: string | null
+  refreshToken: string | null
   isAuthenticated: boolean
   hasHydrated: boolean
 
-  setAuth: (user: AuthUser, token: string) => void
+  setAuth: (user: Omit<AuthUser, 'roles'> & { roles?: Role[] }, token: string, refreshToken?: string | null) => void
+  setToken: (token: string) => void
   setUser: (user: AuthUser) => void
   clearAuth: () => void
   setHasHydrated: (value: boolean) => void
@@ -51,15 +61,28 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       user: null,
       token: null,
+      refreshToken: null,
       isAuthenticated: false,
       hasHydrated: false,
 
-      setAuth: (user, token) =>
-        set({
-          user,
+      setAuth: (user, token, refreshToken = null) => {
+        const computedRoles: Role[] = user.roles && user.roles.length > 0
+          ? user.roles
+          : (user.role ? [user.role, user.role.toLowerCase() as Role] : ['student'])
+
+        return set({
+          user: {
+            ...user,
+            roles: computedRoles,
+            avatarUrl: user.avatarUrl ?? user.avatar_url ?? null,
+          },
           token,
+          refreshToken,
           isAuthenticated: true,
-        }),
+        })
+      },
+
+      setToken: (token) => set({ token }),
 
       setUser: (user) => set({ user }),
 
@@ -67,6 +90,7 @@ export const useAuthStore = create<AuthState>()(
         set({
           user: null,
           token: null,
+          refreshToken: null,
           isAuthenticated: false,
         })
         notifyLogout()
@@ -79,6 +103,7 @@ export const useAuthStore = create<AuthState>()(
       partialize: (state) => ({
         user: state.user,
         token: state.token,
+        refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated,
       }),
       onRehydrateStorage: () => (state) => {
@@ -87,4 +112,3 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 )
-

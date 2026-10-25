@@ -11,6 +11,7 @@ const AuthLayout = lazy(() => import('./layouts/AuthLayout'))
 
 const LoginPage = lazy(() => import('./pages/auth/LoginPage'))
 const DashboardPage = lazy(() => import('./pages/dashboard/DashboardPage'))
+const FeedPage = lazy(() => import('./pages/feed/FeedPage'))
 const DesignSystemShowcasePage = lazy(() => import('./pages/dev/DesignSystemShowcasePage'))
 
 export default function App() {
@@ -32,19 +33,19 @@ export default function App() {
           {/* Protected Application Flow */}
           <Route element={<ProtectedRoute />}>
             <Route element={<DashboardLayout />}>
+              <Route path="/feed" element={<FeedPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/exams" element={<DashboardPage />} />
               <Route path="/questions" element={<DashboardPage />} />
-              <Route path="/feed" element={<DashboardPage />} />
               <Route path="/settings" element={<DashboardPage />} />
             </Route>
           </Route>
 
-          {/* Root Redirect */}
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          {/* Root Redirect to Social Feed */}
+          <Route path="/" element={<Navigate to="/feed" replace />} />
 
-          {/* Catch-all Not Found Redirect */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          {/* Catch-all Redirect */}
+          <Route path="*" element={<Navigate to="/feed" replace />} />
         </Routes>
 
         {/* Global Toast Notifications */}

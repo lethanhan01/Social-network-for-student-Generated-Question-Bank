@@ -262,5 +262,18 @@
     "switchToDark": "ダークモードに切り替え",
     "appearanceTitle": "外観と表示設定",
     "appearanceDesc": "ライト、ダーク、またはシステム設定に合わせた自動切り替えを選択できます。"
+  },
+  "feed": {
+    "title": "学習フィード＆アクティビティ",
+    "network_badge": "学習ソーシャルネットワーク",
+    "semester_badge": "2024.1学期 HUST",
+    "create_post": "新しいディスカッションを投稿",
+    "create_post_placeholder": "質問や学習教材を共有してみましょう...",
+    "loading": "SQB HUSTサーバーから投稿データを読み込み中...",
+    "tabs": {
+      "all": "すべての投稿",
+      "my_subjects": "受講科目",
+      "lecturers": "教員ノート"
+    }
   }
 }
