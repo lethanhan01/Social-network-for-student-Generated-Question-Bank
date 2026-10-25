@@ -131,6 +131,7 @@
       "subjectPlaceholder": "科目を選択",
       "sizeLabel": "予想する問題総数",
       "subjectRequired": "科目を選択してください。",
+      "noSubjects": "予想できる科目がありません。",
       "sizeInvalid": "問題数は0以上の整数で入力してください。"
     },
     "game6": {
@@ -159,7 +160,12 @@
         "RESOLVED": "確定済み"
       },
       "correct": "正解",
-      "wrong": "不正解"
+      "wrong": "不正解",
+      "prediction": {
+        "GAME_1_PARTICIPANTS": "提出者 {{value}} 人と予想",
+        "GAME_4_SUBJECT_BANK_SIZE": "問題バンク {{value}} 問と予想",
+        "GAME_6_LLM_IDENTIFICATION": "AI作成として {{value}} 問を選択"
+      }
     },
     "gameType": {
       "GAME_1_PARTICIPANTS": "ゲーム1 · 提出者数",

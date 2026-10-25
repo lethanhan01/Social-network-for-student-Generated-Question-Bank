@@ -131,6 +131,7 @@
       "subjectPlaceholder": "Chọn môn học",
       "sizeLabel": "Tổng số câu hỏi dự đoán",
       "subjectRequired": "Vui lòng chọn môn học.",
+      "noSubjects": "Chưa có môn học nào để dự đoán.",
       "sizeInvalid": "Số câu hỏi phải là số nguyên không âm."
     },
     "game6": {
@@ -159,7 +160,12 @@
         "RESOLVED": "Đã tổng kết"
       },
       "correct": "Chính xác",
-      "wrong": "Chưa chính xác"
+      "wrong": "Chưa chính xác",
+      "prediction": {
+        "GAME_1_PARTICIPANTS": "Dự đoán {{value}} sinh viên nộp bài",
+        "GAME_4_SUBJECT_BANK_SIZE": "Dự đoán {{value}} câu hỏi trong ngân hàng",
+        "GAME_6_LLM_IDENTIFICATION": "Chọn {{value}} câu do AI tạo"
+      }
     },
     "gameType": {
       "GAME_1_PARTICIPANTS": "Game 1 · Số SV nộp bài",

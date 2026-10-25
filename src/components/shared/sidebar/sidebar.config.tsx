@@ -7,6 +7,7 @@ import {
   Settings,
   CalendarCheck,
   ShoppingBag,
+  Gamepad2,
 } from 'lucide-react'
 import type { NavSection } from './sidebar.types'
 
@@ -44,6 +45,11 @@ export function getSQBNavSections(): NavSection[] {
           label: 'Điểm danh & Vinh danh',
           to: '/gamification/leaderboard',
           icon: <CalendarCheck size={20} />,
+        },
+        {
+          label: 'Đấu trường Minigame',
+          to: '/gamification/minigames',
+          icon: <Gamepad2 size={20} />,
         },
         {
           label: 'Cửa hàng & Túi đồ',
