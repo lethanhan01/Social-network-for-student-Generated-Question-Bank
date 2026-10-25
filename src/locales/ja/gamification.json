@@ -1,0 +1,173 @@
+{
+  "eyebrow": "ゲーミフィケーション & 報酬",
+  "coins": "{{count}} SQBコイン",
+  "leaderboard": {
+    "title": "出席チェック & ランキング",
+    "description": "毎日チェックインして連続記録を維持し、SQBコインを獲得して全校ランキングを上がりましょう。",
+    "checkIn": {
+      "title": "毎日のチェックイン",
+      "doneToday": "今日はチェックイン済みです。また明日！",
+      "notYet": "今日はまだチェックインしていません。",
+      "streakUnit": "日連続",
+      "lastDate": "前回のチェックイン: {{date}}",
+      "action": "今すぐチェックイン",
+      "done": "チェックイン済み",
+      "success": "チェックインしました！",
+      "successDescription": "+{{coins}} SQBコイン · {{streak}}日連続",
+      "error": "チェックインできませんでした",
+      "loadError": "チェックイン状況を読み込めませんでした。"
+    },
+    "myRank": {
+      "title": "あなたの順位",
+      "rank": "現在の順位",
+      "points": "累計ポイント",
+      "top": "上位 {{percent}}%",
+      "topLabel": "全校での位置",
+      "participants": "参加者 {{count}} 人中",
+      "unranked": "ランク外"
+    },
+    "period": {
+      "WEEKLY": "週間",
+      "MONTHLY": "月間",
+      "ALL_TIME": "全期間"
+    },
+    "table": {
+      "title": "ランキング",
+      "rank": "順位",
+      "user": "ユーザー",
+      "code": "番号",
+      "points": "ポイント",
+      "you": "あなた",
+      "empty": "ランキングデータがありません",
+      "emptyDescription": "今期最初にポイントを獲得しましょう。",
+      "error": "ランキングを読み込めませんでした。"
+    }
+  },
+  "shop": {
+    "title": "アイテムショップ & インベントリ",
+    "description": "貯めたSQBコインでアバターフレームやチャット吹き出しを購入し、プロフィールに装備しましょう。",
+    "balance": "現在の残高",
+    "tabs": {
+      "label": "エリアを選択",
+      "shop": "ショップ",
+      "inventory": "インベントリ"
+    },
+    "filter": {
+      "ALL": "すべて",
+      "AVATAR_FRAME": "アバターフレーム",
+      "CHAT_BUBBLE": "チャット吹き出し"
+    },
+    "rarity": {
+      "COMMON": "コモン",
+      "RARE": "レア",
+      "EPIC": "エピック",
+      "LEGENDARY": "レジェンダリー"
+    },
+    "item": {
+      "availableUntil": "{{date}} まで販売",
+      "originalPrice": "定価 {{price}}",
+      "buy": "購入",
+      "owned": "所持済み",
+      "notEnough": "コイン不足"
+    },
+    "confirm": {
+      "title": "購入の確認",
+      "description": "「{{name}}」を {{price}} SQBコインで購入しますか？",
+      "action": "購入する"
+    },
+    "buySuccess": "「{{name}}」を購入しました！",
+    "buySuccessDescription": "アイテムがインベントリに追加されました。",
+    "buyError": "購入に失敗しました",
+    "loadError": "ショップを読み込めませんでした。",
+    "empty": "販売中のアイテムはありません",
+    "emptyDescription": "新しいアイテムをお楽しみに。",
+    "inventory": {
+      "summaryTitle": "コレクション",
+      "unlocked": "解放済みアイテム",
+      "completion": "コレクション達成率",
+      "equip": "装備",
+      "unequip": "外す",
+      "equipped": "装備中",
+      "acquiredAt": "{{date}} から所持",
+      "equipSuccess": "「{{name}}」を装備しました",
+      "unequipSuccess": "「{{name}}」を外しました",
+      "equipError": "装備を更新できませんでした",
+      "loadError": "インベントリを読み込めませんでした。",
+      "empty": "インベントリは空です",
+      "emptyDescription": "ショップでアイテムを購入してプロフィールをカスタマイズしましょう。",
+      "goShop": "ショップへ"
+    },
+    "acquire": {
+      "ACHIEVEMENT": "実績",
+      "SHOP_PURCHASE": "ショップで購入",
+      "EVENT": "イベント",
+      "SYSTEM_GIFT": "システムギフト"
+    }
+  },
+  "minigames": {
+    "title": "予想ミニゲームアリーナ",
+    "description": "学術的な予想ミニゲームに挑戦してSQBコインを獲得しましょう。",
+    "gamesTitle": "ゲーム一覧",
+    "join": "参加する",
+    "submit": "予想を送信",
+    "cancel": "キャンセル",
+    "success": "予想を受け付けました！",
+    "error": "予想の送信に失敗しました",
+    "game1": {
+      "title": "ゲーム1: 提出者数を予想",
+      "description": "明日あなたのクラスで問題を提案する学生の人数を予想します。",
+      "classLabel": "クラス",
+      "classPlaceholder": "クラスを選択",
+      "countLabel": "予想する学生数",
+      "alreadyPredicted": "予想済み: {{count}}",
+      "noClasses": "予想できるクラスに参加していません。",
+      "classRequired": "クラスを選択してください。",
+      "countInvalid": "予想値は0以上の整数で入力してください。"
+    },
+    "game4": {
+      "title": "ゲーム4: 問題バンクの規模",
+      "description": "学期末に科目の問題バンクで承認される問題の総数を予想します。",
+      "subjectLabel": "科目",
+      "subjectPlaceholder": "科目を選択",
+      "sizeLabel": "予想する問題総数",
+      "subjectRequired": "科目を選択してください。",
+      "sizeInvalid": "問題数は0以上の整数で入力してください。"
+    },
+    "game6": {
+      "title": "ゲーム6: AIはどれ？",
+      "description": "毎週土曜日、AIが作成したと思う問題を選びます。",
+      "openBadge": "開催中",
+      "lockedBadge": "ロック中",
+      "locked": "このチャレンジは毎週土曜日のみ開催されます。",
+      "countdown": "{{days}}日{{hours}}時間後に開始",
+      "openingToday": "本日のセッションはまだ開始していないか、終了しました。",
+      "hint": "AIが作成したと思う問題にチェックを入れてください。",
+      "selected": "{{count}} 問選択中",
+      "questionLabel": "問題 {{index}}",
+      "selectLabel": "この問題はAIが作成",
+      "selectRequired": "少なくとも1問選択してください。",
+      "endsAt": "終了: {{date}}"
+    },
+    "history": {
+      "title": "予想履歴",
+      "empty": "予想履歴はまだありません",
+      "emptyDescription": "上のミニゲームに参加して始めましょう。",
+      "error": "予想履歴を読み込めませんでした。",
+      "predictedAt": "予想日時 {{date}}",
+      "status": {
+        "PENDING": "結果待ち",
+        "RESOLVED": "確定済み"
+      },
+      "correct": "正解",
+      "wrong": "不正解"
+    },
+    "gameType": {
+      "GAME_1_PARTICIPANTS": "ゲーム1 · 提出者数",
+      "GAME_2_APPROVED_QUESTIONS": "ゲーム2 · AI vs 人間",
+      "GAME_3_AUTHOR_CONFIDENCE": "ゲーム3 · 作成者の自信度",
+      "GAME_4_SUBJECT_BANK_SIZE": "ゲーム4 · 問題バンク規模",
+      "GAME_5_REPORT_ERROR": "ゲーム5 · 問題エラー報告",
+      "GAME_6_LLM_IDENTIFICATION": "ゲーム6 · AIはどれ？"
+    }
+  }
+}

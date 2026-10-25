@@ -5,6 +5,7 @@ import {
   MessageSquare,
   Sparkles,
   Settings,
+  CalendarCheck,
 } from 'lucide-react'
 import type { NavSection } from './sidebar.types'
 
@@ -32,6 +33,16 @@ export function getSQBNavSections(): NavSection[] {
           label: 'Mạng xã hội học tập',
           to: '/feed',
           icon: <MessageSquare size={20} />,
+        },
+      ],
+    },
+    {
+      label: 'Gamification & Phần thưởng',
+      items: [
+        {
+          label: 'Điểm danh & Vinh danh',
+          to: '/gamification/leaderboard',
+          icon: <CalendarCheck size={20} />,
         },
       ],
     },

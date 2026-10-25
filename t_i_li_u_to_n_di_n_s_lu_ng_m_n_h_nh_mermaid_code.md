@@ -387,7 +387,7 @@ Bảng đối chiếu toàn diện giữa 26 Màn hình chính, 07 Hộp thoại
 | **SCR-14** | Không gian Luyện tập Trắc nghiệm | `/practice/:sessionId` | Student, Lecturer | [`UC21`](requirements.md#uc21-luyen-tap-va-nop-cau-tra-loi) | `Đang chờ (PENDING)` |
 | **MODAL-07** | Hộp thoại Đánh giá & Báo lỗi Câu hỏi (Game 5) | *(Contextual Modal)* | Student, Lecturer | [`UC22`](requirements.md#uc22-danh-gia-chat-luong-cau-hoi), [`UC26`](requirements.md#uc26-tham-gia-minigame-du-doan-hoc-thuat) | `Đang chờ (PENDING)` |
 | **SCR-15** | Thống kê & Phân tích Chất lượng Câu hỏi | `/questions/:id/analytics` | Student, Lecturer | [`UC21`](requirements.md#uc21-luyen-tap-va-nop-cau-tra-loi), [`UC22`](requirements.md#uc22-danh-gia-chat-luong-cau-hoi) | `Đang chờ (PENDING)` |
-| **SCR-16** | Điểm danh & Bảng vinh danh | `/gamification/leaderboard` | Student, Admin | [`UC25`](requirements.md#uc25-diem-danh-chuyen-can-va-bang-xep-hang) | `Đang chờ (PENDING)` |
+| **SCR-16** | Điểm danh & Bảng vinh danh | `/gamification/leaderboard` | Student, Admin | [`UC25`](requirements.md#uc25-diem-danh-chuyen-can-va-bang-xep-hang) | `HOÀN THÀNH (COMPLETED)` |
 | **SCR-17** | Đấu trường Minigame Dự đoán | `/gamification/minigames` | Student, Lecturer | [`UC26`](requirements.md#uc26-tham-gia-minigame-du-doan-hoc-thuat) | `Đang chờ (PENDING)` |
 | **SCR-18** | Cửa hàng Vật phẩm & Túi đồ | `/shop` | All Users | [`UC28`](requirements.md#uc28-cua-hang-va-trang-bi-vat-pham-ca-nhan-hoa) | `Đang chờ (PENDING)` |
 | **SCR-19** | Quản lý Lớp học phần | `/lecturer/classes` | Lecturer, Admin | [`UC18`](requirements.md#uc18-quan-ly-lop-hoc-phan-course-classes) | `Đang chờ (PENDING)` |
@@ -414,4 +414,5 @@ Bảng tổng hợp tiến độ thực tế triển khai các màn hình và h�
 | 4 | **MODAL-01** | Ghi chú chuyên môn GV | [`src/components/social/PostCard.tsx`](src/components/social/PostCard.tsx) | `COMPLETED` | Box ghi chú chuyên môn thẩm định từ giảng viên theo Use Case [`UC06`](requirements.md#uc06-giang-vien-cap-nhat-ghi-chu-chuyen-mon). |
 | 5 | **MODAL-03** | Hộp thoại Báo cáo vi phạm | [`src/components/social/ReportPostModal.tsx`](src/components/social/ReportPostModal.tsx) | `COMPLETED` | Phân loại lý do vi phạm theo Use Case [`UC31`](requirements.md#uc31-gui-bao-cao-vi-pham-reports). |
 | 6 | **SHELL-NAV** | Luồng Đăng xuất an toàn | [`src/components/shared/topbar/TopbarAvatarDropdown.tsx`](src/components/shared/topbar/TopbarAvatarDropdown.tsx) | `COMPLETED` | Thu hồi session server `/auth/logout`, `clearAuth()`, phát tín hiệu `notifyLogout()`, toast và chuyển hướng an toàn về `/login`. |
+| 7 | **SCR-16** | Điểm danh & Bảng vinh danh | [`src/pages/gamification/LeaderboardPage.tsx`](src/pages/gamification/LeaderboardPage.tsx) | `COMPLETED` | Điểm danh `/games/check-in` (streak, toast xu nhận được), bảng xếp hạng `/games/leaderboard` theo kỳ Tuần/Tháng/Toàn thời gian đồng bộ `?period=`, thẻ thứ hạng cá nhân `my_rank`. |
 

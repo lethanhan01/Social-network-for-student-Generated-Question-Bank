@@ -13,6 +13,7 @@ const LoginPage = lazy(() => import('./pages/auth/LoginPage'))
 const DashboardPage = lazy(() => import('./pages/dashboard/DashboardPage'))
 const FeedPage = lazy(() => import('./pages/feed/FeedPage'))
 const DesignSystemShowcasePage = lazy(() => import('./pages/dev/DesignSystemShowcasePage'))
+const LeaderboardPage = lazy(() => import('./pages/gamification/LeaderboardPage'))
 
 export default function App() {
   // Sync global theme
@@ -38,6 +39,7 @@ export default function App() {
               <Route path="/exams" element={<DashboardPage />} />
               <Route path="/questions" element={<DashboardPage />} />
               <Route path="/settings" element={<DashboardPage />} />
+              <Route path="/gamification/leaderboard" element={<LeaderboardPage />} />
             </Route>
           </Route>
 

@@ -1,0 +1,173 @@
+{
+  "eyebrow": "Gamification & Phần thưởng",
+  "coins": "{{count}} SQB Coins",
+  "leaderboard": {
+    "title": "Điểm danh & Bảng vinh danh",
+    "description": "Điểm danh mỗi ngày để giữ chuỗi chuyên cần, nhận SQB Coins và leo hạng trên bảng vinh danh toàn trường.",
+    "checkIn": {
+      "title": "Điểm danh hằng ngày",
+      "doneToday": "Bạn đã điểm danh hôm nay. Hẹn gặp lại ngày mai!",
+      "notYet": "Hôm nay bạn chưa điểm danh.",
+      "streakUnit": "ngày liên tiếp",
+      "lastDate": "Lần điểm danh gần nhất: {{date}}",
+      "action": "Điểm danh ngay",
+      "done": "Đã điểm danh",
+      "success": "Điểm danh thành công!",
+      "successDescription": "+{{coins}} SQB Coins · Chuỗi {{streak}} ngày",
+      "error": "Không thể điểm danh",
+      "loadError": "Không tải được trạng thái điểm danh."
+    },
+    "myRank": {
+      "title": "Thứ hạng của bạn",
+      "rank": "Thứ hạng hiện tại",
+      "points": "Tổng điểm tích lũy",
+      "top": "Top {{percent}}%",
+      "topLabel": "Vị trí toàn trường",
+      "participants": "Trên tổng {{count}} người tham gia",
+      "unranked": "Chưa xếp hạng"
+    },
+    "period": {
+      "WEEKLY": "Tuần",
+      "MONTHLY": "Tháng",
+      "ALL_TIME": "Toàn thời gian"
+    },
+    "table": {
+      "title": "Bảng vinh danh",
+      "rank": "Hạng",
+      "user": "Người dùng",
+      "code": "Mã số",
+      "points": "Điểm",
+      "you": "Bạn",
+      "empty": "Chưa có dữ liệu xếp hạng",
+      "emptyDescription": "Hãy là người đầu tiên tích điểm trong kỳ này.",
+      "error": "Không tải được bảng xếp hạng."
+    }
+  },
+  "shop": {
+    "title": "Cửa hàng Vật phẩm & Túi đồ",
+    "description": "Dùng SQB Coins tích lũy để mua khung avatar, bong bóng chat và trang bị cho hồ sơ của bạn.",
+    "balance": "Số dư hiện tại",
+    "tabs": {
+      "label": "Chọn khu vực",
+      "shop": "Cửa hàng",
+      "inventory": "Túi đồ"
+    },
+    "filter": {
+      "ALL": "Tất cả",
+      "AVATAR_FRAME": "Khung avatar",
+      "CHAT_BUBBLE": "Bong bóng chat"
+    },
+    "rarity": {
+      "COMMON": "Thường",
+      "RARE": "Hiếm",
+      "EPIC": "Sử thi",
+      "LEGENDARY": "Huyền thoại"
+    },
+    "item": {
+      "availableUntil": "Mở bán đến {{date}}",
+      "originalPrice": "Giá gốc {{price}}",
+      "buy": "Mua",
+      "owned": "Đã sở hữu",
+      "notEnough": "Không đủ xu"
+    },
+    "confirm": {
+      "title": "Xác nhận mua vật phẩm",
+      "description": "Bạn có chắc muốn mua \"{{name}}\" với giá {{price}} SQB Coins?",
+      "action": "Mua ngay"
+    },
+    "buySuccess": "Đã mua \"{{name}}\"!",
+    "buySuccessDescription": "Vật phẩm đã được thêm vào túi đồ của bạn.",
+    "buyError": "Mua vật phẩm thất bại",
+    "loadError": "Không tải được cửa hàng.",
+    "empty": "Chưa có vật phẩm nào được mở bán",
+    "emptyDescription": "Quay lại sau để xem các vật phẩm mới nhé.",
+    "inventory": {
+      "summaryTitle": "Bộ sưu tập của bạn",
+      "unlocked": "Vật phẩm đã mở khóa",
+      "completion": "Hoàn thành bộ sưu tập",
+      "equip": "Trang bị",
+      "unequip": "Tháo",
+      "equipped": "Đang trang bị",
+      "acquiredAt": "Sở hữu từ {{date}}",
+      "equipSuccess": "Đã trang bị \"{{name}}\"",
+      "unequipSuccess": "Đã tháo \"{{name}}\"",
+      "equipError": "Không thể cập nhật trang bị",
+      "loadError": "Không tải được túi đồ.",
+      "empty": "Túi đồ đang trống",
+      "emptyDescription": "Mua vật phẩm trong cửa hàng để cá nhân hóa hồ sơ của bạn.",
+      "goShop": "Đến cửa hàng"
+    },
+    "acquire": {
+      "ACHIEVEMENT": "Thành tích",
+      "SHOP_PURCHASE": "Mua tại cửa hàng",
+      "EVENT": "Sự kiện",
+      "SYSTEM_GIFT": "Quà hệ thống"
+    }
+  },
+  "minigames": {
+    "title": "Đấu trường Minigame Dự đoán",
+    "description": "Thử tài phán đoán học thuật qua các minigame để nhận thêm SQB Coins.",
+    "gamesTitle": "Danh mục trò chơi",
+    "join": "Tham gia",
+    "submit": "Gửi dự đoán",
+    "cancel": "Hủy",
+    "success": "Đã ghi nhận dự đoán của bạn!",
+    "error": "Gửi dự đoán thất bại",
+    "game1": {
+      "title": "Game 1: Dự đoán số SV nộp bài",
+      "description": "Dự đoán số sinh viên sẽ đề xuất câu hỏi vào ngày mai ở lớp học phần của bạn.",
+      "classLabel": "Lớp học phần",
+      "classPlaceholder": "Chọn lớp học phần",
+      "countLabel": "Số sinh viên dự đoán",
+      "alreadyPredicted": "Đã dự đoán: {{count}}",
+      "noClasses": "Bạn chưa tham gia lớp học phần nào để dự đoán.",
+      "classRequired": "Vui lòng chọn lớp học phần.",
+      "countInvalid": "Số dự đoán phải là số nguyên không âm."
+    },
+    "game4": {
+      "title": "Game 4: Quy mô ngân hàng câu hỏi",
+      "description": "Dự đoán tổng số câu hỏi được duyệt trong ngân hàng đề của môn học khi kết thúc kỳ.",
+      "subjectLabel": "Môn học",
+      "subjectPlaceholder": "Chọn môn học",
+      "sizeLabel": "Tổng số câu hỏi dự đoán",
+      "subjectRequired": "Vui lòng chọn môn học.",
+      "sizeInvalid": "Số câu hỏi phải là số nguyên không âm."
+    },
+    "game6": {
+      "title": "Game 6: Ai là AI?",
+      "description": "Mỗi Thứ Bảy, chọn ra những câu hỏi mà bạn cho là do AI tạo.",
+      "openBadge": "Đang mở",
+      "lockedBadge": "Đã khóa",
+      "locked": "Thử thách chỉ mở vào Thứ Bảy hằng tuần.",
+      "countdown": "Mở sau {{days}} ngày {{hours}} giờ",
+      "openingToday": "Phiên hôm nay chưa mở hoặc đã kết thúc.",
+      "hint": "Đánh dấu những câu hỏi bạn nghĩ là do AI tạo ra.",
+      "selected": "Đã chọn {{count}} câu",
+      "questionLabel": "Câu {{index}}",
+      "selectLabel": "Câu này do AI tạo",
+      "selectRequired": "Hãy chọn ít nhất một câu hỏi.",
+      "endsAt": "Kết thúc lúc {{date}}"
+    },
+    "history": {
+      "title": "Lịch sử dự đoán",
+      "empty": "Bạn chưa có lượt dự đoán nào",
+      "emptyDescription": "Tham gia một minigame ở trên để bắt đầu.",
+      "error": "Không tải được lịch sử dự đoán.",
+      "predictedAt": "Dự đoán lúc {{date}}",
+      "status": {
+        "PENDING": "Chờ kết quả",
+        "RESOLVED": "Đã tổng kết"
+      },
+      "correct": "Chính xác",
+      "wrong": "Chưa chính xác"
+    },
+    "gameType": {
+      "GAME_1_PARTICIPANTS": "Game 1 · Số SV nộp bài",
+      "GAME_2_APPROVED_QUESTIONS": "Game 2 · AI vs Người",
+      "GAME_3_AUTHOR_CONFIDENCE": "Game 3 · Độ tự tin tác giả",
+      "GAME_4_SUBJECT_BANK_SIZE": "Game 4 · Quy mô ngân hàng",
+      "GAME_5_REPORT_ERROR": "Game 5 · Báo lỗi câu hỏi",
+      "GAME_6_LLM_IDENTIFICATION": "Game 6 · Ai là AI?"
+    }
+  }
+}
