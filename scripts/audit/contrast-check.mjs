@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /**
  * @fileoverview WCAG 2.1 AA Contrast Calculation Engine (A11Y-001 / SEM-A11Y-010)
  * Thuật toán tính Relative Luminance và Contrast Ratio sRGB chuẩn W3C WCAG 2.1.

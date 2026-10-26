@@ -438,7 +438,7 @@ function checkTableOfContentsIntegrity(targetFiles) {
     const fileName = path.basename(filePath);
     if (!fs.existsSync(filePath)) continue;
     const content = fs.readFileSync(filePath, 'utf-8');
-    const lines = content.split('\n');
+    const lines = content.split(/\r?\n/);
 
     let inToc = false;
     const headings = [];

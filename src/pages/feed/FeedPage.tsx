@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Sparkles, BookOpen, GraduationCap } from 'lucide-react'
+import { Sparkles, BookOpen, GraduationCap, RefreshCw } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Heading, Text } from '@/components/ui/typography'
 import { Button } from '@/components/ui/actions'
@@ -14,20 +14,47 @@ import {
   EmptyFeedState,
 } from '@/components/social'
 import { useSocialFeed } from '@/hooks/useSocialFeed'
+import {
+  useInfinitePostsFeedQuery,
+  useNewFeedCountQuery,
+  useToggleReactionMutation,
+} from '@/hooks/queries/usePostsQuery'
 import type { PostResponseDto } from '@/types'
+import { QueryFeedback } from '@/components/social/QueryFeedback'
 
 export default function FeedPage() {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<'ALL' | 'MY_SUBJECTS' | 'LECTURERS'>('ALL')
   const [selectedSubjectId, setSelectedSubjectId] = useState<number | undefined>()
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [latestLoadedTime] = useState<string>(new Date().toISOString())
 
-  const { currentUser, subjects, friends, myPosts, isLoadingFeed, createPost, toggleReact } =
-    useSocialFeed()
+  const { currentUser, subjects, friends, createPost } = useSocialFeed()
+
+  const {
+    data: infiniteFeed,
+    isLoading: isLoadingFeed,
+    isError: isFeedError,
+    error: feedError,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    refetch: refetchFeed,
+  } = useInfinitePostsFeedQuery(10)
+
+  const { data: newFeedData } = useNewFeedCountQuery(latestLoadedTime)
+  const newCount = newFeedData?.new_count || 0
+
+  const toggleReactionMutation = useToggleReactionMutation()
+
+  // Flatten infinite query pages
+  const allPosts = useMemo(() => {
+    return infiniteFeed?.pages.flatMap((page) => page.items || []) || []
+  }, [infiniteFeed])
 
   // Filter posts based on active tab and selected subject
   const filteredPosts = useMemo(() => {
-    let list: PostResponseDto[] = [...myPosts]
+    let list: PostResponseDto[] = [...allPosts]
 
     if (selectedSubjectId) {
       list = list.filter((p) => p.subject_id === selectedSubjectId)
@@ -38,9 +65,18 @@ export default function FeedPage() {
     }
 
     return list
-  }, [myPosts, selectedSubjectId, activeTab])
+  }, [allPosts, selectedSubjectId, activeTab])
+
+  async function handleToggleReact(postId: number, reactionType: 'LIKE' | 'LOVE' | 'WOW' = 'LIKE') {
+    await toggleReactionMutation.mutateAsync({
+      target_type: 'POST',
+      target_id: postId,
+      reaction_type: reactionType,
+    })
+  }
 
   function renderFeedStream() {
+    if (isFeedError) return <QueryFeedback error={feedError} onRetry={refetchFeed} />
     if (isLoadingFeed) {
       return (
         /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Loading state layout container] */
@@ -56,15 +92,43 @@ export default function FeedPage() {
       return (
         /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Feed list stream wrapper] */
         <div className="space-y-4">
+          {newCount > 0 ? (
+            <Button
+              variant="secondary"
+              onClick={() => refetchFeed()}
+              className="w-full justify-center gap-2 py-2.5 text-xs text-action-accent border border-action-accent/30 bg-action-accent/10 hover:bg-action-accent/20 min-h-11"
+            >
+              <RefreshCw size={14} className="animate-spin" />
+              {t('feed.newPostsAvailable', { count: newCount, defaultValue: `Có ${newCount} bài viết mới. Bấm để làm mới.` })}
+            </Button>
+          ) : null}
+
           {filteredPosts.map((post) => (
             <PostCard
               key={post.post_id || Math.random()}
               post={post}
               currentUserAvatar={currentUser?.avatar_url || undefined}
               currentUserName={currentUser?.full_name || 'Bạn'}
-              onToggleReact={toggleReact}
+              onToggleReact={handleToggleReact}
             />
           ))}
+
+          {hasNextPage ? (
+            /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Load more button wrapper] */
+            <div className="pt-2 text-center">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                className="min-h-11 px-6 text-xs"
+              >
+                {isFetchingNextPage
+                  ? t('common.loading', 'Đang tải thêm...')
+                  : t('feed.loadMore', 'Tải thêm bài viết cũ hơn')}
+              </Button>
+            </div>
+          ) : null}
         </div>
       )
     }
