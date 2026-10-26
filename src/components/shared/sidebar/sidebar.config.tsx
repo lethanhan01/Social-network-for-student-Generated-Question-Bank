@@ -1,17 +1,43 @@
 import {
   LayoutDashboard,
-  BookOpen,
-  HelpCircle,
   MessageSquare,
   Sparkles,
   Settings,
+  GraduationCap,
+  FileText,
+  PlayCircle,
 } from 'lucide-react'
 import type { NavSection } from './sidebar.types'
 
 export function getSQBNavSections(): NavSection[] {
   return [
     {
-      label: 'Học tập & Đề thi',
+      label: 'Học thuật & Ngân hàng câu hỏi',
+      items: [
+        {
+          label: 'Danh mục môn học',
+          to: '/subjects',
+          icon: <GraduationCap size={20} />,
+        },
+        {
+          label: 'Phiên đề xuất',
+          to: '/proposals',
+          icon: <FileText size={20} />,
+        },
+        {
+          label: 'Luyện tập',
+          to: '/practice',
+          icon: <PlayCircle size={20} />,
+        },
+        {
+          label: 'Bảng tin & Hoạt động',
+          to: '/feed',
+          icon: <MessageSquare size={20} />,
+        },
+      ],
+    },
+    {
+      label: 'Hệ thống & Công cụ',
       items: [
         {
           label: 'Tổng quan',
@@ -19,32 +45,12 @@ export function getSQBNavSections(): NavSection[] {
           icon: <LayoutDashboard size={20} />,
         },
         {
-          label: 'Ngân hàng đề thi',
-          to: '/exams',
-          icon: <BookOpen size={20} />,
-        },
-        {
-          label: 'Ngân hàng câu hỏi',
-          to: '/questions',
-          icon: <HelpCircle size={20} />,
-        },
-        {
-          label: 'Mạng xã hội học tập',
-          to: '/feed',
-          icon: <MessageSquare size={20} />,
-        },
-      ],
-    },
-    {
-      label: 'Công cụ & Phát triển',
-      items: [
-        {
           label: 'UI Design Showcase',
           to: '/showcase',
           icon: <Sparkles size={20} />,
         },
         {
-          label: 'Cài đặt hệ thống',
+          label: 'Cài đặt',
           to: '/settings',
           icon: <Settings size={20} />,
         },

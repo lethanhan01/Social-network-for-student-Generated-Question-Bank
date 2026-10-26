@@ -13,6 +13,10 @@ const LoginPage = lazy(() => import('./pages/auth/LoginPage'))
 const DashboardPage = lazy(() => import('./pages/dashboard/DashboardPage'))
 const FeedPage = lazy(() => import('./pages/feed/FeedPage'))
 const DesignSystemShowcasePage = lazy(() => import('./pages/dev/DesignSystemShowcasePage'))
+const SubjectsPage = lazy(() => import('./pages/subjects/SubjectsPage'))
+const ProposalsPage = lazy(() => import('./pages/proposals/ProposalsPage'))
+const PracticePage = lazy(() => import('./pages/practice/PracticePage'))
+const QuestionAnalyticsPage = lazy(() => import('./pages/questions/QuestionAnalyticsPage'))
 
 export default function App() {
   // Sync global theme
@@ -35,8 +39,13 @@ export default function App() {
             <Route element={<DashboardLayout />}>
               <Route path="/feed" element={<FeedPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/subjects" element={<SubjectsPage />} />
+              <Route path="/proposals" element={<ProposalsPage />} />
+              <Route path="/practice" element={<PracticePage />} />
+              <Route path="/practice/:sessionId" element={<PracticePage />} />
+              <Route path="/questions" element={<SubjectsPage />} />
+              <Route path="/questions/:id/analytics" element={<QuestionAnalyticsPage />} />
               <Route path="/exams" element={<DashboardPage />} />
-              <Route path="/questions" element={<DashboardPage />} />
               <Route path="/settings" element={<DashboardPage />} />
             </Route>
           </Route>
