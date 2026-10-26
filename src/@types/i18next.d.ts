@@ -7,6 +7,7 @@ import type viOwner from '../locales/vi/owner.json'
 import type viHome from '../locales/vi/home.json'
 import type viValidation from '../locales/vi/validation.json'
 import type viChat from '../locales/vi/chat.json'
+import type viGamification from '../locales/vi/gamification.json'
 
 declare module 'i18next' {
   interface CustomTypeOptions {
@@ -21,6 +22,7 @@ declare module 'i18next' {
       home: typeof viHome
       validation: typeof viValidation
       chat: typeof viChat
+      gamification: typeof viGamification
     }
   }
 }

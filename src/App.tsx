@@ -17,6 +17,9 @@ const ProfilePage = lazy(() => import('./pages/profile/ProfilePage'))
 const FriendsPage = lazy(() => import('./pages/friends/FriendsPage'))
 const SearchPage = lazy(() => import('./pages/search/SearchPage'))
 const DesignSystemShowcasePage = lazy(() => import('./pages/dev/DesignSystemShowcasePage'))
+const LeaderboardPage = lazy(() => import('./pages/gamification/LeaderboardPage'))
+const ShopPage = lazy(() => import('./pages/gamification/ShopPage'))
+const MinigamesPage = lazy(() => import('./pages/gamification/MinigamesPage'))
 
 export default function App() {
   // Sync global theme
@@ -48,6 +51,9 @@ export default function App() {
               <Route path="/exams" element={<DashboardPage />} />
               <Route path="/questions" element={<DashboardPage />} />
               <Route path="/settings" element={<DashboardPage />} />
+              <Route path="/gamification/leaderboard" element={<LeaderboardPage />} />
+              <Route path="/gamification/minigames" element={<MinigamesPage />} />
+              <Route path="/shop" element={<ShopPage />} />
             </Route>
           </Route>
 
