@@ -108,6 +108,31 @@ export function todayInput(): string {
   return toDateInput(new Date())
 }
 
+const VN_OFFSET_MS = 7 * 60 * 60 * 1000
+const SATURDAY = 6
+
+/**
+ * Thời gian còn lại (ms) tới 00:00 Thứ Bảy kế tiếp theo giờ Asia/Ho_Chi_Minh.
+ * Trả về 0 nếu hiện tại đã là Thứ Bảy.
+ */
+export function msUntilNextSaturday(now: Date): number {
+  const vnWallClock = new Date(now.getTime() + VN_OFFSET_MS)
+  const weekday = vnWallClock.getUTCDay()
+  if (weekday === SATURDAY) return 0
+  const daysAhead = (SATURDAY - weekday + 7) % 7
+  const nextSaturdayMidnight = Date.UTC(
+    vnWallClock.getUTCFullYear(),
+    vnWallClock.getUTCMonth(),
+    vnWallClock.getUTCDate() + daysAhead
+  )
+  return nextSaturdayMidnight - vnWallClock.getTime()
+}
+
+export function splitDurationDaysHours(ms: number): { days: number; hours: number } {
+  const totalHours = Math.floor(Math.max(ms, 0) / (60 * 60 * 1000))
+  return { days: Math.floor(totalHours / 24), hours: totalHours % 24 }
+}
+
 export function monthStart(): string {
   const now = new Date()
   return toDateInput(new Date(now.getFullYear(), now.getMonth(), 1))

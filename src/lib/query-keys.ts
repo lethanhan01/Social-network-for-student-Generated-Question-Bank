@@ -93,6 +93,7 @@ export const queryKeys = {
     leaderboard: (params?: Record<string, unknown>) => ['gamification', 'leaderboard', params] as const,
     myPredictions: (params?: Record<string, unknown>) => ['gamification', 'predictions', params] as const,
     activeSession: () => ['gamification', 'activeSession'] as const,
+    game1Classes: () => ['gamification', 'game1Classes'] as const,
     badges: () => ['gamification', 'badges'] as const,
     myBadges: () => ['gamification', 'myBadges'] as const,
     userBadges: (userId: number) => ['gamification', 'badges', 'user', userId] as const,
