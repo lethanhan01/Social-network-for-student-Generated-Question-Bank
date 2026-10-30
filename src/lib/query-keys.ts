@@ -34,10 +34,16 @@ export const queryKeys = {
     comments: (postId: string | number) => ['posts', postId, 'comments'] as const,
     userPosts: (userId: number, params?: Record<string, unknown>) => ['posts', 'user', userId, params] as const,
     videos: (params?: Record<string, unknown>) => ['posts', 'videos', params] as const,
+    /** Client-side cache of the reaction type the current user picked (API only exposes a boolean on posts). */
+    myReaction: (id: string | number) => ['posts', 'myReaction', id] as const,
+    /** Posts created in this session; shown on top of the feed (server response, not mock data). */
+    recentlyCreated: () => ['posts', 'recentlyCreated'] as const,
   },
   comments: {
     all: ['comments'] as const,
     byPost: (postId: number, params?: Record<string, unknown>) => ['comments', 'post', postId, params] as const,
+    replies: (postId: number, parentId: number, params?: Record<string, unknown>) =>
+      ['comments', 'replies', postId, parentId, params] as const,
   },
   users: {
     all: ['users'] as const,
@@ -57,7 +63,7 @@ export const queryKeys = {
   feed: {
     all: ['feed'] as const,
     activity: (params?: Record<string, unknown>) => ['feed', 'activity', params] as const,
-    newCount: () => ['feed', 'newCount'] as const,
+    newCount: (since?: string) => ['feed', 'newCount', since] as const,
   },
   conversations: {
     all: ['conversations'] as const,

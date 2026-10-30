@@ -1,4 +1,5 @@
-import { Trophy, Flame, UserPlus, Users } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { Users, UserPlus } from 'lucide-react'
 import { Card, Avatar, Badge } from '@/components/ui/data-display'
 import { ButtonLink } from '@/components/ui/actions'
 import { Heading, Text } from '@/components/ui/typography'
@@ -10,69 +11,23 @@ interface SocialRightSidebarProps {
 }
 
 export function SocialRightSidebar({ friends = [] }: Readonly<SocialRightSidebarProps>) {
+  const { t } = useTranslation()
+
   return (
     /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Right sidebar container] */
     <div className="space-y-4">
-      {/* Gamification & Academic Streak Card */}
-      <Card className="p-4 bg-surface border-line-subtle shadow-card rounded-2xl space-y-3">
-        <header className="flex items-center justify-between">
-          {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Streak icon and title layout] */}
-          <div className="flex items-center gap-2">
-            {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Flame icon square wrapper] */}
-            <div className="w-8 h-8 rounded-lg bg-tone-warning/15 flex items-center justify-center text-tone-warning">
-              <Flame size={18} />
-            </div>
-            {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Streak title text wrapper] */}
-            <div>
-              <Heading level={4} className="text-xs font-bold text-text-primary">
-                Chuỗi học tập
-              </Heading>
-              <Text size="xs" tone="muted">
-                Điểm danh hàng ngày
-              </Text>
-            </div>
-          </div>
-          <Badge tone="accent" size="sm">
-            Streak: 3 ngày
-          </Badge>
-        </header>
-
-        <section aria-label="Thống kê học tập" className="p-3 bg-surface-hover rounded-xl border border-line-subtle">
-          {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Coins row layout] */}
-          <div className="flex items-center justify-between text-xs mb-1">
-            <strong className="font-normal text-text-muted">Xu SQB tích lũy:</strong>
-            <strong className="font-bold text-action-accent">150 Coins</strong>
-          </div>
-          {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Rank row layout] */}
-          <div className="flex items-center justify-between text-xs">
-            <strong className="font-normal text-text-muted">Hạng tuần:</strong>
-            <strong className="font-bold text-text-primary">#14 Toàn trường</strong>
-          </div>
-        </section>
-
-        <ButtonLink
-          to="/practice"
-          variant="secondary"
-          size="sm"
-          className="w-full justify-center text-xs min-h-11"
-          leftIcon={<Trophy size={14} className="text-tone-warning" />}
-        >
-          Tham gia Thử thách hôm nay
-        </ButtonLink>
-      </Card>
-
-      {/* Online Study Buddies (Friends) Card */}
+      {/* Friends Connection Card */}
       <Card className="p-4 bg-surface border-line-subtle shadow-card rounded-2xl space-y-3">
         <header className="flex items-center justify-between">
           {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Friends header title flex layout] */}
           <div className="flex items-center gap-2">
             <Users size={18} className="text-action-accent" />
             <Heading level={4} className="text-sm font-bold text-text-primary">
-              Bạn học trực tuyến
+              {t('friends.title', 'Bạn bè & Kết nối')}
             </Heading>
           </div>
           <Badge emphasis="outline" size="sm">
-            {friends.length} bạn
+            {friends.length} {t('friends.friendCountUnit', 'bạn')}
           </Badge>
         </header>
 
@@ -80,41 +35,46 @@ export function SocialRightSidebar({ friends = [] }: Readonly<SocialRightSidebar
 
         {friends.length > 0 ? (
           <section aria-label="Danh sách bạn bè" className="space-y-1">
-            {friends.map((friend) => {
-              const name = friend.full_name || 'Bạn học'
+            {friends.slice(0, 8).map((friend) => {
+              const name = friend.full_name || 'Bạn học SQB'
               const initials = name.trim().charAt(0).toUpperCase()
               return (
-                <article
+                <ButtonLink
                   key={friend.user_id}
-                  className="flex items-center gap-3 p-2 rounded-xl hover:bg-surface-hover transition-colors cursor-pointer"
+                  to={`/profile/${friend.user_id}`}
+                  variant="ghost"
+                  className="w-full flex items-center justify-start gap-3 p-2 rounded-xl hover:bg-surface-hover text-left min-h-11 h-auto"
                 >
-                  {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Avatar relative indicator container] */}
-                  <div className="relative">
-                    <Avatar
-                      src={friend.avatar_url || undefined}
-                      name={name}
-                      fallback={initials}
-                      size="sm"
-                      tone="accent"
-                    />
-                    {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Online status indicator dot] */}
-                    <span
-                      className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-tone-success ring-2 ring-surface"
-                      aria-label="Đang trực tuyến"
-                    />
-                  </div>
+                  <Avatar
+                    src={friend.avatar_url || undefined}
+                    name={name}
+                    fallback={initials}
+                    size="sm"
+                    tone="accent"
+                  />
                   {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Friend info text container] */}
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold text-text-primary truncate">
-                      {name}
-                    </p>
+                    <p className="text-xs font-semibold text-text-primary truncate">{name}</p>
                     <p className="text-[11px] text-text-muted truncate">
-                      Sinh viên HUST
+                      {friend.mutual_friends_count
+                        ? `${friend.mutual_friends_count} ${t('friends.mutualCount', 'bạn chung')}`
+                        : t('friends.connected', 'Bạn bè HUST')}
                     </p>
                   </div>
-                </article>
+                </ButtonLink>
               )
             })}
+
+            <div className="pt-2">
+              <ButtonLink
+                to="/friends"
+                variant="outline"
+                size="sm"
+                className="text-xs w-full justify-center min-h-11"
+              >
+                {t('friends.viewAll', 'Xem tất cả bạn bè')}
+              </ButtonLink>
+            </div>
           </section>
         ) : (
           /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Empty friends text stack] */
@@ -124,7 +84,7 @@ export function SocialRightSidebar({ friends = [] }: Readonly<SocialRightSidebar
               <UserPlus size={18} />
             </div>
             <Text size="xs" tone="muted">
-              Chưa có bạn học nào trực tuyến.
+              {t('friends.empty', 'Chưa có bạn bè nào được kết nối.')}
             </Text>
             <ButtonLink
               to="/friends"
@@ -132,7 +92,7 @@ export function SocialRightSidebar({ friends = [] }: Readonly<SocialRightSidebar
               size="sm"
               className="text-xs w-full justify-center min-h-11"
             >
-              Kết nối bạn bè HUST
+              {t('friends.findFriends', 'Tìm kiếm & Kết nối')}
             </ButtonLink>
           </div>
         )}

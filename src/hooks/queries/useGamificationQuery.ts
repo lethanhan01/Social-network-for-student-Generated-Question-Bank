@@ -96,3 +96,14 @@ export function useSubmitGame6Mutation() {
     },
   })
 }
+
+export function useUserBadgesQuery(userId?: number) {
+  const isMe = !userId || userId === 0
+  return useQuery({
+    queryKey: isMe ? queryKeys.gamification.badges() : ['gamification', 'badges', 'user', userId],
+    queryFn: ({ signal }) =>
+      isMe
+        ? gamificationService.getMyBadges({ signal })
+        : gamificationService.getUserBadges(userId, { signal }),
+  })
+}

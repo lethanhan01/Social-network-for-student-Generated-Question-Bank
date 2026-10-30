@@ -1,14 +1,19 @@
 import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { Send } from 'lucide-react'
-import { queryKeys } from '@/lib/query-keys'
-import { commentService } from '@/services/comment.service'
 import { Form, FormField, Input } from '@/components/ui/forms'
 import { SubmitButton } from '@/components/ui/actions'
 import { Avatar } from '@/components/ui/data-display'
 import { Text } from '@/components/ui/typography'
+import { useAuthStore } from '@/stores/authStore'
+import {
+  usePostCommentsQuery,
+  useCreateCommentMutation,
+  useUpdateCommentMutation,
+  useDeleteCommentMutation,
+} from '@/hooks/queries/useCommentsQuery'
+import { CommentItem } from './CommentItem'
 import { toast } from '@/lib/toast'
-import type { CommentResponseDto } from '@/types'
 
 interface PostCommentSectionProps {
   postId: number
@@ -21,41 +26,63 @@ export function PostCommentSection({
   currentUserAvatar,
   currentUserName = 'Bạn',
 }: Readonly<PostCommentSectionProps>) {
+  const { t } = useTranslation()
   const [commentText, setCommentText] = useState('')
-  const queryClient = useQueryClient()
+  const currentUser = useAuthStore((s) => s.user)
+  const isStaff = currentUser?.role === 'LECTURER' || currentUser?.role === 'ADMIN'
 
-  const { data, isLoading } = useQuery({
-    queryKey: queryKeys.comments.byPost(postId),
-    queryFn: ({ signal }) => commentService.getComments({ post_id: postId }, { signal }),
-    staleTime: 15 * 1000,
-  })
-
-  const createCommentMutation = useMutation({
-    mutationFn: (content: string) =>
-      commentService.createComment({
-        target_type: 'POST',
-        target_id: postId,
-        content,
-      }),
-    onSuccess: (newComment: CommentResponseDto) => {
-      setCommentText('')
-      queryClient.setQueryData(
-        queryKeys.comments.byPost(postId),
-        (old: { items?: CommentResponseDto[] } | undefined) => {
-          if (!old?.items) return { items: [newComment] }
-          return { ...old, items: [...old.items, newComment] }
-        }
-      )
-    },
-    onError: () => {
-      toast.error('Không thể gửi bình luận. Vui lòng thử lại.')
-    },
-  })
+  const { data, isLoading } = usePostCommentsQuery(postId)
+  const createMutation = useCreateCommentMutation(postId)
+  const updateMutation = useUpdateCommentMutation(postId)
+  const deleteMutation = useDeleteCommentMutation(postId)
 
   async function handleSendComment(e?: React.SubmitEvent) {
     e?.preventDefault()
     if (!commentText.trim()) return
-    await createCommentMutation.mutateAsync(commentText.trim())
+    try {
+      await createMutation.mutateAsync({
+        target_type: 'POST',
+        target_id: postId,
+        content: commentText.trim(),
+      })
+      setCommentText('')
+    } catch {
+      toast.error(t('comment.createError', 'Không thể gửi bình luận. Vui lòng thử lại.'))
+    }
+  }
+
+  async function handleReply(parentId: number, text: string) {
+    try {
+      await createMutation.mutateAsync({
+        target_type: 'POST',
+        target_id: postId,
+        parent_comment_id: parentId,
+        content: text,
+      })
+    } catch {
+      toast.error(t('comment.replyError', 'Không thể gửi câu trả lời.'))
+    }
+  }
+
+  async function handleUpdate(commentId: number, text: string) {
+    try {
+      await updateMutation.mutateAsync({
+        commentId,
+        payload: { content: text },
+      })
+      toast.success(t('comment.updateSuccess', 'Đã cập nhật bình luận.'))
+    } catch {
+      toast.error(t('comment.updateError', 'Không thể cập nhật bình luận.'))
+    }
+  }
+
+  async function handleDelete(commentId: number) {
+    try {
+      await deleteMutation.mutateAsync(commentId)
+      toast.success(t('comment.deleteSuccess', 'Đã xóa bình luận.'))
+    } catch {
+      toast.error(t('comment.deleteError', 'Không thể xóa bình luận.'))
+    }
   }
 
   const comments = data?.items || []
@@ -64,44 +91,32 @@ export function PostCommentSection({
     if (isLoading) {
       return (
         <Text size="xs" tone="muted" className="italic text-center py-2">
-          Đang tải bình luận...
+          {t('comment.loading', 'Đang tải bình luận...')}
         </Text>
       )
     }
 
     if (comments.length > 0) {
       return (
-        <section aria-label="Danh sách bình luận" className="space-y-2.5 pt-1">
-          {comments.map((comment) => {
-            const author = comment.author?.full_name || 'Người dùng HUST'
-            const initials = author.charAt(0).toUpperCase()
-            return (
-              <article key={comment.comment_id} className="flex items-start gap-2.5">
-                <Avatar
-                  src={comment.author?.avatar_url || undefined}
-                  name={author}
-                  fallback={initials}
-                  size="sm"
-                />
-                {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Comment bubble layout container] */}
-                <div className="flex-1 bg-surface-hover rounded-2xl p-2.5 px-3.5 border border-line-subtle text-xs">
-                  <strong className="font-bold text-text-primary block mb-0.5">
-                    {author}
-                  </strong>
-                  <p className="text-text-primary leading-relaxed whitespace-pre-wrap">
-                    {comment.content}
-                  </p>
-                </div>
-              </article>
-            )
-          })}
+        <section aria-label="Danh sách bình luận" className="space-y-3 pt-1">
+          {comments.map((comment) => (
+            <CommentItem
+              key={comment.comment_id}
+              comment={comment}
+              currentUserId={currentUser?.user_id}
+              isStaff={isStaff}
+              onReply={handleReply}
+              onUpdate={handleUpdate}
+              onDelete={handleDelete}
+            />
+          ))}
         </section>
       )
     }
 
     return (
       <Text size="xs" tone="muted" className="italic text-center py-1">
-        Chưa có bình luận nào. Hãy là người đầu tiên phản hồi!
+        {t('comment.empty', 'Chưa có bình luận nào. Hãy là người đầu tiên thảo luận!')}
       </Text>
     )
   }
@@ -122,14 +137,14 @@ export function PostCommentSection({
           <FormField className="flex-1 mb-0">
             <Input
               aria-label="Viết bình luận"
-              placeholder="Viết câu trả lời hoặc thảo luận..."
+              placeholder={t('comment.inputPlaceholder', 'Viết câu trả lời hoặc thảo luận...')}
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
               className="text-xs h-10 rounded-full bg-surface-hover"
             />
           </FormField>
           <SubmitButton
-            loading={createCommentMutation.isPending}
+            loading={createMutation.isPending}
             disabled={!commentText.trim()}
             variant="primary"
             size="sm"
