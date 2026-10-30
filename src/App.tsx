@@ -17,6 +17,10 @@ const ProfilePage = lazy(() => import('./pages/profile/ProfilePage'))
 const FriendsPage = lazy(() => import('./pages/friends/FriendsPage'))
 const SearchPage = lazy(() => import('./pages/search/SearchPage'))
 const DesignSystemShowcasePage = lazy(() => import('./pages/dev/DesignSystemShowcasePage'))
+const SubjectsPage = lazy(() => import('./pages/subjects/SubjectsPage'))
+const ProposalsPage = lazy(() => import('./pages/proposals/ProposalsPage'))
+const PracticePage = lazy(() => import('./pages/practice/PracticePage'))
+const QuestionAnalyticsPage = lazy(() => import('./pages/questions/QuestionAnalyticsPage'))
 const LeaderboardPage = lazy(() => import('./pages/gamification/LeaderboardPage'))
 const ShopPage = lazy(() => import('./pages/gamification/ShopPage'))
 const MinigamesPage = lazy(() => import('./pages/gamification/MinigamesPage'))
@@ -48,8 +52,13 @@ export default function App() {
               <Route path="/search" element={<SearchPage />} />
 
               <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/subjects" element={<SubjectsPage />} />
+              <Route path="/proposals" element={<ProposalsPage />} />
+              <Route path="/practice" element={<PracticePage />} />
+              <Route path="/practice/:sessionId" element={<PracticePage />} />
+              <Route path="/questions" element={<SubjectsPage />} />
+              <Route path="/questions/:id/analytics" element={<QuestionAnalyticsPage />} />
               <Route path="/exams" element={<DashboardPage />} />
-              <Route path="/questions" element={<DashboardPage />} />
               <Route path="/settings" element={<DashboardPage />} />
               <Route path="/gamification/leaderboard" element={<LeaderboardPage />} />
               <Route path="/gamification/minigames" element={<MinigamesPage />} />

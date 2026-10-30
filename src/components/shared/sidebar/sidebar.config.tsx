@@ -1,40 +1,41 @@
 import {
   LayoutDashboard,
-  BookOpen,
-  HelpCircle,
   MessageSquare,
   Users,
   Search,
   Sparkles,
   Settings,
+  GraduationCap,
+  FileText,
+  PlayCircle,
   CalendarCheck,
   ShoppingBag,
-  Gamepad2,
+  Gamepad2
 } from 'lucide-react'
 import type { NavSection } from './sidebar.types'
 
 export function getSQBNavSections(): NavSection[] {
   return [
     {
-      label: 'Học tập & Đề thi',
+      label: 'Học thuật & Ngân hàng câu hỏi',
       items: [
         {
-          label: 'Tổng quan',
-          to: '/dashboard',
-          icon: <LayoutDashboard size={20} />,
+          label: 'Danh mục môn học',
+          to: '/subjects',
+          icon: <GraduationCap size={20} />,
         },
         {
-          label: 'Ngân hàng đề thi',
-          to: '/exams',
-          icon: <BookOpen size={20} />,
+          label: 'Phiên đề xuất',
+          to: '/proposals',
+          icon: <FileText size={20} />,
         },
         {
-          label: 'Ngân hàng câu hỏi',
-          to: '/questions',
-          icon: <HelpCircle size={20} />,
+          label: 'Luyện tập',
+          to: '/practice',
+          icon: <PlayCircle size={20} />,
         },
         {
-          label: 'Mạng xã hội học tập',
+          label: 'Bảng tin & Hoạt động',
           to: '/feed',
           icon: <MessageSquare size={20} />,
         },
@@ -51,6 +52,7 @@ export function getSQBNavSections(): NavSection[] {
       ],
     },
     {
+      label: 'Hệ thống & Công cụ',
       label: 'Gamification & Phần thưởng',
       items: [
         {
@@ -74,12 +76,17 @@ export function getSQBNavSections(): NavSection[] {
       label: 'Công cụ & Phát triển',
       items: [
         {
+          label: 'Tổng quan',
+          to: '/dashboard',
+          icon: <LayoutDashboard size={20} />,
+        },
+        {
           label: 'UI Design Showcase',
           to: '/showcase',
           icon: <Sparkles size={20} />,
         },
         {
-          label: 'Cài đặt hệ thống',
+          label: 'Cài đặt',
           to: '/settings',
           icon: <Settings size={20} />,
         },
