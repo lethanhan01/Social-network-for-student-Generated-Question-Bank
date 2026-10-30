@@ -517,8 +517,8 @@ export interface ProposeSessionRequest {
   content?: string
   /** Nguồn tài liệu tham khảo (URL giáo trình, tài liệu tham khảo online) */
   source_url?: string
-  /** ID môn học trong hệ thống mà sinh viên đang theo học */
-  subject_id: number
+  /** ID lớp học phần mà sinh viên đang theo học trong học kỳ hiện tại */
+  course_class_id: number
   /** Danh sách các câu hỏi đề xuất trong phiên */
   questions: QuestionProposeDto[]
 }

@@ -86,10 +86,12 @@ export const queryKeys = {
     mySubmissions: (params?: Record<string, unknown>) => ['sessions', 'mySubmissions', params] as const,
     detail: (id: number) => ['sessions', 'detail', id] as const,
     enrolledSubjects: () => ['sessions', 'enrolledSubjects'] as const,
+    enrolledClasses: () => ['sessions', 'enrolledClasses'] as const,
     pending: (params?: Record<string, unknown>) => ['sessions', 'pending', params] as const,
   },
   practice: {
     all: ['practice'] as const,
+    answer: (questionId: number, updatedAt?: string) => ['practice', 'answer', questionId, updatedAt] as const,
     questions: (sessionId: number) => ['practice', 'session', sessionId, 'questions'] as const,
     userSessions: (userId: number) => ['practice', 'user', userId, 'sessions'] as const,
   },
