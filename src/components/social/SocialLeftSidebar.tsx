@@ -23,7 +23,7 @@ export function SocialLeftSidebar({
   const studentCode = user?.student_lecturer_code || 'K68 HUST'
 
   return (
-    <Card className="p-4 bg-surface border-line-subtle shadow-card rounded-2xl space-y-4">
+    <Card className="p-4 bg-surface-card border-line-subtle shadow-card rounded-2xl space-y-4">
       {/* User Profile Summary */}
       <header className="flex items-center gap-3">
         <Avatar
@@ -35,7 +35,7 @@ export function SocialLeftSidebar({
         />
         {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [User profile text layout] */}
         <div className="min-w-0 flex-1">
-          <Heading level={3} className="text-sm font-bold text-text-primary truncate">
+          <Heading level={3} className="text-sm font-bold text-fg-primary truncate">
             {displayName}
           </Heading>
           {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [User student code and role badge flex row] */}
@@ -79,7 +79,7 @@ export function SocialLeftSidebar({
           size="sm"
           className="w-full justify-start gap-2.5 min-h-11"
         >
-          <FileText size={18} className="text-text-muted shrink-0" />
+          <FileText size={18} className="text-fg-muted shrink-0" />
           <strong className="font-normal">Đề thi đang ôn tập</strong>
         </ButtonLink>
         <ButtonLink
@@ -88,7 +88,7 @@ export function SocialLeftSidebar({
           size="sm"
           className="w-full justify-start gap-2.5 min-h-11"
         >
-          <BookmarkCheck size={18} className="text-text-muted shrink-0" />
+          <BookmarkCheck size={18} className="text-fg-muted shrink-0" />
           <strong className="font-normal">Bài viết đã lưu</strong>
         </ButtonLink>
         <ButtonLink
@@ -97,7 +97,7 @@ export function SocialLeftSidebar({
           size="sm"
           className="w-full justify-start gap-2.5 min-h-11"
         >
-          <Users size={18} className="text-text-muted shrink-0" />
+          <Users size={18} className="text-fg-muted shrink-0" />
           <strong className="font-normal">Nhóm học tập HUST</strong>
         </ButtonLink>
       </nav>

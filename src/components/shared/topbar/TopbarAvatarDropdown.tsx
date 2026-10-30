@@ -45,7 +45,7 @@ export function TopbarAvatarDropdown() {
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="flex shrink-0 items-center justify-center rounded-full border-2 border-transparent transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-line-focus cursor-pointer"
+          className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-transparent transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-line-focus cursor-pointer"
           aria-label={tCommon('user.menu', 'Menu người dùng')}
         >
           <Avatar
@@ -62,20 +62,20 @@ export function TopbarAvatarDropdown() {
       <DropdownMenuContent
         align="end"
         sideOffset={8}
-        className="w-56 p-1 bg-surface border border-line-subtle shadow-card rounded-xl text-text-primary z-50"
+        className="w-56 p-1 bg-surface-elevated border border-line-subtle shadow-card rounded-xl text-fg-primary z-50"
       >
         <div className="px-3 py-2 border-b border-line-subtle">
-          <p className="text-sm font-semibold truncate text-text-primary">
+          <p className="text-sm font-semibold truncate text-fg-primary">
             {user?.fullName || 'Sinh viên HUST'}
           </p>
-          <p className="text-xs text-text-muted truncate">
+          <p className="text-xs text-fg-muted truncate">
             {user?.email || 'student@sis.hust.edu.vn'}
           </p>
         </div>
 
         <DropdownMenuItem
           onClick={goProfile}
-          className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-surface-hover cursor-pointer"
+          className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-surface-card-hover cursor-pointer"
         >
           <User size={16} />
           <span>{tCommon('user.profile', 'Hồ sơ cá nhân')}</span>
@@ -84,7 +84,7 @@ export function TopbarAvatarDropdown() {
         <DropdownMenuSeparator className="my-1 border-t border-line-subtle" />
 
         <div className="px-3 py-1.5">
-          <p className="text-xs text-text-muted mb-1.5 font-medium">Giao diện</p>
+          <p className="text-xs text-fg-muted mb-1.5 font-medium">Giao diện</p>
           <ThemeSegmentedControl size="sm" />
         </div>
 
@@ -92,7 +92,7 @@ export function TopbarAvatarDropdown() {
 
         <DropdownMenuItem
           onClick={handleLogout}
-          className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg text-tone-danger hover:bg-tone-danger/10 cursor-pointer"
+          className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg text-status-danger-fg hover:bg-status-danger-bg cursor-pointer"
         >
           <LogOut size={16} />
           <span>{tCommon('user.logout', 'Đăng xuất')}</span>

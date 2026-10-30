@@ -15,7 +15,7 @@ export function SocialFeedLayout({
     /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Responsive 3-column flex container for social feed] */
     <div className="flex justify-center gap-6 w-full items-start">
       {/* Left Column: Shortcuts & Sub-Navigation */}
-      <aside className="hidden lg:block w-72 shrink-0 sticky top-20">
+      <aside className="hidden lg:block w-72 shrink-0 sticky top-20 z-10 max-h-[calc(100vh-5rem)] overflow-y-auto no-scrollbar">
         {leftSidebar}
       </aside>
 
@@ -25,7 +25,7 @@ export function SocialFeedLayout({
       </section>
 
       {/* Right Column: Online Study Buddies & Widgets */}
-      <aside className="hidden xl:block w-80 shrink-0 sticky top-20">
+      <aside className="hidden xl:block w-80 shrink-0 sticky top-20 z-10 max-h-[calc(100vh-5rem)] overflow-y-auto no-scrollbar">
         {rightSidebar}
       </aside>
     </div>
