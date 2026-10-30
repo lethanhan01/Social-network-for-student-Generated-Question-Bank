@@ -29,6 +29,23 @@ describe('Topbar', () => {
     expect(screen.getByRole('button', { name: /menu người dùng/i })).toBeInTheDocument()
   })
 
+  it('renders 5 primary navigation tabs in TopbarNav', () => {
+    render(
+      <MemoryRouter initialEntries={['/feed']}>
+        <Topbar />
+      </MemoryRouter>
+    )
+
+    const mainNav = screen.getByRole('navigation', { name: /thanh điều hướng chính/i })
+    expect(mainNav).toBeInTheDocument()
+
+    expect(screen.getByRole('link', { name: /mạng xã hội học tập/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /bạn bè & kết nối/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /ngân hàng câu hỏi/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /cửa hàng & túi đồ/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /đấu trường minigame/i })).toBeInTheDocument()
+  })
+
   it('renders and toggles mobile menu button when onToggleMobileMenu is provided', () => {
     const onToggle = vi.fn()
     const { rerender } = render(
@@ -53,4 +70,3 @@ describe('Topbar', () => {
     expect(closeBtn).toHaveAttribute('aria-expanded', 'true')
   })
 })
-

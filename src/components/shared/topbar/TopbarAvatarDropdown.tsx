@@ -1,11 +1,17 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { User, LogOut } from 'lucide-react'
+import { User, LogOut, LayoutDashboard, Settings } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/authStore'
 import { Avatar } from '@/components/ui/data-display'
 import { ThemeSegmentedControl } from '@/components/ui/navigation'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/overlay'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/overlay'
 import { authService } from '@/services/auth.service'
 import { toast } from '@/lib/toast'
 import { cn } from '@/utils/cn'
@@ -26,6 +32,16 @@ export function TopbarAvatarDropdown() {
     navigate('/profile')
   }
 
+  function goDashboard() {
+    setOpen(false)
+    navigate('/dashboard')
+  }
+
+  function goSettings() {
+    setOpen(false)
+    navigate('/settings')
+  }
+
   async function handleLogout() {
     setOpen(false)
     try {
@@ -42,6 +58,7 @@ export function TopbarAvatarDropdown() {
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
+        {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS, SEMANTIC_CLICK [Radix DropdownMenuTrigger asChild interactive avatar button] */}
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
@@ -64,6 +81,7 @@ export function TopbarAvatarDropdown() {
         sideOffset={8}
         className="w-56 p-1 bg-surface-elevated border border-line-subtle shadow-card rounded-xl text-fg-primary z-50"
       >
+        {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [User info summary header in dropdown] */}
         <div className="px-3 py-2 border-b border-line-subtle">
           <p className="text-sm font-semibold truncate text-fg-primary">
             {user?.fullName || 'Sinh viên HUST'}
@@ -81,8 +99,25 @@ export function TopbarAvatarDropdown() {
           <span>{tCommon('user.profile', 'Hồ sơ cá nhân')}</span>
         </DropdownMenuItem>
 
+        <DropdownMenuItem
+          onClick={goDashboard}
+          className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-surface-card-hover cursor-pointer"
+        >
+          <LayoutDashboard size={16} />
+          <span>{tCommon('nav.dashboard', 'Tổng quan học tập')}</span>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem
+          onClick={goSettings}
+          className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-surface-card-hover cursor-pointer"
+        >
+          <Settings size={16} />
+          <span>{tCommon('nav.settings', 'Cài đặt hệ thống')}</span>
+        </DropdownMenuItem>
+
         <DropdownMenuSeparator className="my-1 border-t border-line-subtle" />
 
+        {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Theme switcher row in dropdown] */}
         <div className="px-3 py-1.5">
           <p className="text-xs text-fg-muted mb-1.5 font-medium">Giao diện</p>
           <ThemeSegmentedControl size="sm" />

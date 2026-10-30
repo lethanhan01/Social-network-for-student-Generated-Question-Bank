@@ -3,7 +3,7 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 import DashboardLayout from './DashboardLayout'
 
-describe('DashboardLayout — Topbar & Sidebar Non-Overlapping Architecture', () => {
+describe('DashboardLayout — Topbar Navigation & Responsive Architecture', () => {
   function renderLayout() {
     return render(
       <MemoryRouter initialEntries={['/dashboard']}>
@@ -16,43 +16,36 @@ describe('DashboardLayout — Topbar & Sidebar Non-Overlapping Architecture', ()
     )
   }
 
-  it('positions Topbar at top-0 (h-16) with solid bg-surface-card and Sidebar starting strictly below at top-16', () => {
+  it('renders fixed Topbar at top-0 and provides full-width main container without sidebar offset', () => {
     renderLayout()
 
     const topbar = screen.getByRole('banner')
-    const sidebar = screen.getByRole('complementary', { name: /thanh điều hướng chính/i })
-
     expect(topbar).toHaveClass('fixed', 'top-0', 'left-0', 'right-0', 'h-16', 'bg-surface-card')
-    expect(sidebar).toHaveClass('fixed', 'top-16', 'bottom-0', 'left-0', 'bg-surface-card')
-    expect(sidebar).not.toHaveClass('top-0')
+
+    const main = screen.getByRole('main')
+    expect(main).toHaveClass('flex-1', 'w-full', 'pb-20', 'md:pb-6')
+    expect(main.parentElement).not.toHaveClass('md:pl-18')
+    expect(main.parentElement).toHaveClass('pt-16')
   })
 
-  it('expands Sidebar on desktop hover while remaining strictly below Topbar (top-16)', () => {
+  it('renders mobile BottomNavBar fixed at bottom-0 and hidden on md screens', () => {
     renderLayout()
 
-    const sidebar = screen.getByRole('complementary', { name: /thanh điều hướng chính/i })
-    expect(sidebar).toHaveClass('w-18')
-    expect(sidebar).not.toHaveClass('is-expanded')
-
-    fireEvent.mouseEnter(sidebar)
-    expect(sidebar).toHaveClass('w-64', 'is-expanded', 'top-16')
-    expect(sidebar).not.toHaveClass('top-0')
+    const bottomNav = screen.getByRole('navigation', { name: /điều hướng di động/i })
+    expect(bottomNav).toHaveClass('fixed', 'bottom-0', 'md:hidden', 'h-16', 'bg-surface-card')
   })
 
-  it('toggles mobile Sidebar drawer below Topbar via Topbar hamburger button', () => {
+  it('toggles MobileNavDrawer via Topbar hamburger button', () => {
     renderLayout()
 
-    const sidebar = screen.getByRole('complementary', { name: /thanh điều hướng chính/i })
     const toggleBtn = screen.getByRole('button', { name: /mở menu/i })
-
-    expect(sidebar).toHaveClass('-translate-x-full')
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
 
     fireEvent.click(toggleBtn)
-    expect(sidebar).toHaveClass('translate-x-0', 'is-mobile-open', 'top-16')
-    expect(screen.getByRole('button', { name: /đóng menu/i })).toHaveAttribute(
-      'aria-expanded',
-      'true'
-    )
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+
+    const closeBtn = screen.getByRole('button', { name: /đóng/i })
+    fireEvent.click(closeBtn)
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 })
-

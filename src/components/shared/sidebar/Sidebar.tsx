@@ -5,6 +5,10 @@ import { getSQBNavSections } from './sidebar.config'
 import type { SidebarProps } from './sidebar.types'
 import { cn } from '@/utils/cn'
 
+/**
+ * @deprecated Shell thanh điều hướng cạnh bên màn hình cũ.
+ * Toàn bộ điều hướng chính của hệ thống đã được phân bố lên Topbar (TopbarNav) và BottomBar (BottomNavBar).
+ */
 export function Sidebar({
   isMobileOpen = false,
   onCloseMobile,
@@ -55,7 +59,7 @@ export function Sidebar({
       )}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      aria-label="Thanh điều hướng chính"
+      aria-label="Thanh điều hướng cạnh bên cũ"
     >
       {/* Nav List */}
       <div className="flex-1 overflow-y-auto no-scrollbar px-2 py-4">
@@ -64,3 +68,4 @@ export function Sidebar({
     </aside>
   )
 }
+
