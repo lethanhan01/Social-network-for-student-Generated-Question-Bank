@@ -26,12 +26,20 @@ export function useEnrolledSubjectsQuery() {
   })
 }
 
+export function useEnrolledCourseClassesQuery() {
+  return useQuery({
+    queryKey: queryKeys.sessions.enrolledClasses(),
+    queryFn: ({ signal }) => sessionService.getMyEnrolledCourseClasses({ signal }),
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
 export function useProposeSessionMutation() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (payload: ProposeSessionRequest) => sessionService.proposeSession(payload),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.sessions.mySubmissions() })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.sessions.all })
     },
   })
 }

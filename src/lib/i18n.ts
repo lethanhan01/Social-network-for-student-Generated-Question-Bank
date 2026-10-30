@@ -12,6 +12,7 @@ import viHome from '../locales/vi/home.json'
 import viValidation from '../locales/vi/validation.json'
 import viChat from '../locales/vi/chat.json'
 import viGamification from '../locales/vi/gamification.json'
+import viAcademic from '../locales/vi/academic.json'
 
 import jaCommon from '../locales/ja/common.json'
 import jaAuth from '../locales/ja/auth.json'
@@ -23,6 +24,7 @@ import jaHome from '../locales/ja/home.json'
 import jaValidation from '../locales/ja/validation.json'
 import jaChat from '../locales/ja/chat.json'
 import jaGamification from '../locales/ja/gamification.json'
+import jaAcademic from '../locales/ja/academic.json'
 
 i18n
   .use(LanguageDetector)
@@ -32,12 +34,12 @@ i18n
       vi: {
         common: viCommon, auth: viAuth, member: viMember, trainer: viTrainer,
         staff: viStaff, owner: viOwner, home: viHome, validation: viValidation,
-        chat: viChat, gamification: viGamification,
+        chat: viChat, gamification: viGamification, academic: viAcademic,
       },
       ja: {
         common: jaCommon, auth: jaAuth, member: jaMember, trainer: jaTrainer,
         staff: jaStaff, owner: jaOwner, home: jaHome, validation: jaValidation,
-        chat: jaChat, gamification: jaGamification,
+        chat: jaChat, gamification: jaGamification, academic: jaAcademic,
       },
     },
     lng: localStorage.getItem('gym-locale') ?? 'vi',

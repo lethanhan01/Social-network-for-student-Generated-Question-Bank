@@ -53,11 +53,13 @@ export const practiceService = {
 
   async getQuestionRatings(
     questionId: number,
-    options?: { signal?: AbortSignal }
+    options?: { signal?: AbortSignal },
+    params?: { cursor?: string; limit?: number }
   ): Promise<QuestionRatingsResponse> {
     return requestData<QuestionRatingsResponse>(
       api.get<GlobalResponse<QuestionRatingsResponse>>(`/questions/${questionId}/ratings`, {
         signal: options?.signal,
+        params,
       })
     )
   },

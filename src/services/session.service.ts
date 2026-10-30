@@ -1,4 +1,5 @@
 import api, { requestData, type GlobalResponse } from './api'
+import type { EnrolledCourseClass } from '@/types/academic.types'
 import type {
   ProposeSessionRequest,
   ProposeSessionResponse,
@@ -40,7 +41,7 @@ export const sessionService = {
 
   async updateMySubmissionSession(
     sessionId: number,
-    payload: UpdateSubmissionSessionRequest
+    payload: UpdateSubmissionSessionRequest & { course_class_id?: number }
   ): Promise<void> {
     await api.put<GlobalResponse<void>>(`/sessions/my-submissions/${sessionId}`, payload)
   },
@@ -50,10 +51,13 @@ export const sessionService = {
   },
 
   async getMyEnrolledSubjects(options?: { signal?: AbortSignal }): Promise<SubjectResponse[]> {
-    return requestData<SubjectResponse[]>(
-      api.get<GlobalResponse<SubjectResponse[]>>('/sessions/my-enrolled-subjects', {
-        signal: options?.signal,
-      })
-    )
+    const classes = await sessionService.getMyEnrolledCourseClasses(options)
+    return Array.from(new Map(classes.filter((item) => item.subject_id != null).map((item) => [item.subject_id,
+      { subject_id: item.subject_id, code: item.subject_code, name: item.subject_name }])).values())
+  },
+
+  async getMyEnrolledCourseClasses(options?: { signal?: AbortSignal }): Promise<EnrolledCourseClass[]> {
+    return requestData<EnrolledCourseClass[]>(api.get<GlobalResponse<EnrolledCourseClass[]>>(
+      '/sessions/my-enrolled-course-classes', { signal: options?.signal }))
   },
 }
