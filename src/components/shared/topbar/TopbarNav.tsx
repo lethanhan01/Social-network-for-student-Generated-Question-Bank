@@ -1,5 +1,6 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { Tooltip } from '@/components/ui/overlay'
 import { PRIMARY_NAV_ITEMS } from '@/config/navigation.config'
 import { cn } from '@/utils/cn'
 
@@ -9,38 +10,37 @@ interface TopbarNavProps {
 
 export function TopbarNav({ className }: Readonly<TopbarNavProps>) {
   const { t } = useTranslation('common')
+  const { pathname } = useLocation()
 
   return (
     <nav
       aria-label="Thanh điều hướng chính"
-      className={cn('items-center h-16 gap-1 lg:gap-2', className)}
+      className={cn('flex items-center justify-center h-full gap-1 sm:gap-2', className)}
     >
       {PRIMARY_NAV_ITEMS.map((item) => {
         const label = t(item.labelKey, item.defaultLabel)
+        const isActive =
+          pathname === item.to ||
+          (item.to !== '/feed' && pathname.startsWith(`${item.to}/`))
 
         return (
-          <NavLink
-            key={item.id}
-            to={item.to}
-            title={label}
-            aria-label={label}
-            className={({ isActive }) =>
-              cn(
-                'min-h-11 min-w-11 px-3 py-2 flex items-center justify-center gap-2 rounded-lg transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-line-focus',
+          <Tooltip key={item.id} content={label} side="bottom" delayDuration={300}>
+            <NavLink
+              to={item.to}
+              aria-label={label}
+              title={label}
+              className={cn(
+                'h-full flex-1 max-w-[110px] min-w-[56px] px-2 flex items-center justify-center transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-line-focus min-h-11',
                 isActive
-                  ? 'border-b-2 border-action-accent bg-action-accent/10 text-action-accent font-semibold'
-                  : 'text-fg-muted hover:text-fg-primary hover:bg-surface-card-hover border-b-2 border-transparent'
-              )
-            }
-          >
-            {item.icon}
-            <strong className="hidden xl:inline font-medium text-xs whitespace-nowrap">
-              {label}
-            </strong>
-          </NavLink>
+                  ? 'border-b-[3px] border-action-accent text-action-accent font-semibold'
+                  : 'border-b-[3px] border-transparent text-fg-muted hover:text-fg-primary hover:bg-surface-card-hover hover:rounded-xl'
+              )}
+            >
+              {item.icon}
+            </NavLink>
+          </Tooltip>
         )
       })}
     </nav>
   )
 }
-

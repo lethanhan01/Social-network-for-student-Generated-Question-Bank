@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import {
-  MessageSquare,
+  Home,
   Users,
   HelpCircle,
   ShoppingBag,
@@ -19,42 +19,42 @@ export interface NavItemConfig {
   icon: ReactNode
 }
 
-/** 5 Phân hệ chính hiển thị trên Topbar (Desktop) và BottomNavBar (Mobile) */
+/** 5 Phân hệ chính hiển thị trên Topbar (Desktop) và BottomNavBar (Mobile) chuẩn Facebook layout */
 export const PRIMARY_NAV_ITEMS: NavItemConfig[] = [
   {
     id: 'feed',
     labelKey: 'nav.feed',
     defaultLabel: 'Mạng xã hội học tập',
     to: '/feed',
-    icon: <MessageSquare size={20} />,
+    icon: <Home size={26} />,
   },
   {
     id: 'friends',
     labelKey: 'nav.friends',
     defaultLabel: 'Bạn bè & kết nối',
     to: '/friends',
-    icon: <Users size={20} />,
+    icon: <Users size={24} />,
   },
   {
     id: 'questions',
     labelKey: 'nav.questions',
     defaultLabel: 'Ngân hàng câu hỏi',
     to: '/questions',
-    icon: <HelpCircle size={20} />,
+    icon: <HelpCircle size={24} />,
   },
   {
     id: 'shop',
     labelKey: 'nav.shop',
     defaultLabel: 'Cửa hàng & túi đồ',
     to: '/shop',
-    icon: <ShoppingBag size={20} />,
+    icon: <ShoppingBag size={24} />,
   },
   {
     id: 'minigames',
     labelKey: 'nav.minigames',
     defaultLabel: 'Đấu trường Minigame',
     to: '/gamification/minigames',
-    icon: <Gamepad2 size={20} />,
+    icon: <Gamepad2 size={24} />,
   },
 ]
 
@@ -89,4 +89,3 @@ export const SECONDARY_SHORTCUT_ITEMS: NavItemConfig[] = [
     icon: <Search size={18} />,
   },
 ]
-

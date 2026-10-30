@@ -27,6 +27,7 @@ describe('Topbar', () => {
 
     expect(screen.getByRole('link', { name: /sqb hust/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /menu người dùng/i })).toBeInTheDocument()
+    expect(screen.getByRole('searchbox', { name: /tìm kiếm trên sqb hust/i })).toBeInTheDocument()
   })
 
   it('renders 5 primary navigation tabs in TopbarNav', () => {
