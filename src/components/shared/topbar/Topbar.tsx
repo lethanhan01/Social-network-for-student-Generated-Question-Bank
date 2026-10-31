@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom'
-import { GraduationCap, Menu, X } from 'lucide-react'
+import { GraduationCap, Menu, X, MessageCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Button } from '@/components/ui/actions'
+import { Button, ButtonLink } from '@/components/ui/actions'
 import { ThemeToggle } from '@/components/ui/navigation'
 import { LanguageSwitcher } from '@/components/ui/typography'
 import { TopbarNav } from './TopbarNav'
@@ -72,6 +72,15 @@ export function Topbar({
       {/* Right: Global Actions */}
       {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Global action buttons row] */}
       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        <ButtonLink
+          to="/messages"
+          variant="ghost"
+          size="sm"
+          aria-label={t('nav.messages', 'Đoạn chat')}
+          className="min-h-11 min-w-11 p-0 rounded-full text-fg-muted hover:text-fg-primary hover:bg-surface-card-hover flex items-center justify-center shrink-0"
+        >
+          <MessageCircle size={20} />
+        </ButtonLink>
         <ThemeToggle />
         <LanguageSwitcher />
         <TopbarAvatarDropdown />

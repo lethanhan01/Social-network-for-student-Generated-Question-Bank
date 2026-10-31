@@ -59,19 +59,19 @@ export default function FriendsPage() {
 
   function handleAccept(requesterId?: number) {
     if (requesterId) {
-      performAction(() => acceptMutation.mutateAsync({ requester_id: requesterId }), t('friends.acceptedSuccess', 'Đã đồng ý kết bạn!'))
+      void performAction(() => acceptMutation.mutateAsync({ requester_id: requesterId }), t('friends.acceptedSuccess', 'Đã đồng ý kết bạn!'))
     }
   }
 
   function handleDecline(requesterId?: number) {
     if (requesterId) {
-      performAction(() => declineMutation.mutateAsync({ requester_id: requesterId }), t('friends.declinedSuccess', 'Đã từ chối kết bạn.'))
+      void performAction(() => declineMutation.mutateAsync({ requester_id: requesterId }), t('friends.declinedSuccess', 'Đã từ chối kết bạn.'))
     }
   }
 
   function handleUnblock(blockedId?: number) {
     if (blockedId) {
-      performAction(() => unblockMutation.mutateAsync(blockedId), t('friends.unblockedSuccess', 'Đã bỏ chặn.'))
+      void performAction(() => unblockMutation.mutateAsync(blockedId), t('friends.unblockedSuccess', 'Đã bỏ chặn.'))
     }
   }
 
