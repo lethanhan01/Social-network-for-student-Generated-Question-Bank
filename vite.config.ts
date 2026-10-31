@@ -40,6 +40,13 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false,
           configure: (proxy) => {
+            // Both loopback URLs serve this dev app; the backend permits localhost only.
+            // Normalize only this exact local origin, never arbitrary external origins.
+            proxy.on('proxyReq', (proxyReq) => {
+              if (proxyReq.getHeader('origin') === 'http://127.0.0.1:5173') {
+                proxyReq.setHeader('origin', 'http://localhost:5173')
+              }
+            })
             proxy.on('error', (err, _req, res) => {
               const code = (err as { code?: string }).code
               if (code === 'ECONNRESET' || code === 'ECONNABORTED' || code === 'ECONNREFUSED') {
