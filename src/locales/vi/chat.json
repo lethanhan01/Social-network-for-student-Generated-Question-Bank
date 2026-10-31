@@ -125,5 +125,8 @@
   "connected": "Đã kết nối",
   "reconnecting": "Đang kết nối lại...",
   "disconnected": "Mất kết nối realtime",
+  "loadError": "Không thể tải tin nhắn",
+  "loadErrorDesc": "Hội thoại có thể bị kẹt biên nhận đọc từ máy chủ. Bấm Thử lại hoặc gửi một tin nhắn để tự động kết nối lại.",
+  "unlockSync": "Mở khóa hội thoại",
   "noFriendsFound": "Không tìm thấy bạn bè nào"
 }

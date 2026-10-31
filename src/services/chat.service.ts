@@ -17,7 +17,7 @@ import type {
 
 export const chatService = {
   async getConversations(
-    params?: { cursor?: string; limit?: number },
+    params?: { after?: number; limit?: number },
     options?: { signal?: AbortSignal }
   ): Promise<ConversationListResponseDto> {
     return requestData<ConversationListResponseDto>(
@@ -99,7 +99,7 @@ export const chatService = {
 
   async getMessages(
     id: number,
-    params?: { cursor?: string; limit?: number },
+    params?: { after?: number; limit?: number },
     options?: { signal?: AbortSignal }
   ): Promise<MessageListResponseDto> {
     return requestData<MessageListResponseDto>(

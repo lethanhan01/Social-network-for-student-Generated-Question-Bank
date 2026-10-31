@@ -17,6 +17,8 @@ interface ChatMessageListProps {
   onReply: (msg: MessageDto) => void
   onRecall: (msg: MessageDto) => void
   onRetry: () => void
+  onUnlock?: () => void
+  isUnlocking?: boolean
 }
 
 export function ChatMessageList({
@@ -30,6 +32,8 @@ export function ChatMessageList({
   onReply,
   onRecall,
   onRetry,
+  onUnlock,
+  isUnlocking,
 }: Readonly<ChatMessageListProps>) {
   const { t } = useTranslation('chat')
 
@@ -58,12 +62,23 @@ export function ChatMessageList({
   if (isError) {
     return (
       /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Message list error state] */
-      <div className="flex-1 min-h-0 flex flex-col items-center justify-center text-center p-6 space-y-2">
+      <div className="flex-1 min-h-0 flex flex-col items-center justify-center text-center p-6 space-y-3">
         <AlertCircle className="w-10 h-10 text-status-danger-fg" />
-        <p className="text-sm text-fg-muted">{t('loadError', 'Không thể tải tin nhắn')}</p>
-        <Button variant="secondary" size="sm" onClick={onRetry}>
-          {t('retry', 'Thử lại')}
-        </Button>
+        <p className="text-sm font-medium text-fg-primary">{t('loadError', 'Không thể tải tin nhắn')}</p>
+        <p className="text-xs text-fg-muted max-w-sm">
+          {t('loadErrorDesc', 'Hội thoại có thể bị kẹt biên nhận đọc từ máy chủ. Bấm Thử lại hoặc gửi một tin nhắn để tự động kết nối lại.')}
+        </p>
+        {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Action button row for error state] */}
+        <div className="flex items-center gap-2">
+          <Button variant="secondary" size="sm" onClick={onRetry}>
+            {t('retry', 'Thử lại')}
+          </Button>
+          {onUnlock ? (
+            <Button variant="primary" size="sm" onClick={onUnlock} loading={isUnlocking}>
+              {t('unlockSync', 'Mở khóa hội thoại')}
+            </Button>
+          ) : null}
+        </div>
       </div>
     )
   }

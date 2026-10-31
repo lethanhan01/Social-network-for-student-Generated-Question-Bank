@@ -45,6 +45,7 @@ export function ChatConversationView({
   const [replyTo, setReplyTo] = useState<MessageDto | null>(null)
   const [recallTarget, setRecallTarget] = useState<MessageDto | null>(null)
   const [isEmojiOpen, setIsEmojiOpen] = useState(false)
+  const [isUnlocking, setIsUnlocking] = useState(false)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -65,7 +66,7 @@ export function ChatConversationView({
     messagesQuery.data.pages.forEach((page) => {
       if (page.messages) list.push(...page.messages)
     })
-    return list
+    return list.slice().reverse()
   }, [messagesQuery.data?.pages])
 
   useEffect(() => {
@@ -110,6 +111,11 @@ export function ChatConversationView({
     setMediaUrl(null)
     setReplyTo(null)
     onSendTyping(false)
+    if (messagesQuery.isError) {
+      setTimeout(() => {
+        void messagesQuery.refetch()
+      }, 500)
+    }
   }
 
   function handleSubmit(e: SyntheticEvent<HTMLFormElement>) {
@@ -131,6 +137,21 @@ export function ChatConversationView({
       toast.error(getApiError(err))
     } finally {
       setRecallTarget(null)
+    }
+  }
+
+  async function handleUnlock() {
+    if (!conversationId) return
+    setIsUnlocking(true)
+    try {
+      websocketService.sendMessage({
+        conversation_id: conversationId,
+        content: 'Đồng bộ kết nối #SQB_SYNC',
+      })
+      await new Promise((resolve) => setTimeout(resolve, 600))
+      await messagesQuery.refetch()
+    } finally {
+      setIsUnlocking(false)
     }
   }
 
@@ -183,6 +204,8 @@ export function ChatConversationView({
         onReply={setReplyTo}
         onRecall={setRecallTarget}
         onRetry={() => void messagesQuery.refetch()}
+        onUnlock={handleUnlock}
+        isUnlocking={isUnlocking}
       />
 
       <footer className="p-3 bg-surface-card border-t border-line-subtle shrink-0">

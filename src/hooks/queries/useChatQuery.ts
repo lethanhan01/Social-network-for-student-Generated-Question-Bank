@@ -1,5 +1,11 @@
 import { useEffect, useState, useCallback } from 'react'
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+  type InfiniteData,
+} from '@tanstack/react-query'
 import { chatService } from '@/services/chat.service'
 import { websocketService, type WsConnectionStatus } from '@/services/websocket.service'
 import { queryKeys } from '@/lib/query-keys'
@@ -11,7 +17,7 @@ import type {
   MessageDto,
 } from '@/types'
 
-export function useConversationsQuery(params?: { cursor?: string; limit?: number }) {
+export function useConversationsQuery(params?: { after?: number; limit?: number }) {
   return useQuery({
     queryKey: queryKeys.conversations.list(params),
     queryFn: ({ signal }) => chatService.getConversations(params, { signal }),
@@ -20,7 +26,7 @@ export function useConversationsQuery(params?: { cursor?: string; limit?: number
 
 export function useConversationMessagesQuery(
   conversationId: number,
-  params?: { cursor?: string; limit?: number }
+  params?: { after?: number; limit?: number }
 ) {
   return useQuery({
     queryKey: queryKeys.conversations.messages(conversationId, params),
@@ -35,12 +41,14 @@ export function useConversationMessagesInfiniteQuery(conversationId: number) {
     queryFn: ({ pageParam, signal }) =>
       chatService.getMessages(
         conversationId,
-        pageParam ? { cursor: String(pageParam), limit: 20 } : { limit: 20 },
+        pageParam != null ? { after: Number(pageParam), limit: 20 } : { limit: 20 },
         { signal }
       ),
-    initialPageParam: undefined as string | undefined,
+    initialPageParam: undefined as number | undefined,
     getNextPageParam: (lastPage) =>
-      lastPage.pagination?.after ? String(lastPage.pagination.after) : undefined,
+      lastPage.pagination?.has_next && lastPage.pagination?.after != null
+        ? Number(lastPage.pagination.after)
+        : undefined,
     enabled: Number.isFinite(conversationId) && conversationId > 0,
   })
 }
@@ -92,11 +100,13 @@ export function useChatRealtimeSync(activeConversationId?: number) {
 
     const unsubMsg = websocketService.onMessage((msg) => {
       // 1. Append message to active conversation cache if open
-      queryClient.setQueriesData<MessageListResponseDto>(
+      queryClient.setQueriesData<InfiniteData<MessageListResponseDto>>(
         { queryKey: queryKeys.conversations.messages(msg.conversation_id) },
         (old) => {
-          if (!old) return old
-          const exists = old.messages?.some((m) => m.message_id === msg.message_id)
+          if (!old?.pages?.length) return old
+          const exists = old.pages.some((page) =>
+            page.messages?.some((m) => m.message_id === msg.message_id)
+          )
           if (exists) return old
 
           const newMsg: MessageDto = {
@@ -113,12 +123,22 @@ export function useChatRealtimeSync(activeConversationId?: number) {
             created_at: msg.created_at,
           }
 
+          const newPages = old.pages.map((p, i) =>
+            i === 0 ? { ...p, messages: [newMsg, ...(p.messages || [])] } : p
+          )
           return {
             ...old,
-            messages: [...(old.messages || []), newMsg],
+            pages: newPages,
           }
         }
       )
+
+      if (activeConversationId === msg.conversation_id) {
+        const queryState = queryClient.getQueryState(queryKeys.conversations.messages(msg.conversation_id))
+        if (queryState?.status === 'error') {
+          void queryClient.invalidateQueries({ queryKey: queryKeys.conversations.messages(msg.conversation_id) })
+        }
+      }
 
       // 2. Update conversation list preview
       queryClient.setQueriesData<ConversationListResponseDto>(
