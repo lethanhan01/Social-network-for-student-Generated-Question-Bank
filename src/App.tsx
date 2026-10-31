@@ -21,6 +21,11 @@ const LeaderboardPage = lazy(() => import('./pages/gamification/LeaderboardPage'
 const ShopPage = lazy(() => import('./pages/gamification/ShopPage'))
 const MinigamesPage = lazy(() => import('./pages/gamification/MinigamesPage'))
 
+const MessagesPage = lazy(() => import('./pages/messages/MessagesPage'))
+const HiddenVaultPage = lazy(() => import('./pages/messages/HiddenVaultPage'))
+const SettingsPage = lazy(() => import('./pages/settings/SettingsPage'))
+const NotificationsPage = lazy(() => import('./pages/notifications/NotificationsPage'))
+
 export default function App() {
   // Sync global theme
   useTheme()
@@ -50,7 +55,10 @@ export default function App() {
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/exams" element={<DashboardPage />} />
               <Route path="/questions" element={<DashboardPage />} />
-              <Route path="/settings" element={<DashboardPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/messages" element={<MessagesPage />} />
+              <Route path="/messages/hidden-vault" element={<HiddenVaultPage />} />
+              <Route path="/notifications" element={<NotificationsPage />} />
               <Route path="/gamification/leaderboard" element={<LeaderboardPage />} />
               <Route path="/gamification/minigames" element={<MinigamesPage />} />
               <Route path="/shop" element={<ShopPage />} />

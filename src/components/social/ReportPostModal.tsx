@@ -1,155 +1,97 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { AlertTriangle } from 'lucide-react'
-import { Modal } from '@/components/ui/overlay'
-import {
-  Form,
-  FormField,
-  Textarea,
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from '@/components/ui/forms'
+import { Flag } from 'lucide-react'
+import { Form, FormField, Textarea, Select } from '@/components/ui/forms'
 import { Button, SubmitButton } from '@/components/ui/actions'
-import { Text } from '@/components/ui/typography'
+import { PortalDialog } from '@/components/portal/PortalDialog'
+import { reportDescriptionSchema } from '@/components/portal/portal.schemas'
 import { useReportMutation } from '@/hooks/queries/useReportMutation'
 import { toast } from '@/lib/toast'
+import { getApiError } from '@/lib/api-error'
+import type { CreateReportRequestDto } from '@/types'
 
 export interface ReportModalProps {
   isOpen: boolean
   targetType?: 'POST' | 'COMMENT' | 'USER'
   targetId?: number
-  postId?: number // backward compatibility
+  postId?: number
   onClose: () => void
 }
-
-export function ReportModal({
-  isOpen,
-  targetType = 'POST',
-  targetId,
-  postId,
-  onClose,
-}: Readonly<ReportModalProps>) {
-  const { t } = useTranslation()
-  const actualTargetId = targetId ?? postId ?? 0
-  const [violationType, setViolationType] = useState<
-    'SPAM' | 'HARASSMENT' | 'HATE_STATEMENT' | 'OTHER'
-  >('SPAM')
+type Reason = CreateReportRequestDto['violation_type']
+const reasons: Reason[] = ['SPAM', 'HARASSMENT', 'HATE_STATEMENT', 'OTHER']
+function ReportForm({ targetType = 'POST', targetId, postId, onClose }: Omit<ReportModalProps, 'isOpen'>) {
+  const { t } = useTranslation('portal')
+  const [reason, setReason] = useState<Reason>('SPAM')
   const [description, setDescription] = useState('')
-
-  const reportMutation = useReportMutation()
-
+  const [error, setError] = useState('')
+  const mutation = useReportMutation()
   async function handleSubmit() {
-    if (!actualTargetId) {
-      toast.error(t('report.invalidTarget', 'Mục tiêu báo cáo không hợp lệ.'))
+    const id = targetId ?? postId ?? 0
+    if (!Number.isSafeInteger(id) || id <= 0 || !reportDescriptionSchema.safeParse(description).success) {
+      setError(t('report.invalid'))
       return
     }
-
     try {
-      await reportMutation.mutateAsync({
+      await mutation.mutateAsync({
         target_type: targetType,
-        target_id: actualTargetId,
-        violation_type: violationType,
+        target_id: id,
+        violation_type: reason,
         description: description.trim() || undefined,
       })
-      toast.success(t('report.success', 'Đã gửi báo cáo vi phạm'), {
-        description: t(
-          'report.successDesc',
-          'Đội ngũ kiểm duyệt HUST sẽ xem xét và xử lý trong 24h.'
-        ),
-      })
-      setDescription('')
+      toast.success(t('report.success'))
       onClose()
-    } catch {
-      toast.error(
-        t('report.error', 'Không thể gửi báo cáo vi phạm. Vui lòng kiểm tra lại kết nối.')
-      )
+    } catch (cause) {
+      setError(getApiError(cause, t('error')))
     }
   }
-
-  function handleClose() {
-    if (!reportMutation.isPending) {
-      onClose()
-    }
+  const handleClose = () => {
+    if (!mutation.isPending) onClose()
   }
-
   return (
-    <Modal
-      open={isOpen}
-      onClose={handleClose}
-      title={t('report.title', 'Báo cáo vi phạm nội dung')}
-      size="md"
-    >
-      <Form onSubmit={handleSubmit} noValidate className="space-y-4">
-        {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Warning note layout] */}
-        <div className="flex items-start gap-2.5 p-3 rounded-xl bg-tone-warning/10 border border-tone-warning/20 text-tone-warning text-xs">
-          <AlertTriangle size={18} className="shrink-0 mt-0.5" />
-          <Text size="xs" className="leading-relaxed">
-            {t(
-              'report.guideline',
-              'Hành vi báo cáo sai sự thật liên tục có thể bị trừ điểm uy tín học thuật theo quy chế SQB HUST.'
-            )}
-          </Text>
-        </div>
-
-        <FormField label={t('report.reason', 'Lý do báo cáo vi phạm')} required>
+    <PortalDialog title={t('report.title')} description={t('report.description')} onClose={handleClose}>
+      <p className="flex gap-3 rounded-xl bg-action-accent-soft p-4 text-sm text-fg-secondary">
+        <Flag size={22} className="shrink-0 text-action-accent" />
+        {t('report.guideline')}
+      </p>
+      <Form noValidate aria-label={t('report.title')} onSubmit={() => void handleSubmit()} className="space-y-4">
+        <FormField htmlFor="portal-reportpostmodal-0" label={t('report.reason')} required>
           <Select
-            aria-label="Lý do báo cáo vi phạm"
-            value={violationType}
-            onValueChange={(val) =>
-              setViolationType(val as 'SPAM' | 'HARASSMENT' | 'HATE_STATEMENT' | 'OTHER')
-            }
-          >
-            <SelectTrigger aria-label="Lý do báo cáo" className="min-h-11">
-              <SelectValue placeholder={t('report.selectReason', 'Chọn lý do báo cáo')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="SPAM">{t('report.reasons.spam', 'Spam / Quảng cáo không phù hợp')}</SelectItem>
-              <SelectItem value="HARASSMENT">{t('report.reasons.harassment', 'Quấy rối / Công kích cá nhân')}</SelectItem>
-              <SelectItem value="HATE_STATEMENT">{t('report.reasons.hate', 'Ngôn từ thù ghét / Xúc phạm')}</SelectItem>
-              <SelectItem value="OTHER">{t('report.reasons.other', 'Vi phạm quy chế khác')}</SelectItem>
-            </SelectContent>
-          </Select>
-        </FormField>
-
-        <FormField label={t('report.detailLabel', 'Mô tả chi tiết bổ sung (Tùy chọn)')}>
-          <Textarea
-            aria-label="Mô tả chi tiết"
-            placeholder={t(
-              'report.detailPlaceholder',
-              'Cung cấp thêm chi tiết để kiểm duyệt viên thẩm định chính xác hơn...'
-            )}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={3}
-            className="text-xs"
+            id="portal-reportpostmodal-0"
+            ariaLabel={t('report.reason')}
+            value={reason}
+            clearable={false}
+            onValueChange={(value) => {
+              const match = reasons.find((item) => item === value)
+              if (match) setReason(match)
+              setError('')
+            }}
+            options={reasons.map((value) => ({ value, label: t(`report.reasons.${value}`) }))}
           />
         </FormField>
-
-        <footer className="flex items-center justify-end gap-3 pt-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleClose}
-            disabled={reportMutation.isPending}
-            className="min-h-11"
-          >
-            {t('common.cancel', 'Hủy')}
+        <FormField label={t('report.details')} error={error}>
+          <Textarea
+            aria-label={t('report.details')}
+            rows={4}
+            maxLength={2000}
+            value={description}
+            placeholder={t('report.placeholder')}
+            onChange={(e) => {
+              setDescription(e.target.value)
+              setError('')
+            }}
+          />
+        </FormField>
+        <footer className="flex justify-end gap-3">
+          <Button variant="outline" disabled={mutation.isPending} onClick={handleClose}>
+            {t('cancel')}
           </Button>
-          <SubmitButton
-            loading={reportMutation.isPending}
-            variant="primary"
-            className="min-h-11 bg-tone-danger hover:bg-tone-danger/90 border-transparent text-white"
-          >
-            {t('report.submit', 'Gửi báo cáo vi phạm')}
-          </SubmitButton>
+          <SubmitButton loading={mutation.isPending}>{t('report.submit')}</SubmitButton>
         </footer>
       </Form>
-    </Modal>
+    </PortalDialog>
   )
 }
-
-// Export backward compatibility alias
+export function ReportModal({ isOpen, ...props }: Readonly<ReportModalProps>) {
+  return isOpen ? <ReportForm {...props} /> : null
+}
 export const ReportPostModal = ReportModal

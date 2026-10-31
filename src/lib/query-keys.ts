@@ -67,6 +67,8 @@ export const queryKeys = {
   },
   conversations: {
     all: ['conversations'] as const,
+    inbox: () => ['conversations', 'inbox'] as const,
+    messageThread: (id: number) => ['conversations', 'messages', id] as const,
     list: (params?: Record<string, unknown>) => ['conversations', 'list', params] as const,
     detail: (id: number) => ['conversations', 'detail', id] as const,
     members: (id: number) => ['conversations', 'members', id] as const,
