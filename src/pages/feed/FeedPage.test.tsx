@@ -84,9 +84,9 @@ describe('FeedPage Component', () => {
     )
 
     expect(screen.getByRole('heading', { level: 1, name: /Bảng tin & Hoạt động/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Tất cả bảng tin/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Môn học/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Ghi chú Giảng viên/i })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: /Tất cả bảng tin/i })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: /Môn học/i })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: /Ghi chú Giảng viên/i })).toBeInTheDocument()
     expect(await screen.findByText(/Bài viết kiểm thử trên FeedPage/i)).toBeInTheDocument()
   })
 })

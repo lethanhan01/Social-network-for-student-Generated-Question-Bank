@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { Heading, Text } from '@/components/ui/typography'
 import { Button } from '@/components/ui/actions'
 import { Badge } from '@/components/ui/data-display'
+import { Page } from '@/components/ui/layout'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/navigation'
 import {
   SocialFeedLayout,
   SocialLeftSidebar,
@@ -58,6 +60,9 @@ export default function FeedPage() {
 
     if (selectedSubjectId) {
       list = list.filter((p) => p.subject_id === selectedSubjectId)
+    } else if (activeTab === 'MY_SUBJECTS' && subjects.length > 0) {
+      const mySubjectIds = new Set(subjects.map((s) => s.subject_id).filter(Boolean))
+      list = list.filter((p) => p.subject_id && mySubjectIds.has(p.subject_id))
     }
 
     if (activeTab === 'LECTURERS') {
@@ -65,7 +70,7 @@ export default function FeedPage() {
     }
 
     return list
-  }, [allPosts, selectedSubjectId, activeTab])
+  }, [allPosts, selectedSubjectId, activeTab, subjects])
 
   async function handleToggleReact(postId: number, reactionType: 'LIKE' | 'LOVE' | 'WOW' = 'LIKE') {
     await toggleReactionMutation.mutateAsync({
@@ -103,9 +108,9 @@ export default function FeedPage() {
             </Button>
           ) : null}
 
-          {filteredPosts.map((post) => (
+          {filteredPosts.map((post, idx) => (
             <PostCard
-              key={post.post_id || Math.random()}
+              key={post.post_id ? `post-${post.post_id}` : `feed-post-${idx}`}
               post={post}
               currentUserAvatar={currentUser?.avatar_url || undefined}
               currentUserName={currentUser?.full_name || 'Bạn'}
@@ -137,8 +142,7 @@ export default function FeedPage() {
   }
 
   return (
-    /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Page vertical stack wrapper] */
-    <div className="space-y-6">
+    <Page className="space-y-6">
       {/* Page Header */}
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-line-subtle">
         <hgroup>
@@ -179,48 +183,31 @@ export default function FeedPage() {
               onOpenCreateModal={() => setIsCreateModalOpen(true)}
             />
 
-            {/* Filter Tabs Bar */}
-            <nav
-              aria-label="Bộ lọc bảng tin"
-              className="flex items-center gap-2 overflow-x-auto pb-1 border-b border-line-subtle"
+            {/* Filter Tabs Component */}
+            <Tabs
+              value={activeTab}
+              onValueChange={(val) => {
+                setActiveTab(val as typeof activeTab)
+                if (val !== 'MY_SUBJECTS') setSelectedSubjectId(undefined)
+              }}
+              variant="pills"
+              className="space-y-4"
             >
-              <Button
-                variant={activeTab === 'ALL' && !selectedSubjectId ? 'secondary' : 'ghost'}
-                size="sm"
-                onClick={() => {
-                  setActiveTab('ALL')
-                  setSelectedSubjectId(undefined)
-                }}
-                className="text-xs min-h-11"
-                leftIcon={<Sparkles size={15} />}
-              >
-                {t('feed.tabs.all', 'Tất cả bảng tin')}
-              </Button>
-              <Button
-                variant={activeTab === 'MY_SUBJECTS' || selectedSubjectId ? 'secondary' : 'ghost'}
-                size="sm"
-                onClick={() => setActiveTab('MY_SUBJECTS')}
-                className="text-xs min-h-11"
-                leftIcon={<BookOpen size={15} />}
-              >
-                {t('feed.tabs.my_subjects', 'Môn học')} ({subjects.length})
-              </Button>
-              <Button
-                variant={activeTab === 'LECTURERS' ? 'secondary' : 'ghost'}
-                size="sm"
-                onClick={() => {
-                  setActiveTab('LECTURERS')
-                  setSelectedSubjectId(undefined)
-                }}
-                className="text-xs min-h-11"
-                leftIcon={<GraduationCap size={15} />}
-              >
-                {t('feed.tabs.lecturers', 'Ghi chú Giảng viên')}
-              </Button>
-            </nav>
-
-            {/* Posts Feed Stream */}
-            {renderFeedStream()}
+              <TabsList aria-label={t('feed.tabs.label', 'Bộ lọc bảng tin')} className="overflow-x-auto">
+                <TabsTrigger value="ALL" leftIcon={<Sparkles size={15} />}>
+                  {t('feed.tabs.all', 'Tất cả bảng tin')}
+                </TabsTrigger>
+                <TabsTrigger value="MY_SUBJECTS" leftIcon={<BookOpen size={15} />}>
+                  {t('feed.tabs.my_subjects', 'Môn học')} ({subjects.length})
+                </TabsTrigger>
+                <TabsTrigger value="LECTURERS" leftIcon={<GraduationCap size={15} />}>
+                  {t('feed.tabs.lecturers', 'Ghi chú Giảng viên')}
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value={activeTab}>
+                {renderFeedStream()}
+              </TabsContent>
+            </Tabs>
           </div>
         }
         rightSidebar={<SocialRightSidebar friends={friends} />}
@@ -233,6 +220,6 @@ export default function FeedPage() {
         onSubmit={createPost}
         subjects={subjects}
       />
-    </div>
+    </Page>
   )
 }

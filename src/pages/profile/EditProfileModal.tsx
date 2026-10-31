@@ -7,14 +7,10 @@ import {
   FormField,
   Input,
   Textarea,
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
 } from '@/components/ui/forms'
 import { Button, SubmitButton } from '@/components/ui/actions'
 import { Avatar } from '@/components/ui/data-display'
+import { Icon } from '@/components/ui/typography'
 import { useUpdateProfileMutation } from '@/hooks/queries/useProfileQuery'
 import { uploadSingleMedia } from '@/services/media-upload.service'
 import { toast } from '@/lib/toast'
@@ -32,18 +28,15 @@ export function EditProfileModal({
   onClose,
 }: Readonly<EditProfileModalProps>) {
   const { t } = useTranslation()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const updateMutation = useUpdateProfileMutation()
+
   const [fullName, setFullName] = useState(profile.full_name || '')
   const [bio, setBio] = useState(profile.bio || '')
-  const [gender, setGender] = useState<'MALE' | 'FEMALE'>(
-    profile.gender === 'FEMALE' ? 'FEMALE' : 'MALE'
-  )
   const avatarUrl = profile.avatar_url || ''
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
-  const updateMutation = useUpdateProfileMutation()
 
   function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -53,7 +46,8 @@ export function EditProfileModal({
     }
   }
 
-  async function handleSubmit() {
+  async function handleSubmit(e?: React.SubmitEvent) {
+    e?.preventDefault()
     setLoading(true)
     try {
       let finalAvatarUrl = avatarUrl
@@ -67,7 +61,6 @@ export function EditProfileModal({
       await updateMutation.mutateAsync({
         full_name: fullName.trim(),
         bio: bio.trim() || undefined,
-        gender,
         avatar_url: finalAvatarUrl || undefined,
       })
       toast.success(t('profile.updateSuccess', 'Cập nhật thông tin hồ sơ thành công!'))
@@ -94,14 +87,15 @@ export function EditProfileModal({
               size="lg"
               tone="accent"
             />
-            {/* rogym-convention-exempt: NO_RAW_FORM_ELEMENTS [Hidden native file input for avatar selection] */}
+            {/* rogym-convention-exempt: NO_RAW_FORM_ELEMENTS, FORMS_LABEL_ASSOC [Hidden native file input for avatar selection] */}
             <input
+              id="edit-profile-avatar-input"
               type="file"
               ref={fileInputRef}
               onChange={handleFileChange}
               accept="image/*"
               className="hidden"
-              aria-label="Tải lên ảnh đại diện mới"
+              aria-label={t('profile.avatarUploadLabel', 'Tải lên ảnh đại diện mới')}
             />
             <Button
               type="button"
@@ -109,57 +103,47 @@ export function EditProfileModal({
               size="sm"
               onClick={() => fileInputRef.current?.click()}
               className="absolute bottom-0 right-0 rounded-full w-8 h-8 p-0 min-h-8 min-w-8 shadow"
-              aria-label="Đổi ảnh đại diện"
+              aria-label={t('profile.changeAvatarLabel', 'Đổi ảnh đại diện')}
             >
-              <Camera size={14} />
+              <Icon icon={Camera} size="xs" />
             </Button>
           </div>
         </div>
 
         <FormField label={t('profile.fullNameLabel', 'Họ và tên')} required>
           <Input
-            aria-label="Họ và tên"
+            id="profile-fullName"
+            aria-label={t('profile.fullNameLabel', 'Họ và tên')}
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             className="text-sm min-h-11"
+            placeholder={t('profile.fullNamePlaceholder', 'Nguyễn Văn A')}
+            required
           />
-        </FormField>
-
-        <FormField label={t('profile.genderLabel', 'Giới tính')}>
-          <Select
-            aria-label="Giới tính"
-            value={gender}
-            onValueChange={(val) => setGender(val as 'MALE' | 'FEMALE')}
-          >
-            <SelectTrigger aria-label="Chọn giới tính" className="min-h-11">
-              <SelectValue placeholder="Chọn giới tính" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="MALE">{t('profile.genderMale', 'Nam')}</SelectItem>
-              <SelectItem value="FEMALE">{t('profile.genderFemale', 'Nữ')}</SelectItem>
-            </SelectContent>
-          </Select>
         </FormField>
 
         <FormField label={t('profile.bioLabel', 'Tiểu sử / Giới thiệu')}>
           <Textarea
-            aria-label="Tiểu sử bản thân"
+            id="profile-bio"
+            aria-label={t('profile.bioLabel', 'Tiểu sử / Giới thiệu bản thân')}
             value={bio}
             onChange={(e) => setBio(e.target.value)}
+            placeholder={t('profile.bioPlaceholder', 'Chia sẻ đôi nét về bạn...')}
             rows={3}
             maxLength={300}
             className="text-sm"
           />
         </FormField>
 
-        <footer className="flex items-center justify-end gap-3 pt-2">
-          <Button type="button" variant="outline" onClick={onClose} disabled={loading} className="min-h-11">
+        {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Modal action buttons container] */}
+        <div className="flex items-center justify-end gap-3 pt-3 border-t border-line-subtle">
+          <Button variant="outline" type="button" onClick={onClose} disabled={loading || updateMutation.isPending} className="min-h-11">
             {t('common.cancel', 'Hủy')}
           </Button>
-          <SubmitButton loading={loading} variant="primary" className="min-h-11 px-6">
+          <SubmitButton loading={loading || updateMutation.isPending} variant="primary" className="min-h-11 px-6">
             {t('common.saveChanges', 'Lưu thay đổi')}
           </SubmitButton>
-        </footer>
+        </div>
       </Form>
     </Modal>
   )

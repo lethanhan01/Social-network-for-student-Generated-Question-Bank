@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Award, ShieldAlert } from 'lucide-react'
 import { Card, Badge, Image } from '@/components/ui/data-display'
-import { Heading, Text } from '@/components/ui/typography'
+import { Heading, Text, Icon } from '@/components/ui/typography'
 import { useUserBadgesQuery } from '@/hooks/queries/useGamificationQuery'
 import { formatDate } from '@/utils/date'
 
@@ -18,7 +18,7 @@ export function ProfileBadgesCard({ userId }: Readonly<ProfileBadgesCardProps>) 
       <header className="flex items-center justify-between">
         {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Header title flex layout] */}
         <div className="flex items-center gap-2">
-          <Award size={18} className="text-tone-warning" />
+          <Icon icon={Award} size="sm" tone="warning" />
           <Heading level={3} className="text-sm font-bold text-text-primary">
             {t('profile.badgesTitle', 'Huy hiệu thành tích')}
           </Heading>
@@ -49,8 +49,8 @@ export function ProfileBadgesCard({ userId }: Readonly<ProfileBadgesCardProps>) 
                 />
               ) : (
                 /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Badge placeholder circle] */
-                <div className="w-10 h-10 rounded-full bg-tone-warning/15 text-tone-warning flex items-center justify-center">
-                  <Award size={20} />
+                <div className="w-10 h-10 rounded-full bg-status-warning-bg text-status-warning-fg flex items-center justify-center">
+                  <Icon icon={Award} size="md" tone="warning" />
                 </div>
               )}
               <strong className="text-xs font-semibold text-text-primary line-clamp-1">
@@ -72,7 +72,7 @@ export function ProfileBadgesCard({ userId }: Readonly<ProfileBadgesCardProps>) 
       ) : (
         /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Empty badges state container] */
         <div className="text-center py-4 space-y-1">
-          <ShieldAlert size={24} className="mx-auto text-text-muted" />
+          <Icon icon={ShieldAlert} size="lg" fg="muted" className="mx-auto" />
           <Text size="xs" tone="muted">
             {t('profile.emptyBadges', 'Chưa đạt được huy hiệu học tập nào.')}
           </Text>

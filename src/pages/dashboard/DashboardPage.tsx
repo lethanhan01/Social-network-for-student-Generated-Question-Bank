@@ -1,7 +1,9 @@
 import { BookOpen, FileQuestion, MessageSquare, TrendingUp, Plus, Search } from 'lucide-react'
 import { Card, StatCard, Badge, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/data-display'
 import { Button, ButtonLink } from '@/components/ui/actions'
-import { Heading, Text } from '@/components/ui/typography'
+import { Heading, Text, Icon } from '@/components/ui/typography'
+import { Page } from '@/components/ui/layout'
+import { formatNumber } from '@/utils/formatters'
 import { useAuthStore } from '@/stores/authStore'
 
 const RECENT_EXAMS = [
@@ -15,14 +17,15 @@ export default function DashboardPage() {
   const user = useAuthStore((s) => s.user)
 
   return (
-    <div className="space-y-8">
+    <Page className="space-y-8">
       {/* Welcome Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-surface p-6 rounded-2xl border border-line-subtle shadow-sm">
-        <div>
+      <Card as="section" className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 bg-surface border-line-subtle shadow-sm rounded-2xl">
+        <hgroup>
+          {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Badge row] */}
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-action-accent/15 text-action-accent">
+            <Badge tone="accent" size="sm">
               Kỳ học 2024.1
-            </span>
+            </Badge>
             <Badge tone="accent" size="sm">HUST Student</Badge>
           </div>
           <Heading level={1} className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">
@@ -31,61 +34,62 @@ export default function DashboardPage() {
           <Text size="sm" tone="muted" className="mt-1">
             Chào mừng bạn đến với Ngân Hàng Đề Thi & Mạng Xã Hội Học Tập SQB HUST.
           </Text>
-        </div>
+        </hgroup>
 
+        {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Banner action buttons] */}
         <div className="flex items-center gap-3">
           <ButtonLink to="/showcase" variant="outline" size="md">
             UI Showcase
           </ButtonLink>
-          <Button variant="primary" size="md" leftIcon={<Plus size={16} />}>
+          <Button variant="primary" size="md" leftIcon={<Icon icon={Plus} size="sm" />} aria-label="Đóng góp đề thi">
             Đóng góp đề thi
           </Button>
         </div>
-      </div>
+      </Card>
 
       {/* Stat Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <section aria-label="Thống kê học tập" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           label="Đề thi đã lưu"
           value="18"
-          icon={<BookOpen size={20} />}
+          icon={<Icon icon={BookOpen} size="md" tone="accent" />}
           hint="+3 đề thi mới trong tuần"
         />
         <StatCard
           label="Câu hỏi đã đóng góp"
           value="42"
-          icon={<FileQuestion size={20} />}
+          icon={<Icon icon={FileQuestion} size="md" tone="warning" />}
           hint="98% được cộng đồng duyệt"
         />
         <StatCard
           label="Lượt thảo luận"
           value="156"
-          icon={<MessageSquare size={20} />}
+          icon={<Icon icon={MessageSquare} size="md" tone="info" />}
           hint="+12 phản hồi mới"
         />
         <StatCard
           label="Điểm uy tín học tập"
           value="1,240"
-          icon={<TrendingUp size={20} />}
+          icon={<Icon icon={TrendingUp} size="md" tone="success" />}
           hint="Top 5% sinh viên tích cực"
         />
-      </div>
+      </section>
 
       {/* Recent Exams Table */}
       <Card className="p-6 bg-surface border-line-subtle shadow-card rounded-2xl">
-        <div className="flex items-center justify-between mb-4">
-          <div>
+        <header className="flex items-center justify-between mb-4">
+          <hgroup>
             <Heading level={2} className="text-lg font-bold text-text-primary">
               Đề thi & Tài liệu phổ biến gần đây
             </Heading>
             <Text size="xs" tone="muted">
               Các đề thi được sinh viên HUST tải và ôn tập nhiều nhất
             </Text>
-          </div>
-          <Button variant="ghost" size="sm" leftIcon={<Search size={14} />}>
+          </hgroup>
+          <Button variant="ghost" size="sm" leftIcon={<Icon icon={Search} size="xs" />} aria-label="Xem tất cả đề thi">
             Xem tất cả
           </Button>
-        </div>
+        </header>
 
         <Table>
           <TableHeader>
@@ -113,14 +117,13 @@ export default function DashboardPage() {
                   {exam.term}
                 </TableCell>
                 <TableCell className="text-right font-semibold text-action-accent">
-                  {exam.downloads.toLocaleString()}
+                  {formatNumber(exam.downloads)}
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </Card>
-    </div>
+    </Page>
   )
 }
-

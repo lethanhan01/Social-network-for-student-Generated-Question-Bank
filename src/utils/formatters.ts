@@ -9,34 +9,41 @@ const dateTimeFormatCache = new Map<string, Intl.DateTimeFormat>()
 
 function getNumberFormatter(locale: string, options: Intl.NumberFormatOptions): Intl.NumberFormat {
   const cacheKey = `${locale}-${JSON.stringify(options)}`
-  let formatter = numberFormatCache.get(cacheKey)
-  if (!formatter) {
-    formatter = new Intl.NumberFormat(locale, options)
-    numberFormatCache.set(cacheKey, formatter)
-  }
-  return formatter
+  const existing = numberFormatCache.get(cacheKey)
+  if (existing) return existing
+  const created = new Intl.NumberFormat(locale, options)
+  numberFormatCache.set(cacheKey, created)
+  return created
 }
 
 function getDateTimeFormatter(locale: string, options: Intl.DateTimeFormatOptions): Intl.DateTimeFormat {
   const cacheKey = `${locale}-${JSON.stringify(options)}`
-  let formatter = dateTimeFormatCache.get(cacheKey)
-  if (!formatter) {
-    formatter = new Intl.DateTimeFormat(locale, options)
-    dateTimeFormatCache.set(cacheKey, formatter)
-  }
-  return formatter
+  const existing = dateTimeFormatCache.get(cacheKey)
+  if (existing) return existing
+  const created = new Intl.DateTimeFormat(locale, options)
+  dateTimeFormatCache.set(cacheKey, created)
+  return created
 }
+
+// Default options for DateTime and Number formatters to avoid object literal instantiations in parameters (S7737)
+const DEFAULT_DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+}
+
+const DEFAULT_NUMBER_FORMAT_OPTIONS: Intl.NumberFormatOptions = {}
 
 /**
  * Formats an amount with the specified currency and locale.
  */
 export function formatCurrency(
   amount: number | string,
-  currency: 'VND' | 'USD' | 'JPY' | string = 'VND',
+  currency = 'VND',
   locale = 'vi-VN'
 ): string {
-  const num = typeof amount === 'string' ? parseFloat(amount) : amount
-  if (isNaN(num)) return '0 ₫'
+  const num = typeof amount === 'string' ? Number.parseFloat(amount) : amount
+  if (Number.isNaN(num)) return '0 ₫'
 
   const formatter = getNumberFormatter(locale, {
     style: 'currency',
@@ -56,8 +63,8 @@ export function formatVnd(amount: number | string): string {
  * Compact VND formatter for large amounts (e.g., 1 Tr, 10 Tr).
  */
 export function formatVndCompact(amount: number | string, locale = 'vi-VN'): string {
-  const num = typeof amount === 'string' ? parseFloat(amount) : amount
-  if (isNaN(num)) return '0'
+  const num = typeof amount === 'string' ? Number.parseFloat(amount) : amount
+  if (Number.isNaN(num)) return '0'
 
   const formatter = getNumberFormatter(locale, {
     style: 'currency',
@@ -73,16 +80,12 @@ export function formatVndCompact(amount: number | string, locale = 'vi-VN'): str
  */
 export function formatDate(
   date: Date | string | number,
-  options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  },
+  options: Intl.DateTimeFormatOptions = DEFAULT_DATE_FORMAT_OPTIONS,
   locale = 'vi-VN'
 ): string {
   if (!date) return ''
   const d = date instanceof Date ? date : new Date(date)
-  if (isNaN(d.getTime())) return ''
+  if (Number.isNaN(d.getTime())) return ''
 
   const formatter = getDateTimeFormatter(locale, options)
   return formatter.format(d)
@@ -93,11 +96,11 @@ export function formatDate(
  */
 export function formatNumber(
   value: number | string,
-  options: Intl.NumberFormatOptions = {},
+  options: Intl.NumberFormatOptions = DEFAULT_NUMBER_FORMAT_OPTIONS,
   locale = 'vi-VN'
 ): string {
-  const num = typeof value === 'string' ? parseFloat(value) : value
-  if (isNaN(num)) return '0'
+  const num = typeof value === 'string' ? Number.parseFloat(value) : value
+  if (Number.isNaN(num)) return '0'
 
   const formatter = getNumberFormatter(locale, options)
   return formatter.format(num)

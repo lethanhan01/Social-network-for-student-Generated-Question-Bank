@@ -18,15 +18,11 @@ const mockSubjects: SubjectResponse[] = [
     subject_id: 101,
     name: 'Công nghệ Web',
     code: 'IT4409',
-    description: 'Web development',
-    is_active: true,
   },
   {
     subject_id: 102,
     name: 'Cấu trúc dữ liệu & Giải thuật',
     code: 'IT3011',
-    description: 'DSA',
-    is_active: true,
   },
 ]
 
