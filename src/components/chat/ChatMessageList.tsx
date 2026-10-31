@@ -1,4 +1,4 @@
-import type { RefObject } from 'react'
+import { useEffect, useRef, type RefObject } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Reply, Trash2, AlertCircle } from 'lucide-react'
 import { Avatar, Image } from '@/components/ui/data-display'
@@ -17,8 +17,9 @@ interface ChatMessageListProps {
   onReply: (msg: MessageDto) => void
   onRecall: (msg: MessageDto) => void
   onRetry: () => void
-  onUnlock?: () => void
-  isUnlocking?: boolean
+  hasNextPage?: boolean
+  isFetchingNextPage?: boolean
+  onLoadMore?: () => void
 }
 
 export function ChatMessageList({
@@ -32,12 +33,30 @@ export function ChatMessageList({
   onReply,
   onRecall,
   onRetry,
-  onUnlock,
-  isUnlocking,
+  hasNextPage,
+  isFetchingNextPage,
+  onLoadMore,
 }: Readonly<ChatMessageListProps>) {
   const { t } = useTranslation('chat')
+  const topSentinelRef = useRef<HTMLDivElement>(null)
 
-  if (isLoading) {
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage || !onLoadMore) return
+    const el = topSentinelRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          onLoadMore()
+        }
+      },
+      { threshold: 0.1 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [hasNextPage, isFetchingNextPage, onLoadMore])
+
+  if (isLoading && allMessages.length === 0) {
     return (
       /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Loading skeleton message container] */
       <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4 animate-pulse">
@@ -59,25 +78,20 @@ export function ChatMessageList({
     )
   }
 
-  if (isError) {
+  if (isError && allMessages.length === 0) {
     return (
-      /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Message list error state] */
+      /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Message list empty error state] */
       <div className="flex-1 min-h-0 flex flex-col items-center justify-center text-center p-6 space-y-3">
         <AlertCircle className="w-10 h-10 text-status-danger-fg" />
         <p className="text-sm font-medium text-fg-primary">{t('loadError', 'Không thể tải tin nhắn')}</p>
         <p className="text-xs text-fg-muted max-w-sm">
-          {t('loadErrorDesc', 'Hội thoại có thể bị kẹt biên nhận đọc từ máy chủ. Bấm Thử lại hoặc gửi một tin nhắn để tự động kết nối lại.')}
+          {t('loadErrorDesc', 'Kết nối đến máy chủ bị gián đoạn. Vui lòng bấm Thử lại để tải lại tin nhắn.')}
         </p>
-        {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Action button row for error state] */}
+        {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Action button row for retry] */}
         <div className="flex items-center gap-2">
           <Button variant="secondary" size="sm" onClick={onRetry}>
             {t('retry', 'Thử lại')}
           </Button>
-          {onUnlock ? (
-            <Button variant="primary" size="sm" onClick={onUnlock} loading={isUnlocking}>
-              {t('unlockSync', 'Mở khóa hội thoại')}
-            </Button>
-          ) : null}
         </div>
       </div>
     )
@@ -100,6 +114,23 @@ export function ChatMessageList({
   return (
     /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Message list scroll container] */
     <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3">
+      {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Top scroll sentinel for infinite scroll] */}
+      <div ref={topSentinelRef} />
+      {hasNextPage ? (
+        /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Load older messages action container] */
+        <div className="flex justify-center pb-2">
+          <Button variant="ghost" size="sm" onClick={onLoadMore} loading={isFetchingNextPage} className="text-xs text-fg-muted">
+            {t('loadOlder', 'Tải tin nhắn cũ hơn')}
+          </Button>
+        </div>
+      ) : null}
+      {isError ? (
+        /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Subtle warning banner for offline/cached messages] */
+        <div className="flex items-center justify-center gap-1.5 py-1 px-3 text-xs text-status-warning-fg bg-surface-card rounded-md border border-line-subtle mb-2">
+          <AlertCircle size={14} />
+          <p>{t('offlineCachedNote', 'Đang hiển thị tin nhắn từ bộ nhớ đệm')}</p>
+        </div>
+      ) : null}
       {allMessages.map((msg) => {
         const isMe = msg.sender_id === currentUserId
         return (

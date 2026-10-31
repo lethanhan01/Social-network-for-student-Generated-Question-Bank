@@ -126,7 +126,8 @@
   "reconnecting": "Đang kết nối lại...",
   "disconnected": "Mất kết nối realtime",
   "loadError": "Không thể tải tin nhắn",
-  "loadErrorDesc": "Hội thoại có thể bị kẹt biên nhận đọc từ máy chủ. Bấm Thử lại hoặc gửi một tin nhắn để tự động kết nối lại.",
-  "unlockSync": "Mở khóa hội thoại",
+  "loadErrorDesc": "Kết nối đến máy chủ bị gián đoạn. Vui lòng bấm Thử lại để tải lại tin nhắn.",
+  "loadOlder": "Tải tin nhắn cũ hơn",
+  "offlineCachedNote": "Đang hiển thị tin nhắn từ bộ nhớ đệm",
   "noFriendsFound": "Không tìm thấy bạn bè nào"
 }

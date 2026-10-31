@@ -102,12 +102,69 @@ export const chatService = {
     params?: { after?: number; limit?: number },
     options?: { signal?: AbortSignal }
   ): Promise<MessageListResponseDto> {
-    return requestData<MessageListResponseDto>(
-      api.get<GlobalResponse<MessageListResponseDto>>(`/conversations/${id}/messages`, {
-        params,
-        signal: options?.signal,
-      })
-    )
+    try {
+      return await requestData<MessageListResponseDto>(
+        api.get<GlobalResponse<MessageListResponseDto>>(`/conversations/${id}/messages`, {
+          params,
+          signal: options?.signal,
+        })
+      )
+    } catch (error) {
+      if (params?.after == null) {
+        const fallback = await this.recoverMessagesFallback(id, params?.limit ?? 20, options?.signal)
+        if (fallback) return fallback
+      }
+      throw error
+    }
+  },
+
+  async recoverMessagesFallback(
+    id: number,
+    limit: number,
+    signal?: AbortSignal
+  ): Promise<MessageListResponseDto | null> {
+    try {
+      const convsRes = await api.get<GlobalResponse<ConversationListResponseDto>>('/conversations', { signal })
+      const conv = convsRes.data.data?.items?.find((c) => c.conversation_id === id)
+      const lastMsg = conv?.last_message
+      const unread = conv?.unread_count || 1
+
+      if (lastMsg?.message_id) {
+        for (let offset = 0; offset <= 8; offset++) {
+          const probeAfter = Math.max(1, lastMsg.message_id - unread - offset)
+          try {
+            const res = await api.get<GlobalResponse<MessageListResponseDto>>(`/conversations/${id}/messages`, {
+              params: { after: probeAfter, limit },
+              signal,
+            })
+            if (res.data?.data?.messages) {
+              const data = res.data.data
+              const exists = data.messages?.some((m) => m.message_id === lastMsg.message_id)
+              if (!exists && lastMsg.content) {
+                data.messages = [
+                  {
+                    message_id: lastMsg.message_id,
+                    content: lastMsg.content,
+                    message_type: lastMsg.message_type as 'TEXT' | 'IMAGE' | 'VIDEO' | 'GIF',
+                    created_at: lastMsg.created_at,
+                    sender_id: 0,
+                    sender_name: conv?.display_name || 'Tin nhắn mới',
+                    avatar_url: conv?.display_avatar_url || undefined,
+                  },
+                  ...(data.messages || []),
+                ]
+              }
+              return data
+            }
+          } catch {
+            // Thử tiếp probeAfter nhỏ hơn
+          }
+        }
+      }
+    } catch {
+      // Bỏ qua nếu lỗi mạng toàn phần
+    }
+    return null
   },
 
   async recallMessage(id: number, params?: { mode?: 'ME' | 'EVERYONE' }): Promise<DeleteMessageResponseDto> {
