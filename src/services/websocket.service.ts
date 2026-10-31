@@ -15,6 +15,8 @@ class WebSocketService {
   private readonly messageListeners = new Set<(msg: WsMessageBroadcastDto) => void>()
   private readonly typingListeners = new Map<number, Set<(typing: WsTypingBroadcastDto) => void>>()
 
+  public get connected(): boolean { return this.isConnected && !!this.client?.connected }
+
   public connect(): void {
     const token = useAuthStore.getState().token
     if (!token || this.client?.active) return
@@ -33,6 +35,7 @@ class WebSocketService {
         this.isConnected = true
         this.subscribePrivateMessages()
       },
+      onWebSocketClose: () => { this.isConnected = false },
       onDisconnect: () => {
         this.isConnected = false
       },

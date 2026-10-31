@@ -1,3 +1,4 @@
+import type viPortal from '../locales/vi/portal.json'
 import type viCommon from '../locales/vi/common.json'
 import type viAuth from '../locales/vi/auth.json'
 import type viMember from '../locales/vi/member.json'
@@ -22,6 +23,7 @@ declare module 'i18next' {
       home: typeof viHome
       validation: typeof viValidation
       chat: typeof viChat
+      portal: typeof viPortal
       gamification: typeof viGamification
     }
   }

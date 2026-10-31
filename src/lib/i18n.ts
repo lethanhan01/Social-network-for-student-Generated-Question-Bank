@@ -1,3 +1,5 @@
+import viPortal from '../locales/vi/portal.json'
+import jaPortal from '../locales/ja/portal.json'
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
@@ -32,12 +34,12 @@ i18n
       vi: {
         common: viCommon, auth: viAuth, member: viMember, trainer: viTrainer,
         staff: viStaff, owner: viOwner, home: viHome, validation: viValidation,
-        chat: viChat, gamification: viGamification,
+        chat: viChat, gamification: viGamification, portal: viPortal,
       },
       ja: {
         common: jaCommon, auth: jaAuth, member: jaMember, trainer: jaTrainer,
         staff: jaStaff, owner: jaOwner, home: jaHome, validation: jaValidation,
-        chat: jaChat, gamification: jaGamification,
+        chat: jaChat, gamification: jaGamification, portal: jaPortal,
       },
     },
     lng: localStorage.getItem('gym-locale') ?? 'vi',

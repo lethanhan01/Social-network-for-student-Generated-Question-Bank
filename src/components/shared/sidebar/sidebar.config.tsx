@@ -1,5 +1,8 @@
+import i18n from '@/lib/i18n'
 import {
   LayoutDashboard,
+  Mail,
+  Bell,
   BookOpen,
   HelpCircle,
   MessageSquare,
@@ -37,6 +40,16 @@ export function getSQBNavSections(): NavSection[] {
           label: 'Mạng xã hội học tập',
           to: '/feed',
           icon: <MessageSquare size={20} />,
+        },
+        {
+          label: i18n.t('portal:messages.title'),
+          to: '/messages',
+          icon: <Mail size={20} />,
+        },
+        {
+          label: i18n.t('portal:notifications.title'),
+          to: '/notifications',
+          icon: <Bell size={20} />,
         },
         {
           label: 'Bạn bè & Kết nối',

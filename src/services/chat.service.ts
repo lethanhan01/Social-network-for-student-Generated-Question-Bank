@@ -9,6 +9,7 @@ import type {
   AddGroupMembersRequestDto,
   AddGroupMembersResponseDto,
   LeaveGroupResponseDto,
+  LeaveGroupRequestDto,
   UpdateMemberRoleRequestDto,
   UnlockHiddenChatDto,
   MessageListResponseDto,
@@ -71,9 +72,9 @@ export const chatService = {
     await api.put<GlobalResponse<void>>(`/conversations/${id}/members/${userId}/role`, payload)
   },
 
-  async leaveGroup(id: number): Promise<LeaveGroupResponseDto> {
+  async leaveGroup(id: number, payload?: LeaveGroupRequestDto): Promise<LeaveGroupResponseDto> {
     return requestData<LeaveGroupResponseDto>(
-      api.post<GlobalResponse<LeaveGroupResponseDto>>(`/conversations/${id}/leave`)
+      api.post<GlobalResponse<LeaveGroupResponseDto>>(`/conversations/${id}/leave`, payload)
     )
   },
 
