@@ -10,7 +10,12 @@ export function usePostCommentsQuery(postId: number, parentCommentId?: number) {
       : queryKeys.comments.byPost(postId),
     queryFn: ({ signal }) =>
       commentService.getComments(
-        { post_id: postId, parent_id: parentCommentId, limit: 50 },
+        {
+          target_type: 'POST',
+          target_id: postId,
+          parent_comment_id: parentCommentId,
+          limit: 50,
+        },
         { signal }
       ),
     enabled: Number.isFinite(postId) && postId > 0,
