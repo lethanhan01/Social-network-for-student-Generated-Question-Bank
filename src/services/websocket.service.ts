@@ -42,7 +42,11 @@ class WebSocketService {
     if (!token || this.client?.active) return
 
     this.setStatus('CONNECTING')
-    const wsUrl = import.meta.env.VITE_WS_URL || 'wss://snsqb.duckdns.org/api/v1/ws'
+    const rawWsUrl = import.meta.env.VITE_WS_URL || 'wss://snsqb.duckdns.org/api/v1/ws'
+    const normalizedWsUrl = rawWsUrl.endsWith('/websocket')
+      ? rawWsUrl
+      : `${rawWsUrl.replace(/\/+$/, '')}/websocket`
+    const wsUrl = `${normalizedWsUrl}?token=${encodeURIComponent(token)}`
 
     this.client = new Client({
       brokerURL: wsUrl,
@@ -141,12 +145,13 @@ class WebSocketService {
     }
   }
 
-  public sendMessage(payload: SendWsMessageRequestDto): void {
-    if (!this.client || !this.isConnected) return
+  public sendMessage(payload: SendWsMessageRequestDto): boolean {
+    if (!this.client || !this.isConnected) return false
     this.client.publish({
       destination: '/app/chat.send',
       body: JSON.stringify(payload),
     })
+    return true
   }
 
   public markAsRead(payload: ReadWsMessageRequestDto): void {

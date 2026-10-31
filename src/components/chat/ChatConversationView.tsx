@@ -11,8 +11,9 @@ import {
   useConversationMessagesInfiniteQuery,
   useRecallMessageMutation,
   useConversationsQuery,
+  useSendMessageMutation,
 } from '@/hooks/queries/useChatQuery'
-import { websocketService, type WsConnectionStatus } from '@/services/websocket.service'
+import { type WsConnectionStatus } from '@/services/websocket.service'
 import { uploadSingleMedia } from '@/services/media-upload.service'
 import { useAuthStore } from '@/stores/authStore'
 import { useThemeStore } from '@/stores/themeStore'
@@ -57,6 +58,7 @@ export function ChatConversationView({
 
   const messagesQuery = useConversationMessagesInfiniteQuery(conversationId ?? 0)
   const recallMutation = useRecallMessageMutation()
+  const sendMessageMutation = useSendMessageMutation()
   const connectionBadge = useMemo(() => getConnectionBadgeConfig(connectionStatus, t), [connectionStatus, t])
 
   const allMessages = useMemo(() => {
@@ -97,19 +99,31 @@ export function ChatConversationView({
     setIsEmojiOpen(false)
   }
 
-  function sendMessageContent(content: string, type: 'TEXT' | 'IMAGE' = 'TEXT', urls?: string[]) {
+  async function sendMessageContent(content: string, type: 'TEXT' | 'IMAGE' = 'TEXT', urls?: string[]) {
     if (!conversationId) return
-    websocketService.sendMessage({
-      conversation_id: conversationId,
-      content,
-      message_type: type,
-      media_urls: urls,
-      reply_to_message_id: replyTo?.message_id ?? null,
-    })
+    const prevText = text
+    const prevMedia = mediaUrl
+    const prevReply = replyTo
+
     setText('')
     setMediaUrl(null)
     setReplyTo(null)
     onSendTyping(false)
+
+    try {
+      await sendMessageMutation.mutateAsync({
+        conversationId,
+        content,
+        messageType: type,
+        mediaUrls: urls,
+        replyTo: prevReply,
+      })
+    } catch {
+      setText(prevText)
+      setMediaUrl(prevMedia)
+      setReplyTo(prevReply)
+      toast.error(t('sendErrorDisconnected', 'Không thể gửi tin nhắn. Kết nối máy chủ realtime bị gián đoạn. Vui lòng thử lại.'))
+    }
   }
 
   function handleSubmit(e: SyntheticEvent<HTMLFormElement>) {

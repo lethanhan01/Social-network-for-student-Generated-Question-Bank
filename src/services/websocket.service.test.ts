@@ -51,6 +51,7 @@ describe('websocketService', () => {
     websocketService.connect()
     expect(Client).toHaveBeenCalledWith(
       expect.objectContaining({
+        brokerURL: expect.stringContaining('/websocket?token=test-jwt-token'),
         connectHeaders: {
           Authorization: 'Bearer test-jwt-token',
         },
@@ -58,7 +59,16 @@ describe('websocketService', () => {
     )
   })
 
-  it('sendMessage publishes JSON body to /app/chat.send', () => {
+  it('sendMessage returns false when client is not connected', () => {
+    const payload = {
+      conversation_id: 10,
+      content: 'Hello offline',
+    }
+    const result = websocketService.sendMessage(payload)
+    expect(result).toBe(false)
+  })
+
+  it('sendMessage publishes JSON body to /app/chat.send and returns true', () => {
     useAuthStore.getState().setAuth(
       {
         user_id: 1,
@@ -74,10 +84,10 @@ describe('websocketService', () => {
 
     const payload = {
       conversation_id: 10,
-      client_msg_id: 'client-1',
       content: 'Hello STOMP',
     }
-    websocketService.sendMessage(payload)
+    const result = websocketService.sendMessage(payload)
+    expect(result).toBe(true)
 
     const clientInstance = vi.mocked(Client).mock.results[0]?.value
     expect(clientInstance.publish).toHaveBeenCalledWith({

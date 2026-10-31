@@ -30,6 +30,25 @@ describe('Messenger Chat Components', () => {
     })
   })
 
+  describe('ChatConversationView (Sending & Binding)', () => {
+    it('renders message input and allows typing', () => {
+      renderWithQueryClient(
+        <ChatConversationView
+          conversationId={1}
+          onOpenNewChat={vi.fn()}
+          connectionStatus="CONNECTED"
+          typingUsers={{}}
+          onSendTyping={vi.fn()}
+        />
+      )
+
+      const input = screen.getByPlaceholderText('Nhập tin nhắn...')
+      expect(input).toBeInTheDocument()
+      fireEvent.change(input, { target: { value: 'Tin nhắn thử nghiệm' } })
+      expect(input).toHaveValue('Tin nhắn thử nghiệm')
+    })
+  })
+
   describe('ChatMessageList', () => {
     it('renders error state and triggers retry', () => {
       const handleRetry = vi.fn()
@@ -71,6 +90,48 @@ describe('Messenger Chat Components', () => {
 
       expect(screen.getByText('Xin chào các bạn!')).toBeInTheDocument()
       expect(screen.getByText('Chào Lan!')).toBeInTheDocument()
+    })
+
+    it('hides recall button for optimistic message with negative message_id', () => {
+      const messages = [
+        { message_id: -999, sender_id: 1, sender_name: 'An', content: 'Tin nhắn đang gửi' },
+      ]
+      render(
+        <ChatMessageList
+          allMessages={messages}
+          currentUserId={1}
+          isLoading={false}
+          isError={false}
+          messagesEndRef={createRef()}
+          onReply={vi.fn()}
+          onRecall={vi.fn()}
+          onRetry={vi.fn()}
+        />
+      )
+
+      expect(screen.getByText('Tin nhắn đang gửi')).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /thu hồi/i })).not.toBeInTheDocument()
+    })
+
+    it('shows recall button for confirmed message with positive message_id', () => {
+      const messages = [
+        { message_id: 123, sender_id: 1, sender_name: 'An', content: 'Tin nhắn đã lưu' },
+      ]
+      render(
+        <ChatMessageList
+          allMessages={messages}
+          currentUserId={1}
+          isLoading={false}
+          isError={false}
+          messagesEndRef={createRef()}
+          onReply={vi.fn()}
+          onRecall={vi.fn()}
+          onRetry={vi.fn()}
+        />
+      )
+
+      expect(screen.getByText('Tin nhắn đã lưu')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /thu hồi/i })).toBeInTheDocument()
     })
   })
 

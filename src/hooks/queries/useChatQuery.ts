@@ -8,6 +8,7 @@ import {
 } from '@tanstack/react-query'
 import { chatService } from '@/services/chat.service'
 import { websocketService, type WsConnectionStatus } from '@/services/websocket.service'
+import { useAuthStore } from '@/stores/authStore'
 import { queryKeys } from '@/lib/query-keys'
 import type {
   CreateDirectConversationDto,
@@ -82,6 +83,125 @@ export function useRecallMessageMutation() {
       chatService.recallMessage(messageId, { mode }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.conversations.all })
+    },
+  })
+}
+
+export interface SendMessagePayload {
+  conversationId: number
+  content: string
+  messageType?: 'TEXT' | 'IMAGE' | 'VIDEO' | 'GIF'
+  mediaUrls?: string[]
+  replyTo?: MessageDto | null
+}
+
+export function useSendMessageMutation() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({
+      conversationId,
+      content,
+      messageType = 'TEXT',
+      mediaUrls,
+      replyTo,
+    }: SendMessagePayload) => {
+      const user = useAuthStore.getState().user
+      const optimisticId = -Date.now()
+
+      const optimisticMsg: MessageDto = {
+        message_id: optimisticId,
+        sender_id: user?.user_id ?? 0,
+        sender_name: user?.fullName || user?.username || 'Tôi',
+        avatar_url: user?.avatar_url || user?.avatarUrl || undefined,
+        content,
+        message_type: messageType,
+        media_urls: mediaUrls,
+        reply_to_message: replyTo
+          ? {
+              message_id: replyTo.message_id,
+              sender_id: replyTo.sender_id,
+              sender_name: replyTo.sender_name,
+              content_preview: replyTo.content,
+            }
+          : undefined,
+        created_at: new Date().toISOString(),
+      }
+
+      // 1. Optimistic insert into infinite query cache
+      queryClient.setQueriesData<InfiniteData<MessageListResponseDto>>(
+        { queryKey: queryKeys.conversations.messages(conversationId) },
+        (old) => {
+          if (!old?.pages?.length) {
+            return {
+              pageParams: [undefined],
+              pages: [
+                {
+                  conversation_id: conversationId,
+                  messages: [optimisticMsg],
+                  pagination: { has_next: false },
+                },
+              ],
+            }
+          }
+          const pages = old.pages.map((p, idx) =>
+            idx === 0 ? { ...p, messages: [optimisticMsg, ...(p.messages || [])] } : p
+          )
+          return { ...old, pages }
+        }
+      )
+
+      // 2. Update conversation list preview
+      queryClient.setQueriesData<ConversationListResponseDto>(
+        { queryKey: queryKeys.conversations.list() },
+        (old) => {
+          if (!old?.items) return old
+          const items = [...old.items]
+          const idx = items.findIndex((c) => c.conversation_id === conversationId)
+          if (idx >= 0) {
+            const current = items[idx]
+            const updated = {
+              ...current,
+              last_message: {
+                message_id: optimisticId,
+                content: optimisticMsg.content,
+                message_type: optimisticMsg.message_type,
+                created_at: optimisticMsg.created_at,
+              },
+            }
+            items.splice(idx, 1)
+            items.unshift(updated)
+          }
+          return { ...old, items }
+        }
+      )
+
+      // 3. Send over STOMP WebSocket
+      const sent = websocketService.sendMessage({
+        conversation_id: conversationId,
+        content,
+        message_type: messageType === 'IMAGE' ? 'IMAGE' : 'TEXT',
+        media_urls: mediaUrls,
+        reply_to_message_id: replyTo?.message_id ?? null,
+      })
+
+      if (!sent) {
+        websocketService.connect()
+        throw new Error('WS_DISCONNECTED')
+      }
+
+      return optimisticMsg
+    },
+    onSuccess: (_data, variables) => {
+      // 4. Reconcile with server ID after 500ms
+      setTimeout(() => {
+        void queryClient.invalidateQueries({
+          queryKey: queryKeys.conversations.messages(variables.conversationId),
+        })
+        void queryClient.invalidateQueries({
+          queryKey: queryKeys.conversations.list(),
+        })
+      }, 500)
     },
   })
 }

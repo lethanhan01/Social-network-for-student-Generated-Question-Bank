@@ -142,8 +142,10 @@ export function ChatMessageList({
               {isMe ? (
                 /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Actions hover bar for current user] */
                 <div className="hidden group-hover:flex items-center gap-1">
-                  <Button variant="ghost" size="sm" onClick={() => onReply(msg)} className="w-7 h-7 p-0 rounded-full text-fg-muted hover:text-fg-primary"><Reply size={14} /></Button>
-                  <Button variant="ghost" size="sm" onClick={() => onRecall(msg)} className="w-7 h-7 p-0 rounded-full text-status-danger-fg hover:bg-status-danger-bg"><Trash2 size={14} /></Button>
+                  <Button variant="ghost" size="sm" onClick={() => onReply(msg)} aria-label={t('reply', 'Trả lời')} className="w-7 h-7 p-0 rounded-full text-fg-muted hover:text-fg-primary"><Reply size={14} /></Button>
+                  {msg.message_id && msg.message_id > 0 ? (
+                    <Button variant="ghost" size="sm" onClick={() => onRecall(msg)} aria-label={t('recallMessage', 'Thu hồi tin nhắn')} className="w-7 h-7 p-0 rounded-full text-status-danger-fg hover:bg-status-danger-bg"><Trash2 size={14} /></Button>
+                  ) : null}
                 </div>
               ) : null}
               {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Message bubble bubble content] */}
@@ -159,7 +161,7 @@ export function ChatMessageList({
               {!isMe ? (
                 /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Actions hover bar for partner] */
                 <div className="hidden group-hover:flex items-center gap-1">
-                  <Button variant="ghost" size="sm" onClick={() => onReply(msg)} className="w-7 h-7 p-0 rounded-full text-fg-muted hover:text-fg-primary"><Reply size={14} /></Button>
+                  <Button variant="ghost" size="sm" onClick={() => onReply(msg)} aria-label={t('reply', 'Trả lời')} className="w-7 h-7 p-0 rounded-full text-fg-muted hover:text-fg-primary"><Reply size={14} /></Button>
                 </div>
               ) : null}
             </div>
