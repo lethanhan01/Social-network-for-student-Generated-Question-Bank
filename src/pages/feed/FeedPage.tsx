@@ -101,9 +101,9 @@ export default function FeedPage() {
             <Button
               variant="secondary"
               onClick={() => refetchFeed()}
-              className="w-full justify-center gap-2 py-2.5 text-xs text-action-accent border border-action-accent/30 bg-action-accent/10 hover:bg-action-accent/20 min-h-11"
+              leftIcon={<RefreshCw size={14} className="animate-spin" />}
+              className="w-full justify-center text-xs text-action-accent border border-action-accent/30 bg-action-accent/10 hover:bg-action-accent/20 min-h-11"
             >
-              <RefreshCw size={14} className="animate-spin" />
               {t('feed.newPostsAvailable', { count: newCount, defaultValue: `Có ${newCount} bài viết mới. Bấm để làm mới.` })}
             </Button>
           ) : null}
@@ -125,12 +125,11 @@ export default function FeedPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => fetchNextPage()}
-                disabled={isFetchingNextPage}
+                loading={isFetchingNextPage}
+                loadingText={t('common.loading', 'Đang tải thêm...')}
                 className="min-h-11 px-6 text-xs"
               >
-                {isFetchingNextPage
-                  ? t('common.loading', 'Đang tải thêm...')
-                  : t('feed.loadMore', 'Tải thêm bài viết cũ hơn')}
+                {t('feed.loadMore', 'Tải thêm bài viết cũ hơn')}
               </Button>
             </div>
           ) : null}
@@ -142,7 +141,7 @@ export default function FeedPage() {
   }
 
   return (
-    <Page className="space-y-6">
+    <Page maxWidth="2xl" className="space-y-6">
       {/* Page Header */}
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-line-subtle">
         <hgroup>

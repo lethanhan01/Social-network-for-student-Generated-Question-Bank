@@ -772,20 +772,61 @@ Tất cả các thành phần dưới đây được xuất (export) chính th�
 
 ### 6.1 Buttons & Actions
 
-#### 1. `Button`
-- **File nguồn:** [`ui/Button.tsx`](ui/actions/Button.tsx)
-- **Vai trò ngữ nghĩa APG:** Render thẻ `<button>` tương tác, tự động quản lý focus outline, `disabled`, `loading` state và hỗ trợ bàn phím `Enter`/`Space`.
-- **Props & Variants chính:**
-  - `variant`: `'primary'` | `'outline'` | `'outline-white'` | `'outline-green'` | `'secondary'` | `'danger'` | `'ghost'` | `'text'` | `'text-accent'` | `'plain'` | `'icon'`
-  - `size`: `'sm'` | `'md'` | `'lg'` | `'compact'`
-  - `loading?: boolean`: Khi `true`, tự hiển thị spinner và khóa nút không cho click.
-  - `leftIcon?: ReactNode`, `rightIcon?: ReactNode`
-  - `mobileFull?: boolean`: Tự động kéo giãn 100% chiều rộng trên màn hình nhỏ.
-- **Code mẫu chuẩn TSX:**
+Hệ thống cung cấp **5 UI Primitives chuyên biệt** cùng **7 Biến thể hiển thị (Variants)** nhằm tuân thủ triệt để tháp ngữ nghĩa, chuẩn tiếp cận APG và loại bỏ hoàn toàn các lỗi lạm dụng nút bấm (*Button Clutter / Proliferation*).
+
+#### 1. Bảng 5 UI Primitives & Khi Nào Sử Dụng
+
+| Tên Component | Thẻ HTML kết xuất | Vai trò & Khi nào sử dụng | File nguồn |
+| :--- | :---: | :--- | :--- |
+| **`Button`** | `<button type="button">` | **Thao tác tương tác nội trang**: Mở Modal, tương tác Like/Thả tim, bật Dropdown menu, gửi lệnh gọi API trực tiếp, Copy clipboard, mở Drawer... *(CẤM dùng thẻ `<button>` native).* | [`ui/actions/Button.tsx`](ui/actions/Button.tsx) |
+| **`ButtonLink`** | `<Link>` *(React Router)* | **Điều hướng nội bộ SPA**: Chuyển trang sang `/feed`, `/dashboard`, `/profile/:id`... Giữ trọn vẹn khả năng chuột phải mở tab mới và SEO. *(CẤM dùng `<Button onClick={() => navigate(...)}>`).* | [`ui/actions/Button.tsx`](ui/actions/Button.tsx) |
+| **`ButtonAnchor`** | `<a>` *(External)* | **Liên kết ra ngoài / Tải tệp**: Dẫn link sang cổng SIS HUST, mạng xã hội bên ngoài, hoặc tải tài liệu đính kèm. Tự động gắn kèm `target="_blank"` và `rel="noopener noreferrer"`. | [`ui/actions/Button.tsx`](ui/actions/Button.tsx) |
+| **`SubmitButton`** | `<button type="submit">` | **Gửi biểu mẫu (Form Submit)**: Dùng riêng trong `<Form onSubmit={...}>`. Tự động quản lý trạng thái `loading`, spinner xoay tròn và vô hiệu hóa nút khi đang gửi dữ liệu. | [`ui/actions/SubmitButton.tsx`](ui/actions/SubmitButton.tsx) |
+| **`BackButton`** | `<button>` hoặc `<Link>` | **Quay lại trang trước**: Dùng ở đầu trang chi tiết (`PostDetailPage`, `ProfilePage`, Header drawer). Tích hợp sẵn icon mũi tên lùi `ArrowLeft`, nhãn i18n và tự động gọi `navigate(-1)`. | [`ui/actions/BackButton.tsx`](ui/actions/BackButton.tsx) |
+
+#### 2. 7 Biến Thể Hiển Thị (Variants) & Phân Cấp Thị Giác
+
+Hệ thống tuân thủ phân cấp thị giác nghiêm ngặt:
+`[Primary Solid] > [Secondary / Outline] > [Ghost] > [Link]`
+
+1. **`variant="primary"`** *(Primary CTA)*: Nền xanh ngọc đậm (`bg-action-primary`), chữ trắng, hiệu ứng quét viền `rogym-sweep`. Dành cho hành động quan trọng nhất trên màn hình/card (*Đăng bài, Tạo câu hỏi, Làm bài thi*). **Tối đa 1 nút Primary CTA trên một cụm hành động/card**.
+2. **`variant="secondary"`** *(Secondary Action)*: Nền bề mặt nổi (`bg-surface-elevated`), viền nhẹ (`border-line-subtle`). Dành cho thao tác bổ trợ ưu tiên cao (*Xem trước bài viết, kích hoạt ô đăng tin*).
+3. **`variant="outline"`** *(Hành động phụ viền)*: Nền trong suốt, viền border mỏng. Dành cho nút *Hủy, Đóng, Tải thêm bài viết*, các bộ lọc.
+4. **`variant="ghost"`** *(Low-emphasis Action)*: Nền trong suốt hoàn toàn, chỉ nổi nền khi hover. Dành cho các nút lặp lại mật độ cao (*Thích, Bình luận, Chia sẻ, Icon options ba chấm*).
+5. **`variant="danger"`** *(Destructive Action)*: Nền đỏ rực cảnh báo (`bg-status-danger-solid`), chữ trắng. Dành cho thao tác phá hủy không thể hoàn tác (*Xóa bài viết, Hủy kết bạn, Báo cáo vi phạm*).
+6. **`variant="link"`** *(Text Action)*: Dạng liên kết chữ không viền, có gạch chân khi hover. Dành cho hành động inline văn bản (*Xem thêm, Thu gọn, Quên mật khẩu?*).
+7. **`variant="plain"`** *(Unstyled APG Wrapper)*: Không style mặc định. Dành để bọc các card phức tạp cần trợ năng click bàn phím APG.
+
+#### 3. Thang Kích Thước (Sizes), Touch Target Mobile (44px) & Icon Button
+
+- Thang chuẩn: `size="xs"` (28px), `size="sm"` (32px), `size="md"` (40px - Mặc định), `size="lg"` (48px), `size="xl"` (56px), `size="icon"` (40x40px vuông).
+- **Vùng chạm di động (Touch Target)**: Mọi Button đều mặc định bật `touchTarget={true}` để tạo vùng chạm ảo $\ge 44 \times 44\text{px}$ trên mobile theo chuẩn WCAG 2.1 AA (`after:min-h-[44px] after:min-w-[44px]`).
+- **Icon Button**: Khi dùng nút chỉ chứa icon (`size="icon"`), **BẮT BUỘC** phải có `aria-label` mô tả hành động (ví dụ: `<Button size="icon" aria-label="Đóng cửa sổ"><X size={16} /></Button>`).
+
+#### 4. Cây Quyết Định Chọn Nút Bấm (Decision Flowchart)
+
+```mermaid
+graph TD
+    Start(["Cần tạo thành phần tương tác?"]) --> Target{Mục đích chính là gì?}
+    Target -->|"Gửi biểu mẫu Form"| S1["SubmitButton (type='submit', loading state)"]
+    Target -->|"Điều hướng trang khác"| S2{Điều hướng nội bộ hay ngoại vi?}
+    S2 -->|"Nội bộ ứng dụng SPA"| S3["ButtonLink to='...' (Link React Router)"]
+    S2 -->|"Ngoại vi / Tải file"| S4["ButtonAnchor href='...' (target='_blank')"]
+    Target -->|"Quay lại trang trước"| S5["BackButton (tự động navigate lùi)"]
+    Target -->|"Tương tác tại chỗ (Click, Modal, API)"| S6{Phân cấp thị giác nào?}
+    S6 -->|"Hành động chính duy nhất"| S7["Button variant='primary'"]
+    S6 -->|"Hành động hủy / phụ viền"| S8["Button variant='outline'"]
+    S6 -->|"Thao tác lặp lại / icon"| S9["Button variant='ghost'"]
+    S6 -->|"Hành động phá hủy / xóa"| S10["Button variant='danger'"]
+```
+
+#### 5. Code Mẫu Chuẩn TSX
+
 ```tsx
+import { Plus, X } from 'lucide-react'
+import { Button, ButtonLink, SubmitButton } from '@/components/ui/actions'
 
-import { Plus } from 'lucide-react'
-
+// 1. Nút hành động chính có icon và loading
 <Button
   variant="primary"
   size="md"
@@ -795,20 +836,22 @@ import { Plus } from 'lucide-react'
 >
   Tạo Câu Hỏi Mới
 </Button>
+
+// 2. Nút điều hướng nội bộ SPA
+<ButtonLink to="/feed" variant="ghost" size="sm">
+  Về Bảng Tin
+</ButtonLink>
+
+// 3. Nút submit form
+<SubmitButton loading={isSaving} variant="primary">
+  Lưu Thay Đổi
+</SubmitButton>
+
+// 4. Icon button có accessible label
+<Button size="icon" variant="ghost" aria-label="Đóng hộp thoại" onClick={onClose}>
+  <X size={18} />
+</Button>
 ```
-
-#### 2. `ButtonLink` & `ButtonAnchor`
-- **File nguồn:** [`ui/Button.tsx`](ui/actions/Button.tsx)
-- **Vai trò:** Render thẻ link (`<Link>` của React Router hoặc `<a>` ngoại vi) nhưng khoác giao diện và hiệu ứng hover/focus chuẩn của `Button`.
-- **Props:** Tương tự `Button`, kèm prop `to` (với `ButtonLink`) hoặc `href` (với `ButtonAnchor`).
-
-#### 3. `SubmitButton`
-- **File nguồn:** [`ui/SubmitButton.tsx`](ui/actions/SubmitButton.tsx)
-- **Vai trò:** Nút bấm chuyên biệt cho Form submit (`type="submit"`). Tự động vô hiệu hóa khi `disabled` hoặc `loading`.
-
-#### 4. `BackButton`
-- **File nguồn:** [`ui/BackButton.tsx`](ui/actions/BackButton.tsx)
-- **Vai trò:** Nút điều hướng quay lại trang trước, tích hợp sẵn icon mũi tên lùi và i18n fallback route.
 
 ---
 
