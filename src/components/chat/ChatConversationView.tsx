@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo, type SyntheticEvent } from 'react'
+import { useState, useRef, useMemo, type SyntheticEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import EmojiPicker, { Theme as EmojiTheme, type EmojiClickData } from 'emoji-picker-react'
 import { MessageCircle, Send, ThumbsUp, ImagePlus, Smile, X, SquarePen, AlertCircle } from 'lucide-react'
