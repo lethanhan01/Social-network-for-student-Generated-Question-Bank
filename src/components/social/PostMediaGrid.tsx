@@ -40,7 +40,15 @@ export function PostMediaGrid({ media }: Readonly<PostMediaGridProps>) {
                 /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Image clickable wrapper] */
                 <div
                   className="w-full h-full cursor-pointer hover:scale-105 transition-transform"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => setSelectedImage(item.url || null)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      setSelectedImage(item.url || null)
+                    }
+                  }}
                 >
                   <Image
                     src={item.url}
