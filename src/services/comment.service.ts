@@ -8,12 +8,25 @@ import type {
 
 export const commentService = {
   async getComments(
-    params: { post_id: number; parent_id?: number; cursor?: string; limit?: number },
+    params: {
+      post_id: number
+      parent_id?: number
+      cursor?: string
+      limit?: number
+      sort?: 'newest' | 'oldest'
+    },
     options?: { signal?: AbortSignal }
   ): Promise<CursorResponseCommentResponseDto> {
     return requestData<CursorResponseCommentResponseDto>(
       api.get<GlobalResponse<CursorResponseCommentResponseDto>>('/comments', {
-        params,
+        params: {
+          target_type: 'POST',
+          target_id: params.post_id,
+          parent_comment_id: params.parent_id,
+          after: params.cursor,
+          limit: params.limit,
+          sort: params.sort ?? 'newest',
+        },
         signal: options?.signal,
       })
     )
@@ -25,7 +38,10 @@ export const commentService = {
     )
   },
 
-  async updateComment(commentId: number, payload: UpdateCommentRequest): Promise<CommentResponseDto> {
+  async updateComment(
+    commentId: number,
+    payload: UpdateCommentRequest
+  ): Promise<CommentResponseDto> {
     return requestData<CommentResponseDto>(
       api.put<GlobalResponse<CommentResponseDto>>(`/comments/${commentId}`, payload)
     )

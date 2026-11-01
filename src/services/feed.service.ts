@@ -1,8 +1,6 @@
 import api, { requestData, type GlobalResponse } from './api'
-import type {
-  CursorResponseActivityFeedItemDto,
-  NewFeedCountResponseDto,
-} from '@/types'
+import { afterParams } from '@/lib/pagination'
+import type { CursorResponseActivityFeedItemDto, NewFeedCountResponseDto } from '@/types'
 
 export const feedService = {
   async getActivityFeeds(
@@ -11,7 +9,7 @@ export const feedService = {
   ): Promise<CursorResponseActivityFeedItemDto> {
     return requestData<CursorResponseActivityFeedItemDto>(
       api.get<GlobalResponse<CursorResponseActivityFeedItemDto>>('/activity-feeds', {
-        params,
+        params: afterParams(params),
         signal: options?.signal,
       })
     )
@@ -23,7 +21,7 @@ export const feedService = {
   ): Promise<NewFeedCountResponseDto> {
     return requestData<NewFeedCountResponseDto>(
       api.get<GlobalResponse<NewFeedCountResponseDto>>('/activity-feeds/new-count', {
-        params,
+        params: { since: params?.since ? Number(params.since) : undefined },
         signal: options?.signal,
       })
     )

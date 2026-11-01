@@ -51,6 +51,7 @@ describe('websocketService', () => {
     websocketService.connect()
     expect(Client).toHaveBeenCalledWith(
       expect.objectContaining({
+        brokerURL: expect.stringContaining('/api/v1/ws/websocket'),
         connectHeaders: {
           Authorization: 'Bearer test-jwt-token',
         },

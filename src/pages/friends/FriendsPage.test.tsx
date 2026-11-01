@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { BrowserRouter } from 'react-router-dom'
 import { renderWithQueryClient } from '@/test/query-test-utils'
 import { relationshipService } from '@/services/relationship.service'
@@ -69,9 +70,38 @@ describe('FriendsPage Component', () => {
 
   it('does not show an empty friends list when the request fails', async () => {
     vi.mocked(relationshipService.getMyFriends).mockRejectedValue(new Error('Friends unavailable'))
-    renderWithQueryClient(<BrowserRouter><FriendsPage /></BrowserRouter>)
+    renderWithQueryClient(
+      <BrowserRouter>
+        <FriendsPage />
+      </BrowserRouter>
+    )
     expect(await screen.findByRole('alert')).toHaveTextContent('Friends unavailable')
     expect(screen.getByRole('button', { name: 'Thử lại' })).toBeInTheDocument()
     expect(screen.queryByText('Bạn chưa có người bạn nào trong danh sách.')).not.toBeInTheDocument()
+  })
+  it('loads later friends without replacing the first page', async () => {
+    vi.mocked(relationshipService.getMyFriends)
+      .mockResolvedValueOnce({
+        items: [{ user_id: 1, full_name: 'First friend' }],
+        pagination: { has_next: true, after: 100 },
+      })
+      .mockResolvedValueOnce({
+        items: [{ user_id: 2, full_name: 'Second friend' }],
+        pagination: { has_next: false },
+      })
+    const user = userEvent.setup()
+    renderWithQueryClient(
+      <BrowserRouter>
+        <FriendsPage />
+      </BrowserRouter>
+    )
+    expect(await screen.findByText('First friend')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Xem thêm' }))
+    expect(await screen.findByText('Second friend')).toBeInTheDocument()
+    expect(screen.getByText('First friend')).toBeInTheDocument()
+    expect(relationshipService.getMyFriends).toHaveBeenLastCalledWith(
+      { cursor: '100', limit: 20 },
+      expect.objectContaining({ signal: expect.any(AbortSignal) })
+    )
   })
 })

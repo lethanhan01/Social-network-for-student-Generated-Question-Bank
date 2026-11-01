@@ -7,6 +7,7 @@ import { ErrorBoundary } from './components/shared/error-boundary/ErrorBoundary'
 import { useTheme } from './stores/themeStore'
 
 const DashboardLayout = lazy(() => import('./layouts/DashboardLayout'))
+const SocialLayout = lazy(() => import('./layouts/SocialLayout'))
 const AuthLayout = lazy(() => import('./layouts/AuthLayout'))
 
 const LoginPage = lazy(() => import('./pages/auth/LoginPage'))
@@ -16,6 +17,7 @@ const PostDetailPage = lazy(() => import('./pages/post/PostDetailPage'))
 const ProfilePage = lazy(() => import('./pages/profile/ProfilePage'))
 const FriendsPage = lazy(() => import('./pages/friends/FriendsPage'))
 const SearchPage = lazy(() => import('./pages/search/SearchPage'))
+const MessagesPage = lazy(() => import('./pages/messages/MessagesPage'))
 const DesignSystemShowcasePage = lazy(() => import('./pages/dev/DesignSystemShowcasePage'))
 const LeaderboardPage = lazy(() => import('./pages/gamification/LeaderboardPage'))
 const ShopPage = lazy(() => import('./pages/gamification/ShopPage'))
@@ -43,14 +45,16 @@ export default function App() {
 
           {/* Protected Application Flow */}
           <Route element={<ProtectedRoute />}>
-            <Route element={<DashboardLayout />}>
+            <Route element={<SocialLayout />}>
               <Route path="/feed" element={<FeedPage />} />
               <Route path="/posts/:id" element={<PostDetailPage />} />
               <Route path="/profile/:userId" element={<ProfilePage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/friends" element={<FriendsPage />} />
               <Route path="/search" element={<SearchPage />} />
-
+              <Route path="/messages" element={<MessagesPage />} />
+            </Route>
+            <Route element={<DashboardLayout />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/exams" element={<DashboardPage />} />
               <Route path="/questions" element={<SubjectsPage />} />

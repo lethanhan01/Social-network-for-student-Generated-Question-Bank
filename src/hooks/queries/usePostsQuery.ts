@@ -9,6 +9,7 @@ import type {
   UpdatePostRequest,
   UpdateLecturerNoteRequest,
   ReactRequest,
+  PostResponseDto,
 } from '@/types'
 
 export function usePostDetailQuery(postId: number) {
@@ -29,7 +30,7 @@ export function useUserPostsQuery(userId: number, params?: { cursor?: string; li
 
 export function useInfiniteUserPostsQuery(userId: number, limit = 10) {
   return useInfiniteQuery({
-    queryKey: queryKeys.posts.userPosts(userId, { limit }),
+    queryKey: queryKeys.posts.infiniteUserPosts(userId, limit),
     queryFn: ({ pageParam, signal }) =>
       postService.getUserPosts(
         userId,
@@ -44,12 +45,9 @@ export function useInfiniteUserPostsQuery(userId: number, limit = 10) {
 
 export function useInfinitePostsFeedQuery(limit = 10) {
   return useInfiniteQuery({
-    queryKey: queryKeys.posts.feed(),
+    queryKey: queryKeys.posts.infiniteFeed(limit),
     queryFn: ({ pageParam, signal }) =>
-      postService.getMyPosts(
-        { cursor: pageParam as string | undefined, limit },
-        { signal }
-      ),
+      postService.getMyPosts({ cursor: pageParam as string | undefined, limit }, { signal }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => getNextCursor(lastPage.pagination),
   })
@@ -57,12 +55,9 @@ export function useInfinitePostsFeedQuery(limit = 10) {
 
 export function useInfiniteActivityFeedQuery(limit = 10) {
   return useInfiniteQuery({
-    queryKey: queryKeys.feed.activity(),
+    queryKey: queryKeys.feed.infiniteActivity(limit),
     queryFn: ({ pageParam, signal }) =>
-      feedService.getActivityFeeds(
-        { cursor: pageParam as string | undefined, limit },
-        { signal }
-      ),
+      feedService.getActivityFeeds({ cursor: pageParam as string | undefined, limit }, { signal }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => getNextCursor(lastPage.pagination),
   })
@@ -81,7 +76,12 @@ export function useCreatePostMutation() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (payload: CreatePostRequest) => postService.createPost(payload),
-    onSuccess: () => {
+    onSuccess: (post) => {
+      if (post.post_id) queryClient.setQueryData(queryKeys.posts.detail(post.post_id), post)
+      queryClient.setQueryData<PostResponseDto[]>(
+        queryKeys.posts.recentlyCreated(),
+        (previous = []) => [post, ...previous]
+      )
       void queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
       void queryClient.invalidateQueries({ queryKey: queryKeys.feed.all })
     },
@@ -92,8 +92,17 @@ export function useUpdatePostMutation(postId: number) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (payload: UpdatePostRequest) => postService.updatePost(postId, payload),
-    onSuccess: (updated) => {
-      queryClient.setQueryData(queryKeys.posts.detail(postId), updated)
+    onSuccess: (updated, payload) => {
+      queryClient.setQueryData<PostResponseDto[]>(
+        queryKeys.posts.recentlyCreated(),
+        (previous = []) =>
+          previous.map((post) =>
+            post.post_id === postId ? { ...post, ...payload, ...updated } : post
+          )
+      )
+      queryClient.setQueryData<PostResponseDto>(queryKeys.posts.detail(postId), (previous) =>
+        previous ? { ...previous, ...updated } : undefined
+      )
       void queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
       void queryClient.invalidateQueries({ queryKey: queryKeys.feed.all })
     },
@@ -105,6 +114,10 @@ export function useDeletePostMutation() {
   return useMutation({
     mutationFn: (postId: number) => postService.deletePost(postId),
     onSuccess: (_, postId) => {
+      queryClient.setQueryData<PostResponseDto[]>(
+        queryKeys.posts.recentlyCreated(),
+        (previous = []) => previous.filter((post) => post.post_id !== postId)
+      )
       queryClient.removeQueries({ queryKey: queryKeys.posts.detail(postId) })
       void queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
       void queryClient.invalidateQueries({ queryKey: queryKeys.feed.all })
@@ -128,10 +141,11 @@ export function useToggleReactionMutation() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (payload: ReactRequest) => reactionService.toggleReact(payload),
-    onSuccess: (_, variables) => {
+    onSuccess: (result, variables) => {
+      queryClient.setQueryData(queryKeys.posts.myReaction(variables.target_id), result)
       if (variables.target_type === 'POST') {
         void queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
-        void queryClient.invalidateQueries({ queryKey: queryKeys.feed.activity() })
+        void queryClient.invalidateQueries({ queryKey: queryKeys.feed.all })
       }
     },
   })

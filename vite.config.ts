@@ -23,10 +23,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     customLogger,
-    plugins: [
-      tailwindcss(),
-      react(),
-    ],
+    plugins: [tailwindcss(), react()],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
@@ -39,7 +36,16 @@ export default defineConfig(({ mode }) => {
           target: proxyTarget,
           changeOrigin: true,
           secure: false,
+          ws: true,
           configure: (proxy) => {
+            // The browser talks to this same-origin dev proxy. Keep Spring's
+            // origin check consistent with the upstream Host rewritten above.
+            proxy.on('proxyReq', (proxyReq, req) => {
+              if (req.headers.origin) proxyReq.setHeader('Origin', new URL(proxyTarget).origin)
+            })
+            proxy.on('proxyReqWs', (proxyReq) => {
+              proxyReq.setHeader('Origin', new URL(proxyTarget).origin)
+            })
             proxy.on('error', (err, _req, res) => {
               const code = (err as { code?: string }).code
               if (code === 'ECONNRESET' || code === 'ECONNABORTED' || code === 'ECONNREFUSED') {

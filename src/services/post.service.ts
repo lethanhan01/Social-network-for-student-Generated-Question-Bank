@@ -1,4 +1,5 @@
 import api, { requestData, type GlobalResponse } from './api'
+import { afterParams } from '@/lib/pagination'
 import type {
   CreatePostRequest,
   PostResponseDto,
@@ -47,7 +48,7 @@ export const postService = {
   ): Promise<CursorResponseVideoPostItemDto> {
     return requestData<CursorResponseVideoPostItemDto>(
       api.get<GlobalResponse<CursorResponseVideoPostItemDto>>('/video-posts', {
-        params,
+        params: afterParams(params),
         signal: options?.signal,
       })
     )
@@ -60,7 +61,7 @@ export const postService = {
   ): Promise<CursorResponsePostResponseDto> {
     return requestData<CursorResponsePostResponseDto>(
       api.get<GlobalResponse<CursorResponsePostResponseDto>>(`/users/${userId}/posts`, {
-        params,
+        params: afterParams(params),
         signal: options?.signal,
       })
     )
@@ -72,7 +73,7 @@ export const postService = {
   ): Promise<CursorResponsePostResponseDto> {
     return requestData<CursorResponsePostResponseDto>(
       api.get<GlobalResponse<CursorResponsePostResponseDto>>('/posts/me', {
-        params,
+        params: afterParams(params),
         signal: options?.signal,
       })
     )

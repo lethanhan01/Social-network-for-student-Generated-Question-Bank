@@ -11,18 +11,13 @@ const mockSubjects: SubjectResponse[] = [
 describe('CreatePostModal Component', () => {
   it('renders modal with form inputs when open', () => {
     render(
-      <CreatePostModal
-        isOpen={true}
-        onClose={vi.fn()}
-        onSubmit={vi.fn()}
-        subjects={mockSubjects}
-      />
+      <CreatePostModal isOpen={true} onClose={vi.fn()} onSubmit={vi.fn()} subjects={mockSubjects} />
     )
 
     expect(screen.getByRole('heading', { name: /Tạo bài viết thảo luận mới/i })).toBeInTheDocument()
     expect(screen.getByLabelText(/Nội dung bài viết/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Đăng bài viết/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Hủy bỏ/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^Hủy$/ })).toBeInTheDocument()
   })
 
   it('displays validation error if content is empty on submit', async () => {
@@ -40,7 +35,9 @@ describe('CreatePostModal Component', () => {
     fireEvent.click(submitBtn)
 
     await waitFor(() => {
-      expect(screen.getByText(/Vui lòng nhập nội dung bài viết thảo luận/i)).toBeInTheDocument()
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        /Vui lòng nhập nội dung hoặc thêm tệp đính kèm/i
+      )
       expect(handleSubmit).not.toHaveBeenCalled()
     })
   })
@@ -59,7 +56,9 @@ describe('CreatePostModal Component', () => {
     )
 
     const textarea = screen.getByLabelText(/Nội dung bài viết/i)
-    fireEvent.change(textarea, { target: { value: 'Bài tập tuần này khó quá, có ai làm xong chưa?' } })
+    fireEvent.change(textarea, {
+      target: { value: 'Bài tập tuần này khó quá, có ai làm xong chưa?' },
+    })
 
     const submitBtn = screen.getByRole('button', { name: /Đăng bài viết/i })
     fireEvent.click(submitBtn)

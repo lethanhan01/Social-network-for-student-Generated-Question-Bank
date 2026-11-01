@@ -16,20 +16,30 @@ import type {
 
 export const utilityService = {
   async search(
-    params: { keyword: string; type?: 'ALL' | 'POST' | 'QUESTION' | 'USER'; cursor?: string; limit?: number },
+    params: {
+      keyword: string
+      type?: 'ALL' | 'POST' | 'QUESTION' | 'USER' | 'SESSION' | 'SUBJECT'
+      cursor?: string
+      limit?: number
+    },
     options?: { signal?: AbortSignal }
   ): Promise<GlobalSearchResponseDto> {
     return requestData<GlobalSearchResponseDto>(
       api.get<GlobalResponse<GlobalSearchResponseDto>>('/search', {
-        params,
+        params: {
+          query: params.keyword,
+          type: params.type,
+          after: params.cursor,
+          limit: params.limit,
+        },
         signal: options?.signal,
       })
     )
   },
 
-  async getSavedAndTrendingSearches(
-    options?: { signal?: AbortSignal }
-  ): Promise<SavedAndTrendingSearchesResponseDto> {
+  async getSavedAndTrendingSearches(options?: {
+    signal?: AbortSignal
+  }): Promise<SavedAndTrendingSearchesResponseDto> {
     return requestData<SavedAndTrendingSearchesResponseDto>(
       api.get<GlobalResponse<SavedAndTrendingSearchesResponseDto>>('/search/saved', {
         signal: options?.signal,
@@ -39,6 +49,10 @@ export const utilityService = {
 
   async deleteSavedSearch(id: number): Promise<void> {
     await api.delete<GlobalResponse<void>>(`/search/saved/${id}`)
+  },
+
+  async saveSearch(query: string): Promise<void> {
+    await api.post('/search/saved', { query })
   },
 
   async createReport(payload: CreateReportRequestDto): Promise<ReportResponseDto> {

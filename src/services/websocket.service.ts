@@ -12,6 +12,20 @@ import type {
 class WebSocketService {
   private client: Client | null = null
   private isConnected = false
+  private readonly connectionListeners = new Set<(connected: boolean) => void>()
+
+  private setConnected(connected: boolean): void {
+    this.isConnected = connected
+    this.connectionListeners.forEach((listener) => listener(connected))
+  }
+
+  public onConnection(callback: (connected: boolean) => void): () => void {
+    this.connectionListeners.add(callback)
+    callback(this.isConnected)
+    return () => {
+      this.connectionListeners.delete(callback)
+    }
+  }
   private readonly messageListeners = new Set<(msg: WsMessageBroadcastDto) => void>()
   private readonly typingListeners = new Map<number, Set<(typing: WsTypingBroadcastDto) => void>>()
 
@@ -19,7 +33,11 @@ class WebSocketService {
     const token = useAuthStore.getState().token
     if (!token || this.client?.active) return
 
-    const wsUrl = import.meta.env.VITE_WS_URL || 'wss://snsqb.duckdns.org/api/v1/ws'
+    const apiUrl = new URL(import.meta.env.VITE_API_URL || '/api/v1', window.location.origin)
+    apiUrl.protocol = apiUrl.protocol === 'https:' ? 'wss:' : 'ws:'
+    // Spring exposes a SockJS endpoint: native STOMP clients use its /websocket transport.
+    apiUrl.pathname = `${apiUrl.pathname.replace(/\/$/, '')}/ws/websocket`
+    const wsUrl = import.meta.env.VITE_WS_URL || apiUrl.toString()
 
     this.client = new Client({
       brokerURL: wsUrl,
@@ -30,12 +48,13 @@ class WebSocketService {
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
       onConnect: () => {
-        this.isConnected = true
+        this.setConnected(true)
         this.subscribePrivateMessages()
       },
       onDisconnect: () => {
-        this.isConnected = false
+        this.setConnected(false)
       },
+      onWebSocketClose: () => this.setConnected(false),
       onStompError: (frame) => {
         logger.error('[STOMP Error]', { data: frame.headers['message'] })
       },
@@ -90,12 +109,13 @@ class WebSocketService {
     }
   }
 
-  public sendMessage(payload: SendWsMessageRequestDto): void {
-    if (!this.client || !this.isConnected) return
+  public sendMessage(payload: SendWsMessageRequestDto): boolean {
+    if (!this.client || !this.isConnected) return false
     this.client.publish({
       destination: '/app/chat.send',
       body: JSON.stringify(payload),
     })
+    return true
   }
 
   public markAsRead(payload: ReadWsMessageRequestDto): void {
@@ -118,7 +138,7 @@ class WebSocketService {
     if (this.client) {
       void this.client.deactivate()
       this.client = null
-      this.isConnected = false
+      this.setConnected(false)
     }
   }
 }

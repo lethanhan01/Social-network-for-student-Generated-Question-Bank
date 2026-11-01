@@ -17,8 +17,11 @@ export default function PostDetailPage() {
   const { data: post, isLoading, isError, error } = usePostDetailQuery(postId)
   const toggleReactionMutation = useToggleReactionMutation()
 
-  async function handleToggleReact(targetPostId: number, reactionType: 'LIKE' | 'LOVE' | 'WOW' = 'LIKE') {
-    await toggleReactionMutation.mutateAsync({
+  async function handleToggleReact(
+    targetPostId: number,
+    reactionType: 'LIKE' | 'LOVE' | 'WOW' = 'LIKE'
+  ) {
+    return toggleReactionMutation.mutateAsync({
       target_type: 'POST',
       target_id: targetPostId,
       reaction_type: reactionType,
@@ -27,7 +30,7 @@ export default function PostDetailPage() {
 
   if (isLoading) {
     return (
-      <main className="max-w-3xl mx-auto py-8 px-4 space-y-4">
+      <section className="max-w-3xl mx-auto py-8 px-4 space-y-4">
         <BackButton to="/feed" label={t('common.back', 'Quay lại bảng tin')} className="min-h-11" />
         {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Loading skeleton container] */}
         <div className="p-6 sm:p-8 text-center bg-surface border border-line-subtle rounded-2xl shadow-card space-y-3">
@@ -35,14 +38,14 @@ export default function PostDetailPage() {
             {t('post.loadingDetail', 'Đang tải nội dung chi tiết bài viết...')}
           </Text>
         </div>
-      </main>
+      </section>
     )
   }
 
   if (isError || !post || !post.post_id) {
     const isForbidden = (error as { response?: { status?: number } })?.response?.status === 403
     return (
-      <main className="max-w-3xl mx-auto py-8 px-4 space-y-6">
+      <section className="max-w-3xl mx-auto py-8 px-4 space-y-6">
         <BackButton to="/feed" label={t('common.back', 'Quay lại bảng tin')} className="min-h-11" />
         <Card className="p-6 sm:p-8 text-center bg-surface border-line-subtle rounded-2xl shadow-card space-y-4">
           {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Error icon circle wrapper] */}
@@ -56,8 +59,14 @@ export default function PostDetailPage() {
           </Heading>
           <Text size="sm" tone="muted" className="max-w-md mx-auto">
             {isForbidden
-              ? t('post.errorForbiddenDesc', 'Bài viết này được đặt ở chế độ riêng tư hoặc chỉ dành cho nhóm sinh viên cụ thể.')
-              : t('post.errorNotFoundDesc', 'Liên kết bài viết có thể bị sai, hoặc tác giả đã xóa bài viết khỏi hệ thống SQB HUST.')}
+              ? t(
+                  'post.errorForbiddenDesc',
+                  'Bài viết này được đặt ở chế độ riêng tư hoặc chỉ dành cho nhóm sinh viên cụ thể.'
+                )
+              : t(
+                  'post.errorNotFoundDesc',
+                  'Liên kết bài viết có thể bị sai, hoặc tác giả đã xóa bài viết khỏi hệ thống SQB HUST.'
+                )}
           </Text>
           {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Back to feed button wrapper] */}
           <div className="pt-2">
@@ -66,15 +75,19 @@ export default function PostDetailPage() {
             </ButtonLink>
           </div>
         </Card>
-      </main>
+      </section>
     )
   }
 
   return (
-    <main className="max-w-3xl mx-auto py-6 px-4 space-y-6">
+    <section className="max-w-3xl mx-auto py-6 px-4 space-y-6">
       {/* Navigation Header */}
       <nav aria-label="Điều hướng quay lại" className="flex items-center justify-between">
-        <BackButton to="/feed" label={t('common.backToFeed', 'Trở về bảng tin')} className="min-h-11" />
+        <BackButton
+          to="/feed"
+          label={t('common.backToFeed', 'Trở về bảng tin')}
+          className="min-h-11"
+        />
         <Text size="xs" tone="muted">
           {t('post.postIdLabel', 'Mã bài viết')}: #{post.post_id}
         </Text>
@@ -87,6 +100,6 @@ export default function PostDetailPage() {
         currentUserName={currentUser?.fullName || 'Bạn'}
         onToggleReact={handleToggleReact}
       />
-    </main>
+    </section>
   )
 }

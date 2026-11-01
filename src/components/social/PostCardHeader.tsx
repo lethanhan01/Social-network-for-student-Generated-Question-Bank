@@ -1,5 +1,13 @@
 import { useTranslation } from 'react-i18next'
-import { MoreHorizontal, AlertCircle, GraduationCap, Copy, ExternalLink } from 'lucide-react'
+import {
+  MoreHorizontal,
+  AlertCircle,
+  GraduationCap,
+  Copy,
+  ExternalLink,
+  Edit,
+  Trash2,
+} from 'lucide-react'
 import { Avatar, Badge } from '@/components/ui/data-display'
 import { Button, ButtonLink } from '@/components/ui/actions'
 import {
@@ -18,6 +26,9 @@ interface PostCardHeaderProps {
   onOpenLecturerNote: () => void
   onOpenReport: () => void
   onCopyLink: () => void
+  canManage?: boolean
+  onEdit?: () => void
+  onDelete?: () => void
 }
 
 export function PostCardHeader({
@@ -26,6 +37,9 @@ export function PostCardHeader({
   onOpenLecturerNote,
   onOpenReport,
   onCopyLink,
+  canManage,
+  onEdit,
+  onDelete,
 }: Readonly<PostCardHeaderProps>) {
   const { t } = useTranslation()
   const authorName = post.author?.full_name || 'Thành viên HUST'
@@ -103,6 +117,18 @@ export function PostCardHeader({
           align="end"
           className="w-52 bg-surface border-line-subtle shadow-card rounded-xl"
         >
+          {canManage ? (
+            <>
+              <DropdownMenuItem onClick={onEdit}>
+                <Edit size={16} className="mr-2" />
+                {t('social.editPost')}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={onDelete}>
+                <Trash2 size={16} className="mr-2" />
+                {t('social.deletePost')}
+              </DropdownMenuItem>
+            </>
+          ) : null}
           {post.post_id ? (
             <DropdownMenuItem asChild>
               <ButtonLink
@@ -111,14 +137,18 @@ export function PostCardHeader({
                 className="w-full justify-start p-2 h-auto text-xs"
               >
                 <ExternalLink size={15} className="mr-2" />
-                <strong className="font-normal">{t('post.viewDetail', 'Xem chi tiết bài viết')}</strong>
+                <strong className="font-normal">
+                  {t('post.viewDetail', 'Xem chi tiết bài viết')}
+                </strong>
               </ButtonLink>
             </DropdownMenuItem>
           ) : null}
           {isLecturer && post.post_id ? (
             <DropdownMenuItem onClick={onOpenLecturerNote}>
               <GraduationCap size={15} className="mr-2 text-action-accent" />
-              <strong className="font-normal">{t('post.lecturerNote.menu', 'Ghi chú chuyên môn')}</strong>
+              <strong className="font-normal">
+                {t('post.lecturerNote.menu', 'Ghi chú chuyên môn')}
+              </strong>
             </DropdownMenuItem>
           ) : null}
           <DropdownMenuItem onClick={onCopyLink}>

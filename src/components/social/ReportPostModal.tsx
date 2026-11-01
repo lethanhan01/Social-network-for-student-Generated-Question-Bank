@@ -16,6 +16,7 @@ import { Button, SubmitButton } from '@/components/ui/actions'
 import { Text } from '@/components/ui/typography'
 import { useReportMutation } from '@/hooks/queries/useReportMutation'
 import { toast } from '@/lib/toast'
+import { getApiError } from '@/lib/api-error'
 
 export interface ReportModalProps {
   isOpen: boolean
@@ -42,6 +43,7 @@ export function ReportModal({
   const reportMutation = useReportMutation()
 
   async function handleSubmit() {
+    if (reportMutation.isPending) return
     if (!actualTargetId) {
       toast.error(t('report.invalidTarget', 'Mục tiêu báo cáo không hợp lệ.'))
       return
@@ -62,10 +64,8 @@ export function ReportModal({
       })
       setDescription('')
       onClose()
-    } catch {
-      toast.error(
-        t('report.error', 'Không thể gửi báo cáo vi phạm. Vui lòng kiểm tra lại kết nối.')
-      )
+    } catch (cause) {
+      toast.error(getApiError(cause, t('zone2.actionError')))
     }
   }
 
@@ -106,10 +106,18 @@ export function ReportModal({
               <SelectValue placeholder={t('report.selectReason', 'Chọn lý do báo cáo')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="SPAM">{t('report.reasons.spam', 'Spam / Quảng cáo không phù hợp')}</SelectItem>
-              <SelectItem value="HARASSMENT">{t('report.reasons.harassment', 'Quấy rối / Công kích cá nhân')}</SelectItem>
-              <SelectItem value="HATE_STATEMENT">{t('report.reasons.hate', 'Ngôn từ thù ghét / Xúc phạm')}</SelectItem>
-              <SelectItem value="OTHER">{t('report.reasons.other', 'Vi phạm quy chế khác')}</SelectItem>
+              <SelectItem value="SPAM">
+                {t('report.reasons.spam', 'Spam / Quảng cáo không phù hợp')}
+              </SelectItem>
+              <SelectItem value="HARASSMENT">
+                {t('report.reasons.harassment', 'Quấy rối / Công kích cá nhân')}
+              </SelectItem>
+              <SelectItem value="HATE_STATEMENT">
+                {t('report.reasons.hate', 'Ngôn từ thù ghét / Xúc phạm')}
+              </SelectItem>
+              <SelectItem value="OTHER">
+                {t('report.reasons.other', 'Vi phạm quy chế khác')}
+              </SelectItem>
             </SelectContent>
           </Select>
         </FormField>

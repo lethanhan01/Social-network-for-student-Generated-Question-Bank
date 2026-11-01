@@ -1,4 +1,5 @@
 import api, { requestData, type GlobalResponse } from './api'
+import { afterParams } from '@/lib/pagination'
 import type {
   SendFriendRequestDto,
   FriendshipResponseDto,
@@ -44,7 +45,7 @@ export const relationshipService = {
   ): Promise<FriendListResponseDto> {
     return requestData<FriendListResponseDto>(
       api.get<GlobalResponse<FriendListResponseDto>>('/friendships', {
-        params,
+        params: afterParams(params),
         signal: options?.signal,
       })
     )
@@ -56,7 +57,7 @@ export const relationshipService = {
   ): Promise<FriendRequestSentListResponseDto> {
     return requestData<FriendRequestSentListResponseDto>(
       api.get<GlobalResponse<FriendRequestSentListResponseDto>>('/friendships/requests/sent', {
-        params,
+        params: afterParams(params),
         signal: options?.signal,
       })
     )
@@ -67,10 +68,13 @@ export const relationshipService = {
     options?: { signal?: AbortSignal }
   ): Promise<FriendRequestReceivedListResponseDto> {
     return requestData<FriendRequestReceivedListResponseDto>(
-      api.get<GlobalResponse<FriendRequestReceivedListResponseDto>>('/friendships/requests/received', {
-        params,
-        signal: options?.signal,
-      })
+      api.get<GlobalResponse<FriendRequestReceivedListResponseDto>>(
+        '/friendships/requests/received',
+        {
+          params: afterParams(params),
+          signal: options?.signal,
+        }
+      )
     )
   },
 
@@ -92,7 +96,7 @@ export const relationshipService = {
   ): Promise<FollowerListResponseDto> {
     return requestData<FollowerListResponseDto>(
       api.get<GlobalResponse<FollowerListResponseDto>>('/follows/followers', {
-        params,
+        params: afterParams(params),
         signal: options?.signal,
       })
     )
@@ -104,7 +108,7 @@ export const relationshipService = {
   ): Promise<FollowingListResponseDto> {
     return requestData<FollowingListResponseDto>(
       api.get<GlobalResponse<FollowingListResponseDto>>('/follows/following', {
-        params,
+        params: afterParams(params),
         signal: options?.signal,
       })
     )
@@ -139,7 +143,7 @@ export const relationshipService = {
   ): Promise<BlockedListResponseDto> {
     return requestData<BlockedListResponseDto>(
       api.get<GlobalResponse<BlockedListResponseDto>>('/blocks', {
-        params,
+        params: afterParams(params),
         signal: options?.signal,
       })
     )

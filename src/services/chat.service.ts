@@ -1,4 +1,5 @@
 import api, { requestData, type GlobalResponse } from './api'
+import { afterParams } from '@/lib/pagination'
 import type {
   ConversationListResponseDto,
   ConversationDetailDto,
@@ -22,19 +23,23 @@ export const chatService = {
   ): Promise<ConversationListResponseDto> {
     return requestData<ConversationListResponseDto>(
       api.get<GlobalResponse<ConversationListResponseDto>>('/conversations', {
-        params,
+        params: afterParams(params),
         signal: options?.signal,
       })
     )
   },
 
-  async createDirectConversation(payload: CreateDirectConversationDto): Promise<ConversationDetailDto> {
+  async createDirectConversation(
+    payload: CreateDirectConversationDto
+  ): Promise<ConversationDetailDto> {
     return requestData<ConversationDetailDto>(
       api.post<GlobalResponse<ConversationDetailDto>>('/conversations/direct', payload)
     )
   },
 
-  async createGroupConversation(payload: CreateGroupConversationDto): Promise<ConversationDetailDto> {
+  async createGroupConversation(
+    payload: CreateGroupConversationDto
+  ): Promise<ConversationDetailDto> {
     return requestData<ConversationDetailDto>(
       api.post<GlobalResponse<ConversationDetailDto>>('/conversations/group', payload)
     )
@@ -57,7 +62,10 @@ export const chatService = {
     )
   },
 
-  async addGroupMembers(id: number, payload: AddGroupMembersRequestDto): Promise<AddGroupMembersResponseDto> {
+  async addGroupMembers(
+    id: number,
+    payload: AddGroupMembersRequestDto
+  ): Promise<AddGroupMembersResponseDto> {
     return requestData<AddGroupMembersResponseDto>(
       api.post<GlobalResponse<AddGroupMembersResponseDto>>(`/conversations/${id}/members`, payload)
     )
@@ -67,7 +75,11 @@ export const chatService = {
     await api.delete<GlobalResponse<void>>(`/conversations/${id}/members/${userId}`)
   },
 
-  async updateMemberRole(id: number, userId: number, payload: UpdateMemberRoleRequestDto): Promise<void> {
+  async updateMemberRole(
+    id: number,
+    userId: number,
+    payload: UpdateMemberRoleRequestDto
+  ): Promise<void> {
     await api.put<GlobalResponse<void>>(`/conversations/${id}/members/${userId}/role`, payload)
   },
 
@@ -89,7 +101,9 @@ export const chatService = {
     await api.post<GlobalResponse<void>>('/conversations/hidden/unlock', payload)
   },
 
-  async getHiddenConversations(options?: { signal?: AbortSignal }): Promise<ConversationListResponseDto> {
+  async getHiddenConversations(options?: {
+    signal?: AbortSignal
+  }): Promise<ConversationListResponseDto> {
     return requestData<ConversationListResponseDto>(
       api.get<GlobalResponse<ConversationListResponseDto>>('/conversations/hidden', {
         signal: options?.signal,
@@ -104,15 +118,20 @@ export const chatService = {
   ): Promise<MessageListResponseDto> {
     return requestData<MessageListResponseDto>(
       api.get<GlobalResponse<MessageListResponseDto>>(`/conversations/${id}/messages`, {
-        params,
+        params: afterParams(params),
         signal: options?.signal,
       })
     )
   },
 
-  async recallMessage(id: number, params?: { mode?: 'ME' | 'EVERYONE' }): Promise<DeleteMessageResponseDto> {
+  async recallMessage(
+    id: number,
+    params?: { mode?: 'ME' | 'EVERYONE' }
+  ): Promise<DeleteMessageResponseDto> {
     return requestData<DeleteMessageResponseDto>(
-      api.delete<GlobalResponse<DeleteMessageResponseDto>>(`/messages/${id}`, { params })
+      api.delete<GlobalResponse<DeleteMessageResponseDto>>(`/messages/${id}`, {
+        data: { scope: params?.mode ?? 'ME' },
+      })
     )
   },
 }
