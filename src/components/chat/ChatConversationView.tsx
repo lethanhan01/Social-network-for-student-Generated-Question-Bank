@@ -129,9 +129,9 @@ export function ChatConversationView({
     e.preventDefault()
     if (!text.trim() && !mediaUrl) return
     if (mediaUrl) {
-      sendMessageContent(text.trim() || t('sentImage', 'đã gửi một ảnh'), 'IMAGE', [mediaUrl])
+      void sendMessageContent(text.trim() || t('sentImage', 'đã gửi một ảnh'), 'IMAGE', [mediaUrl])
     } else {
-      sendMessageContent(text.trim(), 'TEXT')
+      void sendMessageContent(text.trim(), 'TEXT')
     }
   }
 
@@ -229,7 +229,7 @@ export function ChatConversationView({
           </Popover>
           <Input value={text} onChange={(e) => handleTextChange(e.target.value)} placeholder={t('typeMessage', 'Nhập tin nhắn...')} aria-label={t('typeMessage', 'Nhập tin nhắn...')} className="flex-1 rounded-full bg-surface-sunken" />
           {!text.trim() && !mediaUrl ? (
-            <Button variant="ghost" size="sm" onClick={() => sendMessageContent('👍', 'TEXT')} aria-label={t('likeThumb', 'Thích')} className="w-9 h-9 p-0 rounded-full text-action-accent hover:bg-action-accent/10"><ThumbsUp size={19} /></Button>
+            <Button variant="ghost" size="sm" onClick={() => { void sendMessageContent('👍', 'TEXT') }} aria-label={t('likeThumb', 'Thích')} className="w-9 h-9 p-0 rounded-full text-action-accent hover:bg-action-accent/10"><ThumbsUp size={19} /></Button>
           ) : (
             <Button variant="primary" size="sm" type="submit" disabled={isUploading} aria-label={t('send', 'Gửi')} className="w-9 h-9 p-0 rounded-full"><Send size={16} /></Button>
           )}
