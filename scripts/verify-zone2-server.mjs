@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { randomUUID } from 'node:crypto'
+import { encodeServerIdentifier } from './lib/zone2-request-url.mjs'
 
 // Credentials stay in memory. Use the documented staging account or explicit environment overrides.
 const readme = await readFile(new URL('../README.md', import.meta.url), 'utf8')
@@ -28,6 +29,7 @@ async function request(path, method = 'GET', body) {
     },
     ...(body ? { body: JSON.stringify(body) } : {}),
     signal: AbortSignal.timeout(25_000),
+    redirect: 'error',
   })
   const envelope = await response.json()
   assert.ok(
@@ -65,7 +67,7 @@ if (process.argv.includes('--cleanup-ui-fixtures')) {
       post.visibility === 'ONLY_ME' &&
       /^Zone 2 browser verification [0-9a-f-]{36}( updated)?$/.test(post.content ?? '')
     ) {
-      await request(`/posts/${post.post_id}`, 'DELETE')
+      await request(`/posts/${encodeServerIdentifier(post.post_id)}`, 'DELETE')
       process.stdout.write(`Cleaned private UI fixture ${post.post_id}\n`)
     }
   }
@@ -93,7 +95,7 @@ await check('OpenAPI query parameters', async () => {
 })
 for (const path of [
   '/posts/me?limit=2',
-  `/users/${profile.user_id}/posts?limit=2`,
+  `/users/${encodeServerIdentifier(profile.user_id)}/posts?limit=2`,
   '/activity-feeds?limit=2',
   '/friendships?limit=2',
   '/friendships/requests/received?limit=2',
@@ -113,7 +115,9 @@ for (const path of [
 await check('Post pagination uses after', async () => {
   const first = await request('/posts/me?limit=1')
   if (!first.pagination?.has_next) return
-  const second = await request(`/posts/me?limit=1&after=${first.pagination.after}`)
+  const second = await request(
+    `/posts/me?limit=1&after=${encodeServerIdentifier(first.pagination.after)}`
+  )
   assert.notEqual(first.items[0]?.post_id, second.items[0]?.post_id)
 })
 if (process.argv.includes('--write')) {
@@ -128,11 +132,14 @@ if (process.argv.includes('--write')) {
       })
       postId = post.post_id
       assert.ok(postId)
-      await request(`/posts/${postId}`, 'PUT', {
+      await request(`/posts/${encodeServerIdentifier(postId)}`, 'PUT', {
         content: `${marker} updated`,
         visibility: 'ONLY_ME',
       })
-      assert.equal((await request(`/posts/${postId}`)).content, `${marker} updated`)
+      assert.equal(
+        (await request(`/posts/${encodeServerIdentifier(postId)}`)).content,
+        `${marker} updated`
+      )
       const root = await request('/comments', 'POST', {
         target_type: 'POST',
         target_id: postId,
@@ -145,11 +152,15 @@ if (process.argv.includes('--write')) {
         parent_comment_id: root.comment_id,
         content: 'Automated reply',
       })
-      await request(`/comments/${reply.comment_id}`, 'PUT', { content: 'Automated reply updated' })
-      const roots = await request(`/comments?target_type=POST&target_id=${postId}&limit=20`)
+      await request(`/comments/${encodeServerIdentifier(reply.comment_id)}`, 'PUT', {
+        content: 'Automated reply updated',
+      })
+      const roots = await request(
+        `/comments?target_type=POST&target_id=${encodeServerIdentifier(postId)}&limit=20`
+      )
       assert.ok(roots.items.some((item) => item.comment_id === root.comment_id))
       const replies = await request(
-        `/comments?target_type=POST&target_id=${postId}&parent_comment_id=${root.comment_id}&limit=20`
+        `/comments?target_type=POST&target_id=${encodeServerIdentifier(postId)}&parent_comment_id=${encodeServerIdentifier(root.comment_id)}&limit=20`
       )
       assert.ok(replies.items.some((item) => item.content === 'Automated reply updated'))
       for (const type of ['LIKE', 'LOVE', 'WOW']) {
@@ -167,10 +178,10 @@ if (process.argv.includes('--write')) {
         reaction_type: 'WOW',
       })
       assert.equal(removed.total_count, 0)
-      await request(`/comments/${reply.comment_id}`, 'DELETE')
-      await request(`/comments/${root.comment_id}`, 'DELETE')
+      await request(`/comments/${encodeServerIdentifier(reply.comment_id)}`, 'DELETE')
+      await request(`/comments/${encodeServerIdentifier(root.comment_id)}`, 'DELETE')
     } finally {
-      if (postId) await request(`/posts/${postId}`, 'DELETE')
+      if (postId) await request(`/posts/${encodeServerIdentifier(postId)}`, 'DELETE')
     }
   })
 }
