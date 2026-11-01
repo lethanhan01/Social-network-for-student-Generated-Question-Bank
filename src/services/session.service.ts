@@ -8,6 +8,17 @@ import type {
   SubjectResponse,
 } from '@/types'
 
+export interface EnrolledSubjectResponse extends SubjectResponse {
+  course_class_id?: number
+  class_code?: string
+  subject_code?: string
+  subject_name?: string
+  semester_id?: number
+  semester_name?: string
+  active_semester?: boolean
+  can_propose?: boolean
+}
+
 export const sessionService = {
   async proposeSession(payload: ProposeSessionRequest): Promise<ProposeSessionResponse> {
     return requestData<ProposeSessionResponse>(
@@ -49,9 +60,9 @@ export const sessionService = {
     await api.delete<GlobalResponse<void>>(`/sessions/my-submissions/${sessionId}`)
   },
 
-  async getMyEnrolledSubjects(options?: { signal?: AbortSignal }): Promise<SubjectResponse[]> {
-    return requestData<SubjectResponse[]>(
-      api.get<GlobalResponse<SubjectResponse[]>>('/sessions/my-enrolled-subjects', {
+  async getMyEnrolledSubjects(options?: { signal?: AbortSignal }): Promise<EnrolledSubjectResponse[]> {
+    return requestData<EnrolledSubjectResponse[]>(
+      api.get<GlobalResponse<EnrolledSubjectResponse[]>>('/sessions/my-enrolled-course-classes', {
         signal: options?.signal,
       })
     )

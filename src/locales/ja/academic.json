@@ -1,0 +1,177 @@
+{
+  "eyebrow": "学習と問題バンク",
+  "common": {
+    "cancel": "キャンセル",
+    "loading": "読み込み中...",
+    "back": "戻る"
+  },
+  "subjects": {
+    "title": "科目一覧",
+    "description": "システム内の科目を検索し、履修中の科目や出題提案セッションにすばやくアクセスできます。",
+    "searchLabel": "科目を検索",
+    "searchPlaceholder": "科目コードまたは科目名で検索...",
+    "enrolledOnly": "履修中の科目のみ表示",
+    "listLabel": "科目リスト",
+    "enrolled": "履修中",
+    "notEnrolled": "この科目は履修していません。",
+    "viewProposals": "提案セッションを見る",
+    "viewProposalsAria": "{{name}}の提案セッションを見る",
+    "loadError": "科目一覧を読み込めませんでした。",
+    "empty": {
+      "title": "科目がありません",
+      "filtered": "該当する科目が見つかりません",
+      "description": "キーワードを変更するか、フィルターを解除してください。"
+    }
+  },
+  "proposals": {
+    "title": "出題提案セッション管理",
+    "description": "選択式問題の提案セッションを作成・確認・編集します。審査待ちのセッションは編集または取り消しができます。",
+    "create": "新規提案を作成",
+    "listLabel": "提案セッション一覧",
+    "loadError": "提案セッションを読み込めませんでした。",
+    "deleteSuccess": "提案セッションを取り消しました。",
+    "deleteError": "提案セッションを取り消せませんでした。",
+    "deleteConfirm": {
+      "title": "提案セッションを取り消しますか？",
+      "description": "セッション「{{title}}」と含まれる問題が削除されます。この操作は元に戻せません。"
+    },
+    "empty": {
+      "title": "提案セッションはまだありません",
+      "description": "履修中の科目の問題バンクに問題を提供しましょう。"
+    },
+    "filter": {
+      "label": "科目で絞り込み",
+      "all": "すべての科目"
+    },
+    "card": {
+      "questions": "{{count}}問",
+      "reactions": "リアクション数",
+      "comments": "コメント数",
+      "practice": "練習する",
+      "edit": "編集",
+      "delete": "取り消し",
+      "editAria": "セッション{{title}}を編集",
+      "deleteAria": "セッション{{title}}を取り消し"
+    },
+    "form": {
+      "createTitle": "新しい提案セッションを作成",
+      "editTitle": "提案セッションを編集",
+      "subject": "科目",
+      "subjectPlaceholder": "履修中の科目を選択",
+      "title": "セッションのタイトル",
+      "content": "説明・メモ",
+      "sourceUrl": "参考資料のURL",
+      "sourceUrlHint": "教科書やオンライン参考資料のリンク（任意）。",
+      "questionLabel": "問題{{index}}",
+      "removeQuestion": "問題{{index}}を削除",
+      "remove": "削除",
+      "questionContent": "問題文",
+      "questionPlaceholder": "問題文を入力...",
+      "options": "4つの選択肢",
+      "optionLabel": "選択肢{{key}}",
+      "optionShort": "解答{{key}}",
+      "correctAnswer": "正解を選択",
+      "explanation": "解説",
+      "explanationHint": "正解の理由を説明してください（任意）。",
+      "confidence": "あなたの自信度",
+      "confidenceHint": "問題の正しさに対する自信の度合いです。",
+      "confidenceLevels": {
+        "0": "0 - 完全に誤りの可能性",
+        "1": "1 - 推測のみ",
+        "2": "2 - 理解が不十分",
+        "3": "3 - 基本を理解",
+        "4": "4 - 非常に確信している"
+      },
+      "addQuestion": "問題を追加",
+      "submit": "提案を送信",
+      "saveChanges": "変更を保存",
+      "createSuccess": "提案セッションを送信しました。まもなく講師が審査します。",
+      "updateSuccess": "提案セッションを更新しました。",
+      "submitError": "提案セッションを保存できませんでした。",
+      "loadError": "提案セッションの内容を読み込めませんでした。",
+      "errors": {
+        "titleRequired": "セッションのタイトルを入力してください。",
+        "subjectRequired": "科目を選択してください。",
+        "questionsRequired": "少なくとも1問が必要です。",
+        "questionContentRequired": "問題文を入力してください。",
+        "optionsRequired": "4つの選択肢をすべて入力してください。",
+        "correctRequired": "正解を選択してください。",
+        "sourceUrlInvalid": "URLが無効です（http:// または https:// で始めてください）。"
+      }
+    }
+  },
+  "practice": {
+    "title": "選択式問題の練習",
+    "description": "解答を選んで提出すると、結果と詳しい解説が表示されます。",
+    "invalidSession": "無効な練習セッションです。",
+    "loadError": "練習セッションの問題を読み込めませんでした。",
+    "empty": {
+      "title": "このセッションにはまだ問題がありません",
+      "description": "講師が承認すると問題が表示されます。"
+    },
+    "progress": "{{answered}}/{{total}}問 回答済み",
+    "correctCount": "今回の正解数：{{count}}問",
+    "listLabel": "練習問題リスト",
+    "questionLabel": "問{{index}}",
+    "imageAlt": "問{{index}}の図",
+    "optionsLegend": "問{{index}}の選択肢",
+    "selectRequired": "提出する前に解答を選択してください。",
+    "submit": "提出",
+    "submitError": "解答を提出できませんでした。",
+    "correctOption": "正解",
+    "yourWrongOption": "あなたの選択",
+    "resultLabel": "結果と解説",
+    "correct": "正解です！",
+    "incorrect": "不正解です",
+    "alreadyAnswered": "この問題は回答済みです",
+    "correctAnswer": "正解：{{key}}",
+    "rated": "評価済み",
+    "rate": "評価・誤り報告",
+    "viewAnalytics": "詳細分析を見る"
+  },
+  "rating": {
+    "title": "問題の評価・誤り報告",
+    "description": "問題の品質を評価するか、知識の誤りを報告して講師の審査に回します。",
+    "ratingLabel": "問題の品質",
+    "ratingRequired": "評価レベルを選ぶか、誤りを報告してください。",
+    "levelTitle": "{{level}}点",
+    "levels": {
+      "0": "完全に誤り",
+      "1": "根拠が不十分（LLMの作り話）",
+      "2": "出題者の理解が不十分",
+      "3": "基本的な知識",
+      "4": "良い問題"
+    },
+    "reportError": "知識の誤りを報告",
+    "reportErrorHint": "誤りを報告すると評価は自動的に0点となり、問題は講師の審査に回されます。",
+    "comment": "追加コメント",
+    "commentPlaceholder": "この問題への詳しいご意見をお寄せください...",
+    "submit": "評価を送信",
+    "success": "問題を評価していただきありがとうございます！",
+    "errorReported": "誤り報告を講師の審査に送信しました。",
+    "newAverage": "新しい平均点：{{avg}}（評価{{count}}件）",
+    "submitError": "評価を送信できませんでした。"
+  },
+  "analytics": {
+    "title": "問題の品質統計・分析",
+    "description": "問題 #{{id}} の回答・評価データです。",
+    "invalidQuestion": "無効な問題IDです。",
+    "loadError": "問題の統計を読み込めませんでした。",
+    "ratingsLoadError": "評価一覧を読み込めませんでした。",
+    "summary": "指標の概要",
+    "totalAnswers": "回答数",
+    "correctRate": "正答率",
+    "avgRating": "平均評価",
+    "outOf": "4点満点",
+    "totalRatings": "評価数",
+    "optionDistribution": "選択肢の分布",
+    "ratingDistribution": "評価点の分布",
+    "optionLabel": "解答{{key}}",
+    "ratingLabel": "レベル{{level}}",
+    "ratingsTitle": "学習者からのコメント",
+    "noRatings": "評価はまだありません",
+    "ratingValue": "{{rating}}/4",
+    "errorFlag": "誤り報告"
+  }
+}
+

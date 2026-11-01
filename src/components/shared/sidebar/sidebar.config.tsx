@@ -10,6 +10,8 @@ import {
   CalendarCheck,
   ShoppingBag,
   Gamepad2,
+  GraduationCap,
+  FilePenLine,
 } from 'lucide-react'
 import type { NavSection } from './sidebar.types'
 
@@ -32,6 +34,16 @@ export function getSQBNavSections(): NavSection[] {
           label: 'Ngân hàng câu hỏi',
           to: '/questions',
           icon: <HelpCircle size={20} />,
+        },
+        {
+          label: 'Môn học',
+          to: '/subjects',
+          icon: <GraduationCap size={20} />,
+        },
+        {
+          label: 'Phiên đề xuất câu hỏi',
+          to: '/proposals',
+          icon: <FilePenLine size={20} />,
         },
         {
           label: 'Mạng xã hội học tập',
