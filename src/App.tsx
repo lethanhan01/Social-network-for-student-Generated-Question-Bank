@@ -16,6 +16,7 @@ const PostDetailPage = lazy(() => import('./pages/post/PostDetailPage'))
 const ProfilePage = lazy(() => import('./pages/profile/ProfilePage'))
 const FriendsPage = lazy(() => import('./pages/friends/FriendsPage'))
 const SearchPage = lazy(() => import('./pages/search/SearchPage'))
+const ChatPage = lazy(() => import('./pages/chat/ChatPage'))
 const DesignSystemShowcasePage = lazy(() => import('./pages/dev/DesignSystemShowcasePage'))
 const LeaderboardPage = lazy(() => import('./pages/gamification/LeaderboardPage'))
 const ShopPage = lazy(() => import('./pages/gamification/ShopPage'))
@@ -46,6 +47,8 @@ export default function App() {
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/friends" element={<FriendsPage />} />
               <Route path="/search" element={<SearchPage />} />
+              <Route path="/messages" element={<ChatPage />} />
+              <Route path="/messages/:conversationId" element={<ChatPage />} />
 
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/exams" element={<DashboardPage />} />

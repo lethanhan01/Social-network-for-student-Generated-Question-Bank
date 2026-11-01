@@ -17,7 +17,7 @@ import type {
 
 export const chatService = {
   async getConversations(
-    params?: { cursor?: string; limit?: number },
+    params?: { after?: number; limit?: number },
     options?: { signal?: AbortSignal }
   ): Promise<ConversationListResponseDto> {
     return requestData<ConversationListResponseDto>(
@@ -99,15 +99,99 @@ export const chatService = {
 
   async getMessages(
     id: number,
-    params?: { cursor?: string; limit?: number },
+    params?: { after?: number; limit?: number },
     options?: { signal?: AbortSignal }
   ): Promise<MessageListResponseDto> {
-    return requestData<MessageListResponseDto>(
-      api.get<GlobalResponse<MessageListResponseDto>>(`/conversations/${id}/messages`, {
-        params,
-        signal: options?.signal,
+    try {
+      return await requestData<MessageListResponseDto>(
+        api.get<GlobalResponse<MessageListResponseDto>>(`/conversations/${id}/messages`, {
+          params,
+          signal: options?.signal,
+        })
+      )
+    } catch (error) {
+      if (params?.after == null) {
+        const fallback = await this.recoverMessagesFallback(id, params?.limit ?? 20, options?.signal)
+        if (fallback) return fallback
+      }
+      throw error
+    }
+  },
+
+  async recoverMessagesFallback(
+    id: number,
+    limit: number,
+    signal?: AbortSignal
+  ): Promise<MessageListResponseDto | null> {
+    try {
+      const convsRes = await api.get<GlobalResponse<ConversationListResponseDto>>('/conversations', {
+        params: { limit: 50 },
+        signal,
       })
-    )
+      const conv = convsRes.data.data?.items?.find((c) => c.conversation_id === id)
+      const lastMsg = conv?.last_message
+
+      if (!lastMsg?.message_id) {
+        return {
+          conversation_id: id,
+          conversation_type: conv?.type,
+          messages: [],
+          pagination: { has_next: false },
+        }
+      }
+
+      // Cấp 1: Probe after = lastMsg.message_id + 1 (Lấy toàn bộ tin nhắn kể cả lastMsg từ DB)
+      try {
+        const probeRes = await api.get<GlobalResponse<MessageListResponseDto>>(
+          `/conversations/${id}/messages`,
+          {
+            params: { after: lastMsg.message_id + 1, limit },
+            signal,
+          }
+        )
+        const msgs = probeRes.data?.data?.messages
+        if (msgs && msgs.length > 0 && msgs.some((m) => m.message_id === lastMsg.message_id)) {
+          return probeRes.data.data
+        }
+      } catch {
+        // Tiếp tục dự phòng cấp 2 nếu server từ chối id + 1
+      }
+
+      // Cấp 2: Probe after = lastMsg.message_id và ghép lastMsg
+      try {
+        const probeRes = await api.get<GlobalResponse<MessageListResponseDto>>(
+          `/conversations/${id}/messages`,
+          {
+            params: { after: lastMsg.message_id, limit },
+            signal,
+          }
+        )
+        if (probeRes.data?.data?.messages) {
+          const data = probeRes.data.data
+          const exists = data.messages?.some((m) => m.message_id === lastMsg.message_id)
+          if (!exists && lastMsg.content) {
+            data.messages = [
+              {
+                message_id: lastMsg.message_id,
+                content: lastMsg.content,
+                message_type: lastMsg.message_type as 'TEXT' | 'IMAGE' | 'VIDEO' | 'GIF',
+                created_at: lastMsg.created_at,
+                sender_id: 0,
+                sender_name: conv?.display_name || 'Tin nhắn mới',
+                avatar_url: conv?.display_avatar_url || undefined,
+              },
+              ...(data.messages || []),
+            ]
+          }
+          return data
+        }
+      } catch {
+        // Bỏ qua nếu lỗi mạng toàn phần
+      }
+    } catch {
+      // Bỏ qua nếu không lấy được danh sách hội thoại
+    }
+    return null
   },
 
   async recallMessage(id: number, params?: { mode?: 'ME' | 'EVERYONE' }): Promise<DeleteMessageResponseDto> {

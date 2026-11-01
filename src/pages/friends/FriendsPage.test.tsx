@@ -61,8 +61,8 @@ describe('FriendsPage Component', () => {
     )
 
     expect(screen.getByRole('heading', { level: 1, name: /Bạn bè & Kết nối/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Bạn bè/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Lời mời nhận được/i })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: /Bạn bè/i })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: /Lời mời nhận/i })).toBeInTheDocument()
     expect(await screen.findByText(/Đặng Tuấn Anh/i)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Nhắn tin/i })).toBeInTheDocument()
   })

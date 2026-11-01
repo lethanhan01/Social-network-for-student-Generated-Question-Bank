@@ -16,7 +16,15 @@ export function QueryFeedback({ pending, error, onRetry }: Readonly<QueryFeedbac
       <Text role={pending ? 'status' : 'alert'}>
         {pending ? t('zone2.loading') : getApiError(error, t('zone2.loadError'))}
       </Text>
-      {!pending ? <Button onClick={() => { void onRetry() }}>{t('zone2.retry')}</Button> : null}
+      {!pending ? (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => { void onRetry() }}
+        >
+          {t('zone2.retry')}
+        </Button>
+      ) : null}
     </section>
   )
 }

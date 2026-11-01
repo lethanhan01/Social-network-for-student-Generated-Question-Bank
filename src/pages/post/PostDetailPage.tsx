@@ -4,6 +4,7 @@ import { AlertCircle, FileQuestion } from 'lucide-react'
 import { Heading, Text } from '@/components/ui/typography'
 import { BackButton, ButtonLink } from '@/components/ui/actions'
 import { Card } from '@/components/ui/data-display'
+import { Page } from '@/components/ui/layout'
 import { PostCard } from '@/components/social/PostCard'
 import { usePostDetailQuery, useToggleReactionMutation } from '@/hooks/queries/usePostsQuery'
 import { useAuthStore } from '@/stores/authStore'
@@ -27,7 +28,7 @@ export default function PostDetailPage() {
 
   if (isLoading) {
     return (
-      <main className="max-w-3xl mx-auto py-8 px-4 space-y-4">
+      <Page className="max-w-3xl py-8 px-4 space-y-4">
         <BackButton to="/feed" label={t('common.back', 'Quay lại bảng tin')} className="min-h-11" />
         {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Loading skeleton container] */}
         <div className="p-6 sm:p-8 text-center bg-surface border border-line-subtle rounded-2xl shadow-card space-y-3">
@@ -35,14 +36,14 @@ export default function PostDetailPage() {
             {t('post.loadingDetail', 'Đang tải nội dung chi tiết bài viết...')}
           </Text>
         </div>
-      </main>
+      </Page>
     )
   }
 
-  if (isError || !post || !post.post_id) {
+  if (isError || !post?.post_id) {
     const isForbidden = (error as { response?: { status?: number } })?.response?.status === 403
     return (
-      <main className="max-w-3xl mx-auto py-8 px-4 space-y-6">
+      <Page className="max-w-3xl py-8 px-4 space-y-6">
         <BackButton to="/feed" label={t('common.back', 'Quay lại bảng tin')} className="min-h-11" />
         <Card className="p-6 sm:p-8 text-center bg-surface border-line-subtle rounded-2xl shadow-card space-y-4">
           {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Error icon circle wrapper] */}
@@ -66,12 +67,12 @@ export default function PostDetailPage() {
             </ButtonLink>
           </div>
         </Card>
-      </main>
+      </Page>
     )
   }
 
   return (
-    <main className="max-w-3xl mx-auto py-6 px-4 space-y-6">
+    <Page className="max-w-3xl py-6 px-4 space-y-6">
       {/* Navigation Header */}
       <nav aria-label="Điều hướng quay lại" className="flex items-center justify-between">
         <BackButton to="/feed" label={t('common.backToFeed', 'Trở về bảng tin')} className="min-h-11" />
@@ -81,12 +82,14 @@ export default function PostDetailPage() {
       </nav>
 
       {/* Main Post Card with Comment Section Included */}
-      <PostCard
-        post={post}
-        currentUserAvatar={currentUser?.avatar_url || undefined}
-        currentUserName={currentUser?.fullName || 'Bạn'}
-        onToggleReact={handleToggleReact}
-      />
-    </main>
+      <div className="vt-post-card">
+        <PostCard
+          post={post}
+          currentUserAvatar={currentUser?.avatar_url || undefined}
+          currentUserName={currentUser?.fullName || 'Bạn'}
+          onToggleReact={handleToggleReact}
+        />
+      </div>
+    </Page>
   )
 }

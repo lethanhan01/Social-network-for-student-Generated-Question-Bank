@@ -4,7 +4,7 @@ import { GraduationCap, Lock, Mail } from 'lucide-react'
 import { Card } from '@/components/ui/data-display'
 import { Form, FormField, Input } from '@/components/ui/forms'
 import { SubmitButton } from '@/components/ui/actions'
-import { Heading, Text } from '@/components/ui/typography'
+import { Heading, Text, Icon } from '@/components/ui/typography'
 import { useAuthStore } from '@/stores/authStore'
 import { authService } from '@/services/auth.service'
 import { toast } from '@/lib/toast'
@@ -72,9 +72,10 @@ export default function LoginPage() {
 
   return (
     <Card className="p-4 sm:p-6 lg:p-8 bg-surface border-line-subtle shadow-card rounded-2xl">
-      <div className="text-center mb-8">
+      <header className="text-center mb-8">
+        {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [App logo icon badge container] */}
         <div className="mx-auto w-14 h-14 rounded-2xl bg-action-accent flex items-center justify-center text-text-inverse mb-4 shadow-sm">
-          <GraduationCap size={32} />
+          <Icon icon={GraduationCap} size="xl" />
         </div>
         <Heading level={2} className="text-2xl font-extrabold tracking-tight text-text-primary">
           SQB HUST
@@ -82,7 +83,7 @@ export default function LoginPage() {
         <Text size="sm" tone="muted" className="mt-1">
           Hệ Thống Mạng Xã Hội Học Tập & Ngân Hàng Đề Thi
         </Text>
-      </div>
+      </header>
 
       <Form onSubmit={handleSubmit} noValidate className="space-y-5">
         <FormField
@@ -100,7 +101,7 @@ export default function LoginPage() {
               setEmail(e.target.value)
               if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }))
             }}
-            leftIcon={<Mail size={16} />}
+            leftIcon={<Icon icon={Mail} size="sm" />}
             autoComplete="email"
           />
         </FormField>
@@ -120,7 +121,7 @@ export default function LoginPage() {
               setPassword(e.target.value)
               if (errors.password) setErrors((prev) => ({ ...prev, password: undefined }))
             }}
-            leftIcon={<Lock size={16} />}
+            leftIcon={<Icon icon={Lock} size="sm" />}
             autoComplete="current-password"
           />
         </FormField>

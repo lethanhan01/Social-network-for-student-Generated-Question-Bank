@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Send } from 'lucide-react'
 import { Form, FormField, Input } from '@/components/ui/forms'
-import { SubmitButton } from '@/components/ui/actions'
+import { Button, SubmitButton } from '@/components/ui/actions'
 import { Avatar } from '@/components/ui/data-display'
 import { Text } from '@/components/ui/typography'
 import { useAuthStore } from '@/stores/authStore'
@@ -31,7 +31,7 @@ export function PostCommentSection({
   const currentUser = useAuthStore((s) => s.user)
   const isStaff = currentUser?.role === 'LECTURER' || currentUser?.role === 'ADMIN'
 
-  const { data, isLoading } = usePostCommentsQuery(postId)
+  const { data, isLoading, isError, refetch } = usePostCommentsQuery(postId)
   const createMutation = useCreateCommentMutation(postId)
   const updateMutation = useUpdateCommentMutation(postId)
   const deleteMutation = useDeleteCommentMutation(postId)
@@ -88,6 +88,26 @@ export function PostCommentSection({
   const comments = data?.items || []
 
   function renderCommentsList() {
+    if (isError) {
+      return (
+        /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Comment list error state container] */
+        <div className="text-center py-2 space-y-1">
+          <Text size="xs" tone="danger">
+            {t('comment.loadError', 'Không thể tải danh sách bình luận.')}
+          </Text>
+          <Button
+            variant="link"
+            tone="accent"
+            size="sm"
+            onClick={() => { void refetch() }}
+            className="text-xs"
+          >
+            {t('common.retry', 'Thử lại')}
+          </Button>
+        </div>
+      )
+    }
+
     if (isLoading) {
       return (
         <Text size="xs" tone="muted" className="italic text-center py-2">
