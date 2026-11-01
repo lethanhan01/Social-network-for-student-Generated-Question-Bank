@@ -12,6 +12,7 @@ import {
   useRecallMessageMutation,
   useConversationsQuery,
   useSendMessageMutation,
+  useAutoMarkAsRead,
 } from '@/hooks/queries/useChatQuery'
 import { type WsConnectionStatus } from '@/services/websocket.service'
 import { uploadSingleMedia } from '@/services/media-upload.service'
@@ -61,6 +62,8 @@ export function ChatConversationView({
   const sendMessageMutation = useSendMessageMutation()
   const connectionBadge = useMemo(() => getConnectionBadgeConfig(connectionStatus, t), [connectionStatus, t])
 
+  useAutoMarkAsRead(conversationId, activeConv?.unread_count, activeConv?.last_message?.message_id)
+
   const allMessages = useMemo(() => {
     if (!messagesQuery.data?.pages) return []
     const list: MessageDto[] = []
@@ -69,10 +72,6 @@ export function ChatConversationView({
     })
     return list.slice().reverse()
   }, [messagesQuery.data?.pages])
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [allMessages.length])
 
   function handleTextChange(val: string) {
     setText(val)
@@ -200,6 +199,7 @@ export function ChatConversationView({
         hasNextPage={messagesQuery.hasNextPage}
         isFetchingNextPage={messagesQuery.isFetchingNextPage}
         onLoadMore={() => void messagesQuery.fetchNextPage()}
+        unreadCount={activeConv?.unread_count}
       />
 
       <footer className="p-3 bg-surface-card border-t border-line-subtle shrink-0">

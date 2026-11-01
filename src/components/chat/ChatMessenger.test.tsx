@@ -133,6 +133,29 @@ describe('Messenger Chat Components', () => {
       expect(screen.getByText('Tin nhắn đã lưu')).toBeInTheDocument()
       expect(screen.getByRole('button', { name: /thu hồi/i })).toBeInTheDocument()
     })
+
+    it('renders unread messages divider when unreadCount is greater than 0', () => {
+      const messages = [
+        { message_id: 1, sender_id: 2, sender_name: 'Lan', content: 'Tin cũ' },
+        { message_id: 2, sender_id: 2, sender_name: 'Lan', content: 'Tin mới chưa đọc' },
+      ]
+      render(
+        <ChatMessageList
+          allMessages={messages}
+          currentUserId={1}
+          isLoading={false}
+          isError={false}
+          messagesEndRef={createRef()}
+          onReply={vi.fn()}
+          onRecall={vi.fn()}
+          onRetry={vi.fn()}
+          unreadCount={1}
+        />
+      )
+
+      expect(screen.getByText('Tin nhắn chưa đọc')).toBeInTheDocument()
+      expect(screen.getByRole('separator')).toBeInTheDocument()
+    })
   })
 
   describe('ChatSidebar', () => {

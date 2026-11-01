@@ -44,7 +44,7 @@ describe('chatService', () => {
     })
   })
 
-  it('getMessages triggers self-healing fallback when 500 occurs on initial load', async () => {
+  it('getMessages triggers level 1 probe (after = lastMsg.id + 1) when 500 occurs on initial load', async () => {
     // 1st call fails with 500 (read receipt write error)
     vi.mocked(api.get).mockRejectedValueOnce(new Error('500 Internal Server Error'))
 
@@ -71,7 +71,66 @@ describe('chatService', () => {
       },
     })
 
-    // Fallback step 2: GET /conversations/5/messages?after=68 succeeds
+    // Level 1 probe: GET /conversations/5/messages?after=71 returns full server messages including 70
+    const serverData = {
+      conversation_id: 5,
+      messages: [
+        { message_id: 70, content: 'Tin mới nhất', sender_id: 2 },
+        { message_id: 68, content: 'Tin cũ hơn', sender_id: 2 },
+      ],
+      pagination: { has_next: true, after: 60 },
+    }
+    vi.mocked(api.get).mockResolvedValueOnce({
+      data: {
+        code: '1000',
+        message: 'SUCCESS',
+        data: serverData,
+      },
+    })
+
+    const res = await chatService.getMessages(5, { limit: 20 })
+
+    expect(res).toBeDefined()
+    expect(res.messages).toHaveLength(2)
+    expect(res.messages?.[0]?.message_id).toBe(70)
+    expect(res.messages?.[1]?.message_id).toBe(68)
+    expect(api.get).toHaveBeenCalledWith('/conversations/5/messages', {
+      params: { after: 71, limit: 20 },
+      signal: undefined,
+    })
+  })
+
+  it('getMessages triggers level 2 fallback (after = lastMsg.id) when level 1 probe fails', async () => {
+    // 1st call fails with 500
+    vi.mocked(api.get).mockRejectedValueOnce(new Error('500 Internal Server Error'))
+
+    // GET /conversations metadata
+    vi.mocked(api.get).mockResolvedValueOnce({
+      data: {
+        code: '1000',
+        message: 'SUCCESS',
+        data: {
+          items: [
+            {
+              conversation_id: 5,
+              display_name: 'Nhóm Học Tập',
+              unread_count: 2,
+              last_message: {
+                message_id: 70,
+                content: 'Tin mới nhất',
+                message_type: 'TEXT',
+                created_at: '2026-11-01T00:00:00Z',
+              },
+            },
+          ],
+        },
+      },
+    })
+
+    // Level 1 probe (after=71) fails
+    vi.mocked(api.get).mockRejectedValueOnce(new Error('Rejected +1'))
+
+    // Level 2 probe (after=70) succeeds returning messages < 70
     const recoveredData = {
       conversation_id: 5,
       messages: [{ message_id: 68, content: 'Tin cũ hơn', sender_id: 2 }],
@@ -93,6 +152,37 @@ describe('chatService', () => {
     expect(res.messages?.[0]?.message_id).toBe(70)
     expect(res.messages?.[0]?.content).toBe('Tin mới nhất')
     expect(res.messages?.[1]?.message_id).toBe(68)
+  })
+
+  it('getMessages handles empty conversation with no messages gracefully on 500', async () => {
+    // 1st call fails with 500
+    vi.mocked(api.get).mockRejectedValueOnce(new Error('500 Internal Server Error'))
+
+    // GET /conversations returns empty last_message
+    vi.mocked(api.get).mockResolvedValueOnce({
+      data: {
+        code: '1000',
+        message: 'SUCCESS',
+        data: {
+          items: [
+            {
+              conversation_id: 9,
+              display_name: 'Hội thoại mới',
+              unread_count: 0,
+              last_message: undefined,
+            },
+          ],
+        },
+      },
+    })
+
+    const res = await chatService.getMessages(9, { limit: 20 })
+    expect(res).toEqual({
+      conversation_id: 9,
+      conversation_type: undefined,
+      messages: [],
+      pagination: { has_next: false },
+    })
   })
 
   it('getMessages does not trigger fallback and rethrows when after param is already specified', async () => {

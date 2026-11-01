@@ -130,5 +130,7 @@
   "loadOlder": "Tải tin nhắn cũ hơn",
   "offlineCachedNote": "Đang hiển thị tin nhắn từ bộ nhớ đệm",
   "noFriendsFound": "Không tìm thấy bạn bè nào",
-  "sendErrorDisconnected": "Không thể gửi tin nhắn. Kết nối máy chủ realtime bị gián đoạn. Vui lòng thử lại."
+  "sendErrorDisconnected": "Không thể gửi tin nhắn. Kết nối máy chủ realtime bị gián đoạn. Vui lòng thử lại.",
+  "unreadMessagesDivider": "Tin nhắn chưa đọc",
+  "scrollToBottom": "Cuộn xuống tin mới nhất"
 }

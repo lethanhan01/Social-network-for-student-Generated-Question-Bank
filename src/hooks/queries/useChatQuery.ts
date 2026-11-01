@@ -350,3 +350,43 @@ export function useChatRealtimeSync(activeConversationId?: number) {
     sendTypingStatus,
   }
 }
+
+export function useAutoMarkAsRead(
+  conversationId?: number,
+  unreadCount?: number,
+  lastMessageId?: number
+) {
+  const queryClient = useQueryClient()
+  useEffect(() => {
+    if (!conversationId || !unreadCount || unreadCount <= 0 || !lastMessageId) return
+
+    // 1. Optimistic clear unread badge in conversation list
+    queryClient.setQueriesData<ConversationListResponseDto>(
+      { queryKey: queryKeys.conversations.list() },
+      (old) => {
+        if (!old?.items) return old
+        return {
+          ...old,
+          items: old.items.map((c) =>
+            c.conversation_id === conversationId ? { ...c, unread_count: 0 } : c
+          ),
+        }
+      }
+    )
+
+    // 2. Send STOMP markAsRead
+    websocketService.markAsRead({
+      conversation_id: conversationId,
+      message_id: lastMessageId,
+    })
+
+    // 3. Reconcile with server after 400ms
+    const timer = setTimeout(() => {
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.conversations.messages(conversationId),
+      })
+    }, 400)
+
+    return () => clearTimeout(timer)
+  }, [conversationId, unreadCount, lastMessageId, queryClient])
+}
