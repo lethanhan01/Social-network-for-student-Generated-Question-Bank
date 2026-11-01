@@ -20,6 +20,11 @@ function matchesKeyword(subject: SubjectResponse, keyword: string): boolean {
   )
 }
 
+interface EnrolledClassItem {
+  subject_id?: number
+  course_class_id?: number
+}
+
 export default function SubjectsPage() {
   const { t } = useTranslation('academic')
   const [keyword, setKeyword] = useState('')
@@ -28,7 +33,9 @@ export default function SubjectsPage() {
   const subjectsQuery = useSubjectsQuery()
   const enrolledQuery = useEnrolledSubjectsQuery()
 
-  const enrolledIds = new Set((enrolledQuery.data ?? []).map((s) => s.subject_id ?? (s as any).course_class_id))
+  const enrolledIds = new Set(
+    (enrolledQuery.data ?? []).map((s) => s.subject_id ?? (s as unknown as EnrolledClassItem).course_class_id)
+  )
   const subjects = (subjectsQuery.data ?? []).filter(
     (subject) => matchesKeyword(subject, debouncedKeyword) && (!enrolledOnly || enrolledIds.has(subject.subject_id))
   )

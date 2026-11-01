@@ -23,6 +23,14 @@ const ALL_SUBJECTS = 'ALL'
 
 type FormState = { mode: 'create' } | { mode: 'edit'; sessionId: number } | null
 
+interface SubjectOptionItem {
+  subject_id?: number
+  code?: string
+  subject_code?: string
+  name?: string
+  subject_name?: string
+}
+
 export default function ProposalsPage() {
   const { t } = useTranslation('academic')
   const [searchParams, setSearchParams] = useSearchParams()
@@ -116,11 +124,14 @@ export default function ProposalsPage() {
         </SelectTrigger>
         <SelectContent>
           <SelectItem value={ALL_SUBJECTS}>{t('proposals.filter.all')}</SelectItem>
-          {(subjectsQuery.data ?? []).map((subject) => (
-            <SelectItem key={subject.subject_id} value={String(subject.subject_id)}>
-              {((subject as any).code ?? (subject as any).subject_code)} - {((subject as any).name ?? (subject as any).subject_name)}
-            </SelectItem>
-          ))}
+          {(subjectsQuery.data ?? []).map((subject) => {
+            const item = subject as unknown as SubjectOptionItem
+            return (
+              <SelectItem key={item.subject_id} value={String(item.subject_id)}>
+                {(item.code ?? item.subject_code)} - {(item.name ?? item.subject_name)}
+              </SelectItem>
+            )
+          })}
         </SelectContent>
       </Select>
 

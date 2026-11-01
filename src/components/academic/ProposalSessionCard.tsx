@@ -12,9 +12,14 @@ interface ProposalSessionCardProps {
   onDelete: (session: SubmissionSessionSummaryDto) => void
 }
 
+interface SessionWithStatus {
+  status?: string
+}
+
 export function ProposalSessionCard({ session, onEdit, onDelete }: Readonly<ProposalSessionCardProps>) {
   const { t } = useTranslation('academic')
   const sessionId = session.session_id ?? 0
+  const sessionStatus = ((session as unknown as SessionWithStatus).status ?? 'PENDING').toUpperCase()
 
   return (
     <Card as="article" variant="compact" className="flex h-full flex-col gap-3">
@@ -24,14 +29,13 @@ export function ProposalSessionCard({ session, onEdit, onDelete }: Readonly<Prop
             {session.subject_code ?? session.subject_name}
           </Badge>
           {(() => {
-            const rawStatus = ((session as any).status as string | undefined)?.toUpperCase() ?? 'PENDING'
-            if (rawStatus === 'APPROVED' || rawStatus === 'RESOLVED') {
+            if (sessionStatus === 'APPROVED' || sessionStatus === 'RESOLVED') {
               return <Badge tone="success" size="xs">{t('proposals.card.statusApproved', 'Đã duyệt')}</Badge>
             }
-            if (rawStatus === 'REJECTED') {
+            if (sessionStatus === 'REJECTED') {
               return <Badge tone="danger" size="xs">{t('proposals.card.statusRejected', 'Bị từ chối')}</Badge>
             }
-            if (rawStatus === 'REVIEWING') {
+            if (sessionStatus === 'REVIEWING') {
               return <Badge tone="info" size="xs">{t('proposals.card.statusReviewing', 'Đang thẩm định')}</Badge>
             }
             return <Badge tone="warning" size="xs">{t('proposals.card.statusPending', 'Chờ duyệt')}</Badge>
@@ -67,9 +71,8 @@ export function ProposalSessionCard({ session, onEdit, onDelete }: Readonly<Prop
           {session.created_at ? formatDate(session.created_at) : null}
         </Text>
         {(() => {
-          const rawStatus = ((session as any).status as string | undefined)?.toUpperCase() ?? 'PENDING'
-          const isApproved = rawStatus === 'APPROVED' || rawStatus === 'RESOLVED'
-          const isPending = rawStatus === 'PENDING'
+          const isApproved = sessionStatus === 'APPROVED' || sessionStatus === 'RESOLVED'
+          const isPending = sessionStatus === 'PENDING'
 
           return (
             <nav aria-label={session.title} className="flex flex-wrap gap-2">

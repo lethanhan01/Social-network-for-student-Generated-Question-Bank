@@ -42,6 +42,16 @@ interface ProposalFormProps {
   onDone: () => void
 }
 
+interface EnrolledSubjectItem {
+  subject_id?: number
+  subject_code?: string
+  subject_name?: string
+  course_class_id?: number
+  class_code?: string
+  code?: string
+  name?: string
+}
+
 export function ProposalForm({ initialDraft, editSessionId, onDone }: Readonly<ProposalFormProps>) {
   const { t } = useTranslation('academic')
   const [draft, setDraft] = useState(initialDraft)
@@ -121,13 +131,14 @@ export function ProposalForm({ initialDraft, editSessionId, onDone }: Readonly<P
           </SelectTrigger>
           <SelectContent>
             {subjects.map((subject) => {
-              const sId = String(subject.subject_id)
-              const cId = (subject as any).course_class_id ? String((subject as any).course_class_id) : ''
+              const item = subject as unknown as EnrolledSubjectItem
+              const sId = String(item.subject_id ?? '')
+              const cId = item.course_class_id ? String(item.course_class_id) : ''
               const val = cId ? `${sId}:${cId}` : sId
-              const classCode = (subject as any).class_code ? ` [Lớp ${(subject as any).class_code}]` : ''
+              const classCode = item.class_code ? ` [Lớp ${item.class_code}]` : ''
               return (
                 <SelectItem key={val} value={val}>
-                  {((subject as any).code ?? (subject as any).subject_code)} - {((subject as any).name ?? (subject as any).subject_name)}{classCode}
+                  {(item.code ?? item.subject_code)} - {(item.name ?? item.subject_name)}{classCode}
                 </SelectItem>
               )
             })}
