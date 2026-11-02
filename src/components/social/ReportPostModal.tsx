@@ -148,8 +148,8 @@ export function ReportModal({
           </Button>
           <SubmitButton
             loading={reportMutation.isPending}
-            variant="primary"
-            className="min-h-11 bg-tone-danger hover:bg-tone-danger/90 border-transparent text-white"
+            variant="danger"
+            className="min-h-11 px-5"
           >
             {t('report.submit', 'Gửi báo cáo vi phạm')}
           </SubmitButton>

@@ -1,4 +1,11 @@
-import { BookOpen, BookmarkCheck, Users, FileText, Sparkles } from 'lucide-react'
+import {
+  BookOpen,
+  LayoutDashboard,
+  CalendarCheck,
+  Search,
+  Sparkles,
+} from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Card, Avatar, Badge } from '@/components/ui/data-display'
 import { Button, ButtonLink } from '@/components/ui/actions'
 import { Heading, Text } from '@/components/ui/typography'
@@ -18,12 +25,13 @@ export function SocialLeftSidebar({
   selectedSubjectId,
   onSelectSubject,
 }: Readonly<SocialLeftSidebarProps>) {
+  const { t } = useTranslation('common')
   const displayName = user?.full_name || user?.email || 'Sinh viên HUST'
   const initials = displayName.trim().charAt(0).toUpperCase()
   const studentCode = user?.student_lecturer_code || 'K68 HUST'
 
   return (
-    <Card className="p-4 bg-surface border-line-subtle shadow-card rounded-2xl space-y-4">
+    <Card className="p-4 bg-surface-card border-line-subtle shadow-card rounded-2xl space-y-4">
       {/* User Profile Summary */}
       <header className="flex items-center gap-3">
         <Avatar
@@ -35,7 +43,7 @@ export function SocialLeftSidebar({
         />
         {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [User profile text layout] */}
         <div className="min-w-0 flex-1">
-          <Heading level={3} className="text-sm font-bold text-text-primary truncate">
+          <Heading level={3} className="text-sm font-bold text-fg-primary truncate">
             {displayName}
           </Heading>
           {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [User student code and role badge flex row] */}
@@ -58,10 +66,10 @@ export function SocialLeftSidebar({
 
       <Separator />
 
-      {/* Navigation Shortcuts */}
-      <nav aria-label="Lối tắt mạng xã hội học tập" className="space-y-1">
+      {/* Group 1: Navigation Shortcuts */}
+      <nav aria-label="Lối tắt tính năng" className="space-y-1">
         <Text size="xs" tone="muted" className="font-semibold uppercase tracking-wider px-2 mb-2 block">
-          Lối tắt học tập
+          {t('nav.shortcuts', 'Lối tắt tính năng')}
         </Text>
         <ButtonLink
           to="/feed"
@@ -71,7 +79,16 @@ export function SocialLeftSidebar({
           onClick={() => onSelectSubject?.(undefined)}
         >
           <Sparkles size={18} className="text-action-accent shrink-0" />
-          <strong className="font-normal">Tất cả bảng tin</strong>
+          <strong className="font-normal">{t('feed.allPosts', 'Tất cả bảng tin')}</strong>
+        </ButtonLink>
+        <ButtonLink
+          to="/dashboard"
+          variant="ghost"
+          size="sm"
+          className="w-full justify-start gap-2.5 min-h-11"
+        >
+          <LayoutDashboard size={18} className="text-action-accent shrink-0" />
+          <strong className="font-normal">{t('nav.dashboard', 'Tổng quan học tập')}</strong>
         </ButtonLink>
         <ButtonLink
           to="/exams"
@@ -79,35 +96,35 @@ export function SocialLeftSidebar({
           size="sm"
           className="w-full justify-start gap-2.5 min-h-11"
         >
-          <FileText size={18} className="text-text-muted shrink-0" />
-          <strong className="font-normal">Đề thi đang ôn tập</strong>
+          <BookOpen size={18} className="text-action-accent shrink-0" />
+          <strong className="font-normal">{t('nav.exams', 'Ngân hàng đề thi')}</strong>
         </ButtonLink>
         <ButtonLink
-          to="/feed"
+          to="/gamification/leaderboard"
           variant="ghost"
           size="sm"
           className="w-full justify-start gap-2.5 min-h-11"
         >
-          <BookmarkCheck size={18} className="text-text-muted shrink-0" />
-          <strong className="font-normal">Bài viết đã lưu</strong>
+          <CalendarCheck size={18} className="text-action-accent shrink-0" />
+          <strong className="font-normal">{t('nav.leaderboard', 'Điểm danh & Vinh danh')}</strong>
         </ButtonLink>
         <ButtonLink
-          to="/questions"
+          to="/search"
           variant="ghost"
           size="sm"
           className="w-full justify-start gap-2.5 min-h-11"
         >
-          <Users size={18} className="text-text-muted shrink-0" />
-          <strong className="font-normal">Nhóm học tập HUST</strong>
+          <Search size={18} className="text-action-accent shrink-0" />
+          <strong className="font-normal">{t('nav.search', 'Tìm kiếm toàn cục')}</strong>
         </ButtonLink>
       </nav>
 
       <Separator />
 
-      {/* Real Subjects List from API */}
+      {/* Group 2: Real Subjects List from API */}
       <section aria-label="Môn học theo dõi" className="space-y-2">
         <Text size="xs" tone="muted" className="font-semibold uppercase tracking-wider px-2 block">
-          Môn học theo dõi ({subjects.length})
+          {t('nav.mySubjects', 'Môn học theo dõi')} ({subjects.length})
         </Text>
         {subjects.length > 0 ? (
           /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Subject list buttons vertical stack] */

@@ -5,7 +5,7 @@ import { Client } from '@stomp/stompjs'
 
 vi.mock('@stomp/stompjs', () => {
   return {
-    Client: vi.fn().mockImplementation((config: { onConnect?: () => void }) => {
+    Client: vi.fn().mockImplementation((config: { onConnect?: () => void; onWebSocketClose?: () => void }) => {
       const mockInstance = {
         active: false,
         activate: vi.fn().mockImplementation(() => {
@@ -131,5 +131,23 @@ describe('websocketService', () => {
 
     websocketService.disconnect()
     expect(clientInstance.deactivate).toHaveBeenCalled()
+  })
+
+  it('notifies both chat consumers when the transport closes', () => {
+    useAuthStore.setState({ token: 'test-token' })
+    const status = vi.fn()
+    const connected = vi.fn()
+    const unsubscribeStatus = websocketService.onStatusChange(status)
+    const unsubscribeConnection = websocketService.onConnection(connected)
+    websocketService.connect()
+    expect(status).toHaveBeenLastCalledWith('CONNECTED')
+    expect(connected).toHaveBeenLastCalledWith(true)
+
+    vi.mocked(Client).mock.calls[0][0]?.onWebSocketClose?.({} as CloseEvent)
+    expect(status).toHaveBeenLastCalledWith('DISCONNECTED')
+    expect(connected).toHaveBeenLastCalledWith(false)
+    expect(websocketService.sendMessage({ conversation_id: 10, content: 'Offline' })).toBe(false)
+    unsubscribeStatus()
+    unsubscribeConnection()
   })
 })

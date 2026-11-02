@@ -95,10 +95,11 @@ export function PostCard({
         {isLongText && !isExpanded ? `${content.slice(0, 200)}...` : content}
         {isLongText ? (
           <Button
-            variant="ghost"
+            variant="link"
+            tone="accent"
             size="sm"
             onClick={() => setIsExpanded((prev) => !prev)}
-            className="text-action-accent font-semibold p-0 h-auto ml-1 min-h-11 inline-flex items-center"
+            className="font-semibold p-0 h-auto ml-1 min-h-11 inline-flex items-center"
           >
             {isExpanded ? t('common.collapse', 'Thu gọn') : t('common.expand', 'Xem thêm')}
           </Button>
@@ -131,10 +132,11 @@ export function PostCard({
           {reaction.count} {t('post.likeCountUnit', 'lượt tương tác')}
         </strong>
         <Button
-          variant="ghost"
+          variant="link"
+          tone="neutral"
           size="sm"
           onClick={() => setShowComments((prev) => !prev)}
-          className="text-xs text-text-muted hover:text-text-primary p-0 h-auto min-h-11 inline-flex items-center"
+          className="text-xs"
         >
           {post.comment_count || 0} {t('post.commentCountUnit', 'bình luận')}
         </Button>

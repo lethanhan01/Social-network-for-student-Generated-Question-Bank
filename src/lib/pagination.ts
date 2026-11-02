@@ -15,6 +15,6 @@ export function getNextCursor(pagination?: CursorPaginationDto): string | undefi
 export const getCursorFromPagination = getNextCursor
 
 /** Zone 2 APIs call the next-page query parameter `after`, not `cursor`. */
-export function afterParams(params?: { cursor?: string; limit?: number }) {
-  return { after: params?.cursor, limit: params?.limit }
+export function afterParams(params?: { after?: number; cursor?: string; limit?: number }) {
+  return { after: params?.after ?? params?.cursor, limit: params?.limit }
 }

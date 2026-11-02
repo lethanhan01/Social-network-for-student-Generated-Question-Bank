@@ -132,7 +132,7 @@
     "retry": "再試行"
   },
   "nav": {
-    "dashboard": "ホーム",
+    "dashboard": "ダッシュボード",
     "profile": "プロフィール",
     "logout": "ログアウト",
     "closeMenu": "メニューを閉じる",
@@ -144,7 +144,18 @@
     "members": "会員",
     "checkIn": "チェックイン",
     "staff": "スタッフ",
-    "reports": "レポート"
+    "reports": "レポート",
+    "feed": "ソーシャルフィード",
+    "friends": "友達・つながり",
+    "questions": "問題バンク",
+    "shop": "ショップ・アイテム",
+    "minigames": "ミニゲームアリーナ",
+    "exams": "試験問題バンク",
+    "leaderboard": "ランキング・表彰",
+    "search": "グローバル検索",
+    "settings": "システム設定",
+    "shortcuts": "ショートカット",
+    "mySubjects": "登録コース"
   },
   "status": {
     "active": "アクティブ",
@@ -207,8 +218,18 @@
     "evening": "夜間シフト (17:00–22:00)"
   },
   "search": {
-    "placeholder": "検索...",
-    "clear": "検索をクリア"
+    "title": "全体検索",
+    "placeholder": "投稿、質問、ユーザーを検索...",
+    "filter_all": "すべて",
+    "filter_posts": "投稿",
+    "filter_users": "ユーザー",
+    "filter_questions": "質問",
+    "filter_sessions": "セッション",
+    "recent_searches": "最近の検索履歴",
+    "trending_searches": "トレンドキーワード",
+    "delete_history": "削除",
+    "empty_results": "該当する検索結果が見つかりませんでした",
+    "results_count": "{{count}}件の検索結果"
   },
   "filter": {
     "title": "フィルター"
@@ -508,20 +529,6 @@
     "request_declined": "申請を辞退しました",
     "request_sent": "友達申請を送信しました",
     "unblocked_success": "ブロックを解除しました"
-  },
-  "search": {
-    "title": "全体検索",
-    "placeholder": "投稿、質問、ユーザーを検索...",
-    "filter_all": "すべて",
-    "filter_posts": "投稿",
-    "filter_users": "ユーザー",
-    "filter_questions": "質問",
-    "filter_sessions": "セッション",
-    "recent_searches": "最近の検索履歴",
-    "trending_searches": "トレンドキーワード",
-    "delete_history": "削除",
-    "empty_results": "該当する検索結果が見つかりませんでした",
-    "results_count": "{{count}}件の検索結果"
   },
   "report": {
     "modal_title": "コンテンツの問題を報告",

@@ -9,8 +9,11 @@ import type {
 export const commentService = {
   async getComments(
     params: {
-      post_id: number
+      post_id?: number
       parent_id?: number
+      target_type?: 'POST'
+      target_id?: number
+      parent_comment_id?: number
       cursor?: string
       limit?: number
       sort?: 'newest' | 'oldest'
@@ -20,9 +23,9 @@ export const commentService = {
     return requestData<CursorResponseCommentResponseDto>(
       api.get<GlobalResponse<CursorResponseCommentResponseDto>>('/comments', {
         params: {
-          target_type: 'POST',
-          target_id: params.post_id,
-          parent_comment_id: params.parent_id,
+          target_type: params.target_type ?? 'POST',
+          target_id: params.target_id ?? params.post_id,
+          parent_comment_id: params.parent_comment_id ?? params.parent_id,
           after: params.cursor,
           limit: params.limit,
           sort: params.sort ?? 'newest',

@@ -29,7 +29,16 @@
     "empty": "Chưa có môn học phù hợp.",
     "enrolled": "Đã tham gia",
     "practice": "Luyện tập",
-    "propose": "Đề xuất câu hỏi"
+    "propose": "Đề xuất câu hỏi",
+    "description": "Tra cứu các môn học trong hệ thống, xem môn bạn đang tham gia và truy cập nhanh các phiên đề xuất câu hỏi.",
+    "searchLabel": "Tìm kiếm môn học",
+    "searchPlaceholder": "Tìm theo mã hoặc tên môn học...",
+    "enrolledOnly": "Chỉ hiển thị môn đang tham gia",
+    "listLabel": "Danh sách môn học",
+    "notEnrolled": "Bạn chưa tham gia môn học này.",
+    "viewProposals": "Xem phiên đề xuất",
+    "viewProposalsAria": "Xem phiên đề xuất của môn {{name}}",
+    "loadError": "Không tải được danh mục môn học."
   },
   "status": {
     "ALL": "Tất cả",
@@ -53,7 +62,72 @@
     "edit": "Chỉnh sửa",
     "delete": "Hủy đề xuất",
     "deleteConfirm": "Bạn có chắc muốn hủy phiên này? Nội dung đã gửi sẽ bị xóa.",
-    "deleted": "Đã hủy đề xuất."
+    "deleted": "Đã hủy đề xuất.",
+    "description": "Soạn thảo, theo dõi và chỉnh sửa các phiên đề xuất câu hỏi trắc nghiệm của bạn. Phiên đang chờ duyệt vẫn có thể chỉnh sửa hoặc hủy.",
+    "listLabel": "Danh sách phiên đề xuất",
+    "loadError": "Không tải được danh sách phiên đề xuất.",
+    "deleteSuccess": "Đã hủy phiên đề xuất.",
+    "deleteError": "Không thể hủy phiên đề xuất.",
+    "filter": {
+      "label": "Lọc theo môn học",
+      "all": "Tất cả môn học"
+    },
+    "card": {
+      "questions": "{{count}} câu hỏi",
+      "reactions": "Lượt thể hiện cảm xúc",
+      "comments": "Lượt bình luận",
+      "practice": "Luyện tập",
+      "edit": "Chỉnh sửa",
+      "delete": "Hủy phiên",
+      "editAria": "Chỉnh sửa phiên {{title}}",
+      "deleteAria": "Hủy phiên {{title}}"
+    },
+    "form": {
+      "createTitle": "Tạo phiên đề xuất mới",
+      "editTitle": "Chỉnh sửa phiên đề xuất",
+      "subject": "Môn học",
+      "subjectPlaceholder": "Chọn môn học bạn đang tham gia",
+      "title": "Tiêu đề phiên",
+      "content": "Mô tả / ghi chú",
+      "sourceUrl": "Nguồn tài liệu tham khảo",
+      "sourceUrlHint": "Đường dẫn giáo trình hoặc tài liệu tham khảo trực tuyến (không bắt buộc).",
+      "questionLabel": "Câu hỏi {{index}}",
+      "removeQuestion": "Xóa câu hỏi {{index}}",
+      "remove": "Xóa",
+      "questionContent": "Nội dung câu hỏi",
+      "questionPlaceholder": "Nhập nội dung câu hỏi...",
+      "options": "Bốn phương án trả lời",
+      "optionLabel": "Phương án {{key}}",
+      "optionShort": "Đáp án {{key}}",
+      "correctAnswer": "Chọn đáp án đúng",
+      "explanation": "Lời giải thích",
+      "explanationHint": "Giải thích vì sao đáp án đó đúng (không bắt buộc).",
+      "confidence": "Mức độ tự tin của bạn",
+      "confidenceHint": "Mức độ chắc chắn của bạn về tính đúng đắn của câu hỏi.",
+      "confidenceLevels": {
+        "0": "0 - Có thể sai hoàn toàn",
+        "1": "1 - Chỉ là phỏng đoán",
+        "2": "2 - Chưa nắm vững",
+        "3": "3 - Hiểu cơ bản",
+        "4": "4 - Rất chắc chắn"
+      },
+      "addQuestion": "Thêm câu hỏi",
+      "submit": "Gửi đề xuất",
+      "saveChanges": "Lưu thay đổi",
+      "createSuccess": "Đã gửi phiên đề xuất. Giảng viên sẽ sớm thẩm định.",
+      "updateSuccess": "Đã cập nhật phiên đề xuất.",
+      "submitError": "Không thể lưu phiên đề xuất.",
+      "loadError": "Không tải được nội dung phiên đề xuất.",
+      "errors": {
+        "titleRequired": "Vui lòng nhập tiêu đề phiên.",
+        "subjectRequired": "Vui lòng chọn môn học.",
+        "questionsRequired": "Cần ít nhất một câu hỏi.",
+        "questionContentRequired": "Vui lòng nhập nội dung câu hỏi.",
+        "optionsRequired": "Vui lòng nhập đủ 4 phương án.",
+        "correctRequired": "Vui lòng chọn đáp án đúng.",
+        "sourceUrlInvalid": "Đường dẫn không hợp lệ (cần bắt đầu bằng http:// hoặc https://)."
+      }
+    }
   },
   "composer": {
     "courseClass": "Lớp học phần",
@@ -100,7 +174,23 @@
     "correct": "Chính xác!",
     "incorrect": "Chưa chính xác",
     "correctAnswer": "Đáp án đúng: {{answer}}",
-    "rate": "Đánh giá / Báo lỗi"
+    "rate": "Đánh giá / Báo lỗi",
+    "description": "Chọn đáp án và nộp bài để xem kết quả cùng lời giải thích chi tiết.",
+    "invalidSession": "Phiên luyện tập không hợp lệ.",
+    "loadError": "Không tải được câu hỏi của phiên luyện tập.",
+    "correctCount": "{{count}} câu đúng trong lượt làm này",
+    "listLabel": "Danh sách câu hỏi luyện tập",
+    "questionLabel": "Câu {{index}}",
+    "imageAlt": "Hình minh họa cho câu {{index}}",
+    "optionsLegend": "Các phương án của câu {{index}}",
+    "selectRequired": "Vui lòng chọn một đáp án trước khi nộp bài.",
+    "submitError": "Không thể nộp câu trả lời.",
+    "correctOption": "Đáp án đúng",
+    "yourWrongOption": "Bạn đã chọn",
+    "resultLabel": "Kết quả và lời giải",
+    "alreadyAnswered": "Bạn đã trả lời câu này",
+    "rated": "Đã đánh giá",
+    "viewAnalytics": "Xem phân tích chuyên sâu"
   },
   "rating": {
     "0": "0 · Sai kiến thức",
@@ -114,7 +204,27 @@
     "needComment": "Hãy mô tả lỗi để giảng viên có thể kiểm tra.",
     "saved": "Đã gửi đánh giá.",
     "send": "Gửi đánh giá",
-    "value": "{{score}} / 4 điểm"
+    "value": "{{score}} / 4 điểm",
+    "title": "Đánh giá \u0026 Báo lỗi câu hỏi",
+    "description": "Chấm điểm chất lượng câu hỏi hoặc báo lỗi sai kiến thức để giảng viên thẩm định.",
+    "ratingLabel": "Chất lượng câu hỏi",
+    "ratingRequired": "Vui lòng chọn mức đánh giá hoặc báo lỗi.",
+    "levelTitle": "{{level}} sao",
+    "levels": {
+      "0": "Sai hoàn toàn",
+      "1": "Nội dung thiếu căn cứ (LLM bịa)",
+      "2": "Người ra đề chưa vững kiến thức",
+      "3": "Kiến thức cơ bản",
+      "4": "Câu hỏi hay"
+    },
+    "reportError": "Báo lỗi sai kiến thức",
+    "reportErrorHint": "Khi báo lỗi, điểm đánh giá sẽ tự động là 0 và câu hỏi được chuyển cho giảng viên thẩm định.",
+    "commentPlaceholder": "Chia sẻ góp ý chi tiết cho câu hỏi này...",
+    "submit": "Gửi đánh giá",
+    "success": "Cảm ơn bạn đã đánh giá câu hỏi!",
+    "errorReported": "Đã gửi báo lỗi cho giảng viên thẩm định.",
+    "newAverage": "Điểm trung bình mới: {{avg}} ({{count}} lượt đánh giá)",
+    "submitError": "Không thể gửi đánh giá."
   },
   "analytics": {
     "title": "Phân tích câu hỏi",
@@ -125,6 +235,28 @@
     "ratings": "Lượt đánh giá",
     "distribution": "Phân bố lựa chọn",
     "community": "Đánh giá từ cộng đồng",
-    "noRatings": "Chưa có đánh giá nào."
+    "noRatings": "Chưa có đánh giá nào.",
+    "description": "Số liệu trả lời và đánh giá của câu hỏi #{{id}}.",
+    "invalidQuestion": "Mã câu hỏi không hợp lệ.",
+    "loadError": "Không tải được thống kê câu hỏi.",
+    "ratingsLoadError": "Không tải được danh sách đánh giá.",
+    "summary": "Tổng quan chỉ số",
+    "totalAnswers": "Lượt trả lời",
+    "avgRating": "Điểm đánh giá trung bình",
+    "outOf": "Trên thang 4",
+    "totalRatings": "Lượt đánh giá",
+    "optionDistribution": "Phân bố lựa chọn đáp án",
+    "ratingDistribution": "Phân bố điểm đánh giá",
+    "optionLabel": "Đáp án {{key}}",
+    "ratingLabel": "Mức {{level}}",
+    "ratingsTitle": "Nhận xét từ người học",
+    "ratingValue": "{{rating}}/4",
+    "errorFlag": "Báo lỗi"
+  },
+  "eyebrow": "Học tập \u0026 Ngân hàng câu hỏi",
+  "common": {
+    "cancel": "Hủy",
+    "loading": "Đang tải...",
+    "back": "Quay lại"
   }
 }

@@ -17,12 +17,12 @@ export function SocialRightSidebar({ friends = [] }: Readonly<SocialRightSidebar
     /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Right sidebar container] */
     <div className="space-y-4">
       {/* Friends Connection Card */}
-      <Card className="p-4 bg-surface border-line-subtle shadow-card rounded-2xl space-y-3">
+      <Card className="p-4 bg-surface-card border-line-subtle shadow-card rounded-2xl space-y-3">
         <header className="flex items-center justify-between">
           {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Friends header title flex layout] */}
           <div className="flex items-center gap-2">
             <Users size={18} className="text-action-accent" />
-            <Heading level={4} className="text-sm font-bold text-text-primary">
+            <Heading level={4} className="text-sm font-bold text-fg-primary">
               {t('friends.title', 'Bạn bè & Kết nối')}
             </Heading>
           </div>
@@ -43,7 +43,7 @@ export function SocialRightSidebar({ friends = [] }: Readonly<SocialRightSidebar
                   key={friend.user_id}
                   to={`/profile/${friend.user_id}`}
                   variant="ghost"
-                  className="w-full flex items-center justify-start gap-3 p-2 rounded-xl hover:bg-surface-hover text-left min-h-11 h-auto"
+                  className="w-full flex items-center justify-start gap-3 p-2 rounded-xl hover:bg-surface-card-hover text-left min-h-11 h-auto"
                 >
                   <Avatar
                     src={friend.avatar_url || undefined}
@@ -54,8 +54,8 @@ export function SocialRightSidebar({ friends = [] }: Readonly<SocialRightSidebar
                   />
                   {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Friend info text container] */}
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold text-text-primary truncate">{name}</p>
-                    <p className="text-[11px] text-text-muted truncate">
+                    <p className="text-xs font-semibold text-fg-primary truncate">{name}</p>
+                    <p className="text-[11px] text-fg-muted truncate">
                       {friend.mutual_friends_count
                         ? `${friend.mutual_friends_count} ${t('friends.mutualCount', 'bạn chung')}`
                         : t('friends.connected', 'Bạn bè HUST')}
@@ -65,6 +65,7 @@ export function SocialRightSidebar({ friends = [] }: Readonly<SocialRightSidebar
               )
             })}
 
+            {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [View all friends button spacing wrapper] */}
             <div className="pt-2">
               <ButtonLink
                 to="/friends"
@@ -80,7 +81,7 @@ export function SocialRightSidebar({ friends = [] }: Readonly<SocialRightSidebar
           /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Empty friends text stack] */
           <div className="text-center py-4 space-y-2">
             {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [UserPlus icon circle] */}
-            <div className="w-10 h-10 mx-auto rounded-full bg-surface-hover flex items-center justify-center text-text-muted">
+            <div className="w-10 h-10 mx-auto rounded-full bg-surface-card-hover flex items-center justify-center text-fg-muted">
               <UserPlus size={18} />
             </div>
             <Text size="xs" tone="muted">

@@ -18,6 +18,16 @@
   --color-surface-glass: var(--color-surface-glass);
   --color-surface-overlay: var(--color-surface-overlay);
 
+  /* 1b. Surface & Foreground Short Aliases (Bảo vệ tailwind-merge & tương thích toàn cục) */
+  --color-surface: var(--color-surface-card);
+  --color-surface-hover: var(--color-surface-card-hover);
+  --color-bg-base: var(--color-surface-base);
+  --color-text-primary: var(--color-fg-primary);
+  --color-text-secondary: var(--color-fg-secondary);
+  --color-text-muted: var(--color-fg-muted);
+  --color-text-inverse: var(--color-fg-on-solid);
+  --color-tone-danger: var(--color-status-danger-fg);
+
   /* 2. Semantic Foregrounds (text-fg-*) */
   --color-fg-primary: var(--color-fg-primary);
   --color-fg-secondary: var(--color-fg-secondary);

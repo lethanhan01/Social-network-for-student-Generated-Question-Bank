@@ -36,7 +36,16 @@
     "migrate:suggest": "node scripts/audit/migrate-suggest.mjs",
     "migrate:props": "node scripts/audit/props-migrate.mjs",
     "verify:docs": "node scripts/verify-docs-integrity.mjs",
-    "verify:zone2-server": "node scripts/verify-zone2-server.mjs"
+    "verify:zone2-server": "node scripts/verify-zone2-server.mjs",
+    "seed": "node scripts/seed/index.mjs",
+    "seed:social": "node scripts/seed/index.mjs --social",
+    "seed:chat": "node scripts/seed/index.mjs --chat",
+    "seed:questions": "node scripts/seed/index.mjs --questions",
+    "seed:relationships": "node scripts/seed/index.mjs --relationships",
+    "seed:gamification": "node scripts/seed/index.mjs --gamification",
+    "seed:status": "node scripts/seed/index.mjs --status",
+    "seed:rollback": "node scripts/seed/index.mjs --clean",
+    "seed:clean": "node scripts/seed/index.mjs --clean --force-scan"
   },
   "dependencies": {
     "@stomp/stompjs": "^7.5.0",
