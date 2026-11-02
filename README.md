@@ -10,6 +10,8 @@ Backend URL: https://snsqb.duckdns.org/api/v1/
 
 Tài khoản được cung cấp:
 
+- student:
+
 ```
 student_1
 user:       an.lt235631@sis.hust.edu.vn
@@ -30,5 +32,30 @@ password:   20235845
 student_5
 user:       kien.nt235759@sis.hust.edu.vn
 password:   20235759
+
+```
+
+- teacher:
+
+```
+teacher_1:
+user:      giangvientest01@mail.com
+password:  Hust@123456
+
+teacher_2:
+user:      giangvientest02@mail.com
+password:  Hust@123456
+
+teacher_3:
+user:      giangvientest03@mail.com
+password:  Hust@123456
+
+teacher_4:
+user:      giangvientest04@mail.com
+password:  Hust@123456
+
+teacher_5:
+user:      giangvientest05@mail.com
+password:  Hust@123456
 
 ```
