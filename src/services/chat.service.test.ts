@@ -191,5 +191,15 @@ describe('chatService', () => {
     await expect(chatService.getMessages(5, { after: 50, limit: 20 })).rejects.toThrow('500 Internal Server Error')
     expect(api.get).toHaveBeenCalledTimes(1)
   })
+
+  it('preserves cursor pagination and rethrows without recovering the first page', async () => {
+    vi.mocked(api.get).mockRejectedValueOnce(new Error('Page unavailable'))
+    await expect(chatService.getMessages(5, { cursor: '50', limit: 20 })).rejects.toThrow('Page unavailable')
+    expect(api.get).toHaveBeenCalledTimes(1)
+    expect(api.get).toHaveBeenCalledWith('/conversations/5/messages', {
+      params: { after: '50', limit: 20 },
+      signal: undefined,
+    })
+  })
 })
 

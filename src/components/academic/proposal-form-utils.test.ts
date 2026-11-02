@@ -16,7 +16,7 @@ function validDraft(): ProposalDraft {
     correctKey: 'B',
     explanation: 'Basic arithmetic',
   })
-  return { title: 'Session', content: '', sourceUrl: '', subjectId: '7', questions: [question] }
+  return { title: 'Session', content: '', sourceUrl: '', subjectId: '7', courseClassId: '12', questions: [question] }
 }
 
 describe('proposal-form-utils', () => {
@@ -40,7 +40,7 @@ describe('proposal-form-utils', () => {
   it('maps a draft to the propose request with exactly one correct option', () => {
     const request = toProposeRequest(validDraft())
 
-    expect(request.subject_id).toBe(7)
+    expect(request.course_class_id).toBe(12)
     expect(request.questions[0].llm_generated).toBe(false)
     expect(request.questions[0].options.map((option) => option.is_correct)).toEqual([false, true, false, false])
   })

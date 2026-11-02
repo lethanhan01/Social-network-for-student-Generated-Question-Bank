@@ -1,238 +1,197 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Reply, MoreHorizontal, Edit, Trash2, AlertCircle } from 'lucide-react'
-import { Avatar } from '@/components/ui/data-display'
-import { Button, SubmitButton } from '@/components/ui/actions'
-import { Form, FormField, Input } from '@/components/ui/forms'
+import { MoreHorizontal } from 'lucide-react'
+import { Avatar } from '@/components/ui/data-display/Avatar'
+import { Image } from '@/components/ui/data-display/Image'
+import { Button, ButtonLink } from '@/components/ui/actions/Button'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
 } from '@/components/ui/overlay'
+import { ConfirmDialog } from '@/components/ui/overlay/ConfirmDialog'
+import { useInfinitePostCommentsQuery } from '@/hooks/queries/useCommentsQuery'
 import { formatDateTime } from '@/utils/date'
+import { getApiError } from '@/lib/api-error'
+import { toast } from '@/lib/toast'
 import { ReportModal } from './ReportPostModal'
+import { CommentForm } from './CommentForm'
+import { LoadMore } from './LoadMore'
+import { QueryFeedback } from './QueryFeedback'
 import type { CommentResponseDto } from '@/types'
 
 interface CommentItemProps {
   comment: CommentResponseDto
+  postId: number
   currentUserId?: number
   isStaff?: boolean
-  onReply: (parentId: number, text: string) => Promise<void>
-  onUpdate: (commentId: number, text: string) => Promise<void>
-  onDelete: (commentId: number) => Promise<void>
+  depth?: number
+  onReply: (parentId: number, text: string, media?: string) => Promise<unknown>
+  onUpdate: (commentId: number, text: string, media?: string) => Promise<unknown>
+  onDelete: (commentId: number) => Promise<unknown>
 }
-
 export function CommentItem({
   comment,
+  postId,
   currentUserId,
-  isStaff = false,
+  isStaff,
   onReply,
   onUpdate,
   onDelete,
+  depth = 0,
 }: Readonly<CommentItemProps>) {
   const { t } = useTranslation()
-  const [isReplying, setIsReplying] = useState(false)
-  const [replyText, setReplyText] = useState('')
-  const [isEditing, setIsEditing] = useState(false)
-  const [editText, setEditText] = useState(comment.content || '')
-  const [isReportOpen, setIsReportOpen] = useState(false)
-  const [loading, setLoading] = useState(false)
-
-  const isOwner = Boolean(comment.author?.user_id && comment.author?.user_id === currentUserId)
-  const canDelete = isOwner || isStaff
-  const author = comment.author?.full_name || 'Người dùng HUST'
-  const initials = author.charAt(0).toUpperCase()
-
-  async function handleSendReply() {
-    if (!replyText.trim() || !comment.comment_id) return
-    setLoading(true)
+  const [mode, setMode] = useState<'view' | 'reply' | 'edit' | 'delete' | 'report'>('view')
+  const [expanded, setExpanded] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const replies = useInfinitePostCommentsQuery(
+    postId,
+    comment.comment_id,
+    expanded && Boolean(comment.comment_id)
+  )
+  const children = expanded ? (replies.data?.pages.flatMap((page) => page.items ?? []) ?? []) : []
+  const owner = Boolean(currentUserId && currentUserId === comment.author?.user_id)
+  const author = comment.author?.full_name ?? t('social.member')
+  async function remove() {
+    if (!comment.comment_id || deleting) return
+    setDeleting(true)
     try {
-      await onReply(comment.comment_id, replyText.trim())
-      setReplyText('')
-      setIsReplying(false)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  async function handleSaveEdit() {
-    if (!editText.trim() || !comment.comment_id) return
-    setLoading(true)
-    try {
-      await onUpdate(comment.comment_id, editText.trim())
-      setIsEditing(false)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  async function handleDelete() {
-    if (!comment.comment_id) return
-    if (window.confirm(t('comment.confirmDelete', 'Bạn có chắc chắn muốn xóa bình luận này?'))) {
       await onDelete(comment.comment_id)
+      setMode('view')
+    } catch (error) {
+      toast.error(getApiError(error, t('zone2.actionError')))
+    } finally {
+      setDeleting(false)
     }
   }
-
-  if (comment.deleted) {
-    return (
-      /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Deleted comment placeholder layout] */
-      <div className="p-2.5 rounded-xl bg-surface-elevated text-xs text-text-muted italic border border-line-subtle">
-        {t('comment.deletedMessage', 'Bình luận này đã bị xóa.')}
-      </div>
-    )
-  }
-
   return (
-    <article className="space-y-2">
-      {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Comment row layout container] */}
-      <div className="flex items-start gap-2.5">
-        <Avatar
-          src={comment.author?.avatar_url || undefined}
-          name={author}
-          fallback={initials}
-          size="sm"
+    <article className="space-y-3 rounded-xl bg-surface-hover p-3">
+      <header className="flex items-center justify-between gap-2">
+        <Avatar name={author} src={comment.author?.avatar_url || undefined} size="sm" />
+        <ButtonLink
+          to={`/profile/${comment.author?.user_id ?? 'me'}`}
+          variant="ghost"
+          className="min-w-0 flex-1 justify-start truncate text-sm"
+        >
+          {author}
+        </ButtonLink>
+        <time className="text-xs text-text-muted">{formatDateTime(comment.created_at)}</time>
+        {!comment.deleted ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" aria-label={t('social.commentOptions')}>
+                <MoreHorizontal size={18} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {owner ? (
+                <DropdownMenuItem onClick={() => setMode('edit')}>
+                  {t('social.commentEdit')}
+                </DropdownMenuItem>
+              ) : null}
+              {owner || isStaff ? (
+                <DropdownMenuItem onClick={() => setMode('delete')}>
+                  {t('social.deleteComment')}
+                </DropdownMenuItem>
+              ) : null}
+              <DropdownMenuItem onClick={() => setMode('report')}>
+                {t('report.submit')}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : null}
+      </header>
+      {comment.deleted ? (
+        <p className="text-sm italic text-text-muted">{t('social.commentDeleted')}</p>
+      ) : mode === 'edit' ? (
+        <CommentForm
+          initial={comment.content ?? ''}
+          label={t('social.commentEdit')}
+          onCancel={() => setMode('view')}
+          onSend={async (text, media) => {
+            await onUpdate(comment.comment_id!, text, media)
+            setMode('view')
+          }}
         />
-        {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Comment bubble and actions wrapper] */}
-        <div className="flex-1 min-w-0">
-          {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Bubble container] */}
-          <div className="bg-surface-hover rounded-2xl p-2.5 px-3.5 border border-line-subtle text-xs relative group">
-            {/* Header info */}
-            {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Author name and options header row] */}
-            <div className="flex items-center justify-between gap-2 mb-0.5">
-              <strong className="font-bold text-text-primary truncate">{author}</strong>
-              <div className="flex items-center gap-1">
-                <time className="text-[10px] text-text-muted">
-                  {formatDateTime(comment.created_at)}
-                </time>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-6 h-6 p-0 rounded-full text-text-muted hover:text-text-primary"
-                      aria-label="Tùy chọn bình luận"
-                    >
-                      <MoreHorizontal size={14} />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-36 bg-surface shadow-card rounded-xl">
-                    {isOwner ? (
-                      <DropdownMenuItem onClick={() => setIsEditing(true)}>
-                        <Edit size={13} className="mr-2" />
-                        <strong className="font-normal">{t('common.edit', 'Chỉnh sửa')}</strong>
-                      </DropdownMenuItem>
-                    ) : null}
-                    {canDelete ? (
-                      <DropdownMenuItem onClick={handleDelete} className="text-tone-danger">
-                        <Trash2 size={13} className="mr-2" />
-                        <strong className="font-normal">{t('common.delete', 'Xóa')}</strong>
-                      </DropdownMenuItem>
-                    ) : null}
-                    <DropdownMenuItem onClick={() => setIsReportOpen(true)} className="text-tone-danger">
-                      <AlertCircle size={13} className="mr-2" />
-                      <strong className="font-normal">{t('report.submit', 'Báo cáo')}</strong>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </div>
-
-            {/* Content / Edit Form */}
-            {isEditing ? (
-              <Form onSubmit={handleSaveEdit} noValidate className="space-y-2 pt-1">
-                <FormField className="mb-0">
-                  <Input
-                    aria-label="Chỉnh sửa bình luận"
-                    value={editText}
-                    onChange={(e) => setEditText(e.target.value)}
-                    className="text-xs h-8"
-                  />
-                </FormField>
-                {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Edit buttons row] */}
-                <div className="flex justify-end gap-2">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setIsEditing(false)}
-                    className="h-7 text-xs"
-                  >
-                    {t('common.cancel', 'Hủy')}
-                  </Button>
-                  <SubmitButton loading={loading} variant="primary" size="sm" className="h-7 text-xs px-3">
-                    {t('common.save', 'Lưu')}
-                  </SubmitButton>
-                </div>
-              </Form>
-            ) : (
-              <p className="text-text-primary leading-relaxed whitespace-pre-wrap">{comment.content}</p>
-            )}
-          </div>
-
-          {/* Reply Action Trigger */}
-          {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Reply trigger container] */}
-          <div className="flex items-center gap-3 mt-1 ml-2 text-[11px] text-text-muted">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsReplying((prev) => !prev)}
-              className="p-0 h-auto text-text-muted hover:text-text-primary inline-flex items-center gap-1 font-semibold"
-            >
-              <Reply size={12} />
-              {t('comment.reply', 'Trả lời')}
-            </Button>
-          </div>
-
-          {/* Reply Input Form */}
-          {isReplying ? (
-            <Form onSubmit={handleSendReply} noValidate className="mt-2 flex gap-2">
-              <FormField className="flex-1 mb-0">
-                <Input
-                  aria-label="Viết câu trả lời"
-                  placeholder={t('comment.replyPlaceholder', 'Viết câu trả lời...')}
-                  value={replyText}
-                  onChange={(e) => setReplyText(e.target.value)}
-                  className="text-xs h-8 rounded-full bg-surface-hover"
-                />
-              </FormField>
-              <SubmitButton
-                loading={loading}
-                disabled={!replyText.trim()}
-                variant="primary"
-                size="sm"
-                className="h-8 px-3 rounded-full text-xs"
-              >
-                {t('comment.send', 'Gửi')}
-              </SubmitButton>
-            </Form>
+      ) : (
+        <p className="whitespace-pre-wrap break-words text-sm">{comment.content}</p>
+      )}
+      {!comment.deleted && comment.media_url ? (
+        <Image
+          src={comment.media_url}
+          alt={t('social.attachment')}
+          className="max-h-64 rounded-xl object-contain"
+        />
+      ) : null}
+      <footer className="flex flex-wrap gap-2">
+        {!comment.deleted ? (
+          <Button variant="ghost" onClick={() => setMode(mode === 'reply' ? 'view' : 'reply')}>
+            {t('comment.reply')}
+          </Button>
+        ) : null}
+        {(comment.reply_count ?? comment.replies?.length ?? 0) > 0 ? (
+          <Button
+            variant="ghost"
+            aria-expanded={expanded}
+            onClick={() => setExpanded((previous) => !previous)}
+          >
+            {t('social.replies', { count: comment.reply_count ?? comment.replies?.length ?? 0 })}
+          </Button>
+        ) : null}
+      </footer>
+      {mode === 'reply' ? (
+        <CommentForm
+          label={t('social.replyInput')}
+          onCancel={() => setMode('view')}
+          onSend={async (text, media) => {
+            await onReply(comment.comment_id!, text, media)
+            setMode('view')
+            setExpanded(true)
+          }}
+        />
+      ) : null}
+      {expanded ? (
+        <section className={depth < 2 ? 'space-y-3 border-l border-line-subtle pl-3' : 'space-y-3'}>
+          {replies.isPending || (replies.isError && !replies.data) ? (
+            <QueryFeedback
+              pending={replies.isPending}
+              error={replies.error}
+              onRetry={replies.refetch}
+            />
           ) : null}
-
-          {/* Nested Replies List */}
-          {comment.replies && comment.replies.length > 0 ? (
-            /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Nested replies tree stack] */
-            <div className="pl-6 pt-2 space-y-2 border-l border-line-subtle mt-1">
-              {comment.replies.map((reply) => (
-                <CommentItem
-                  key={reply.comment_id}
-                  comment={reply}
-                  currentUserId={currentUserId}
-                  isStaff={isStaff}
-                  onReply={onReply}
-                  onUpdate={onUpdate}
-                  onDelete={onDelete}
-                />
-              ))}
-            </div>
-          ) : null}
-        </div>
-      </div>
-
+          {children.map((child) => (
+            <CommentItem
+              key={child.comment_id}
+              comment={child}
+              postId={postId}
+              currentUserId={currentUserId}
+              isStaff={isStaff}
+              onReply={onReply}
+              onUpdate={onUpdate}
+              onDelete={onDelete}
+              depth={depth + 1}
+            />
+          ))}
+          <LoadMore query={replies} />
+        </section>
+      ) : null}
+      <ConfirmDialog
+        open={mode === 'delete'}
+        title={t('social.deleteComment')}
+        description={t('comment.delete_confirm')}
+        variant="danger"
+        loading={deleting}
+        onClose={() => {
+          if (!deleting) setMode('view')
+        }}
+        onConfirm={remove}
+      />
       <ReportModal
-        isOpen={isReportOpen}
+        isOpen={mode === 'report'}
         targetType="COMMENT"
         targetId={comment.comment_id}
-        onClose={() => setIsReportOpen(false)}
+        onClose={() => setMode('view')}
       />
     </article>
   )

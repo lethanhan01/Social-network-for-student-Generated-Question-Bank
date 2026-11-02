@@ -1,128 +1,71 @@
-import { useState } from 'react'
-import { BookOpen, GraduationCap, Search } from 'lucide-react'
+import { useSearchParams } from 'react-router-dom'
+import { BookOpen, PenLine, Play } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Badge, Card } from '@/components/ui/data-display'
-import { ButtonLink } from '@/components/ui/actions'
-import { Checkbox, Input } from '@/components/ui/forms'
-import { Grid, Page, PageEmptyState, PageErrorState, PageHeader, PageSkeleton } from '@/components/ui/layout'
-import { Heading, Text } from '@/components/ui/typography'
-import { useEnrolledSubjectsQuery, useSubjectsQuery } from '@/hooks/queries'
-import { useDebounceValue } from '@/hooks/useDebounce'
-import { getApiError } from '@/lib/api-error'
-import type { SubjectResponse } from '@/types'
-
-function matchesKeyword(subject: SubjectResponse, keyword: string): boolean {
-  if (!keyword) return true
-  const normalized = keyword.toLowerCase()
-  return (
-    (subject.name ?? '').toLowerCase().includes(normalized) ||
-    (subject.code ?? '').toLowerCase().includes(normalized)
-  )
-}
-
-interface EnrolledClassItem {
-  subject_id?: number
-  course_class_id?: number
-}
+import { AcademicLayout } from '@/components/academic/AcademicLayout'
+import { AcademicFeedback } from '@/components/academic/AcademicFeedback'
+import { useSubjectsQuery } from '@/hooks/queries/useAcademicQuery'
+import { useEnrolledSubjectsQuery } from '@/hooks/queries/useSessionsQuery'
+import { Card } from '@/components/ui/data-display/Card'
+import { Badge } from '@/components/ui/data-display/Badge'
+import { Button } from '@/components/ui/actions/Button'
+import { ButtonLink } from '@/components/ui/actions/Button'
+import { SearchInput } from '@/components/ui/forms/SearchInput'
+import { Heading } from '@/components/ui/typography/Heading'
+import { Text } from '@/components/ui/typography/Text'
 
 export default function SubjectsPage() {
   const { t } = useTranslation('academic')
-  const [keyword, setKeyword] = useState('')
-  const [enrolledOnly, setEnrolledOnly] = useState(false)
-  const debouncedKeyword = useDebounceValue(keyword.trim(), 250)
-  const subjectsQuery = useSubjectsQuery()
-  const enrolledQuery = useEnrolledSubjectsQuery()
+  const [params, setParams] = useSearchParams()
+  const subjects = useSubjectsQuery()
+  const enrolled = useEnrolledSubjectsQuery()
+  const mine = params.get('tab') === 'mine'
+  const search = params.get('q') ?? ''
+  const active = mine ? enrolled : subjects
+  const enrolledIds = new Set((enrolled.data ?? []).map((subject) => subject.subject_id))
+  const filtered = (active.data ?? []).filter((subject) =>
+    `${subject.code ?? ''} ${subject.name ?? ''}`.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()))
 
-  const enrolledIds = new Set(
-    (enrolledQuery.data ?? []).map((s) => s.subject_id ?? (s as unknown as EnrolledClassItem).course_class_id)
-  )
-  const subjects = (subjectsQuery.data ?? []).filter(
-    (subject) => matchesKeyword(subject, debouncedKeyword) && (!enrolledOnly || enrolledIds.has(subject.subject_id))
-  )
-
-  function renderList() {
-    if (subjectsQuery.isLoading) return <PageSkeleton rows={3} />
-    if (subjectsQuery.isError) {
-      return (
-        <PageErrorState
-          message={getApiError(subjectsQuery.error, t('subjects.loadError'))}
-          onRetry={() => void subjectsQuery.refetch()}
-        />
-      )
-    }
-    if (subjects.length === 0) {
-      return (
-        <PageEmptyState
-          title={t(debouncedKeyword || enrolledOnly ? 'subjects.empty.filtered' : 'subjects.empty.title')}
-          description={t('subjects.empty.description')}
-        />
-      )
-    }
-    return (
-      <Grid cols={1} smCols={2} lgCols={3} gap={4} as="section" aria-label={t('subjects.listLabel')}>
-        {subjects.map((subject) => {
-          const enrolled = enrolledIds.has(subject.subject_id)
-          return (
-            <Card as="article" variant="compact" key={subject.subject_id} className="flex h-full flex-col gap-3">
-              <header className="flex items-start justify-between gap-2">
-                <Badge tone="accent" size="xs" leftIcon={<BookOpen size={12} />}>
-                  {subject.code}
-                </Badge>
-                {enrolled ? (
-                  <Badge tone="success" size="xs" leftIcon={<GraduationCap size={12} />}>
-                    {t('subjects.enrolled')}
-                  </Badge>
-                ) : null}
-              </header>
-              <Heading level={3} size="xs">
-                {subject.name}
-              </Heading>
-              <footer className="mt-auto">
-                {enrolled ? (
-                  <ButtonLink
-                    to={`/proposals?subject=${subject.subject_id}`}
-                    variant="outline"
-                    size="sm"
-                    touchTarget
-                    aria-label={t('subjects.viewProposalsAria', { name: subject.name })}
-                  >
-                    {t('subjects.viewProposals')}
-                  </ButtonLink>
-                ) : (
-                  <Text size="xs" tone="dim">
-                    {t('subjects.notEnrolled')}
-                  </Text>
-                )}
-              </footer>
-            </Card>
-          )
-        })}
-      </Grid>
-    )
+  function update(key: string, value: string) {
+    setParams((previous) => { const next = new URLSearchParams(previous); next.set(key, value); return next }, { replace: true })
   }
 
   return (
-    <Page>
-      <PageHeader eyebrow={t('eyebrow')} title={t('subjects.title')} description={t('subjects.description')} />
-
-      <section aria-label={t('subjects.searchLabel')} className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <Input
-          type="search"
-          aria-label={t('subjects.searchLabel')}
-          placeholder={t('subjects.searchPlaceholder')}
-          leftIcon={<Search size={16} />}
-          value={keyword}
-          onChange={(event) => setKeyword(event.target.value)}
-          className="min-h-11"
-        />
-        <Checkbox
-          label={t('subjects.enrolledOnly')}
-          checked={enrolledOnly}
-          onCheckedChange={setEnrolledOnly}
-        />
-      </section>
-
-      {renderList()}
-    </Page>
+    <AcademicLayout title={t('subjects.title')} subtitle={t('subjects.subtitle')}>
+      <Card as="section" className="space-y-4 rounded-2xl">
+        <SearchInput aria-label={t('subjects.search')} placeholder={t('subjects.search')}
+          value={search} onChange={(value) => update('q', value)} fullWidth />
+        <nav aria-label={t('subjects.filter')} className="flex gap-2">
+          <Button variant={!mine ? 'secondary' : 'ghost'} aria-pressed={!mine} onClick={() => update('tab', 'all')}>{t('subjects.all')}</Button>
+          <Button variant={mine ? 'secondary' : 'ghost'} aria-pressed={mine} onClick={() => update('tab', 'mine')}>{t('subjects.mine')}</Button>
+        </nav>
+      </Card>
+      {!mine && enrolled.isError ? <AcademicFeedback error={enrolled.error} onRetry={enrolled.refetch} /> : null}
+      {active.isPending ? <AcademicFeedback pending /> : active.isError ? (
+        <AcademicFeedback error={active.error} onRetry={active.refetch} />
+      ) : filtered.length === 0 ? <AcademicFeedback empty={t('subjects.empty')} /> : (
+        <section aria-label={t('subjects.title')} className="grid gap-4 sm:grid-cols-2">
+          {filtered.map((subject) => (
+            <Card as="article" key={subject.subject_id ?? subject.code} className="flex flex-col gap-4 rounded-2xl">
+              <header className="flex items-center gap-3">
+                <BookOpen size={32} className="shrink-0 text-action-accent" />
+                <hgroup className="min-w-0 space-y-1">
+                  <Text size="xs" tone="muted">{subject.code}</Text>
+                  <Heading level={2} className="text-base font-bold">{subject.name}</Heading>
+                </hgroup>
+              </header>
+              {enrolledIds.has(subject.subject_id) ? <Badge tone="success">{t('subjects.enrolled')}</Badge> : null}
+              <footer className="mt-auto flex flex-wrap gap-2 border-t border-line-subtle pt-4">
+                {subject.subject_id ? <ButtonLink to={`/practice?subjectId=${subject.subject_id}`} variant="secondary"
+                  leftIcon={<Play size={16} />}>{t('subjects.practice')}</ButtonLink> : null}
+                {subject.subject_id && enrolledIds.has(subject.subject_id) ? (
+                  <ButtonLink to={`/proposals?subjectId=${subject.subject_id}`} variant="ghost"
+                    leftIcon={<PenLine size={16} />}>{t('subjects.propose')}</ButtonLink>
+                ) : null}
+              </footer>
+            </Card>
+          ))}
+        </section>
+      )}
+    </AcademicLayout>
   )
 }

@@ -1,224 +1,153 @@
-import { useState, useMemo } from 'react'
-import { Sparkles, BookOpen, GraduationCap, RefreshCw } from 'lucide-react'
+import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Heading, Text } from '@/components/ui/typography'
-import { Button } from '@/components/ui/actions'
-import { Badge } from '@/components/ui/data-display'
-import { Page } from '@/components/ui/layout'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/navigation'
-import {
-  SocialFeedLayout,
-  SocialLeftSidebar,
-  SocialRightSidebar,
-  CreatePostBox,
-  CreatePostModal,
-  PostCard,
-  EmptyFeedState,
-} from '@/components/social'
+import { Heading } from '@/components/ui/typography/Heading'
+import { Button } from '@/components/ui/actions/Button'
+import { Select } from '@/components/ui/forms/Select'
+import { CreatePostBox } from '@/components/social/CreatePostBox'
+import { CreatePostModal } from '@/components/social/CreatePostModal'
+import { PostCard } from '@/components/social/PostCard'
+import { QueryFeedback } from '@/components/social/QueryFeedback'
+import { ActivityFeedEntry, ActivityPost } from '@/components/social/ActivityFeedEntry'
+import { LoadMore } from '@/components/social/LoadMore'
 import { useSocialFeed } from '@/hooks/useSocialFeed'
 import {
+  useInfiniteActivityFeedQuery,
   useInfinitePostsFeedQuery,
   useNewFeedCountQuery,
-  useToggleReactionMutation,
 } from '@/hooks/queries/usePostsQuery'
+import { queryKeys } from '@/lib/query-keys'
 import type { PostResponseDto } from '@/types'
-import { QueryFeedback } from '@/components/social/QueryFeedback'
 
 export default function FeedPage() {
   const { t } = useTranslation()
-  const [activeTab, setActiveTab] = useState<'ALL' | 'MY_SUBJECTS' | 'LECTURERS'>('ALL')
-  const [selectedSubjectId, setSelectedSubjectId] = useState<number | undefined>()
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-  const [latestLoadedTime] = useState<string>(new Date().toISOString())
-
-  const { currentUser, subjects, friends, createPost } = useSocialFeed()
-
-  const {
-    data: infiniteFeed,
-    isLoading: isLoadingFeed,
-    isError: isFeedError,
-    error: feedError,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
-    refetch: refetchFeed,
-  } = useInfinitePostsFeedQuery(10)
-
-  const { data: newFeedData } = useNewFeedCountQuery(latestLoadedTime)
-  const newCount = newFeedData?.new_count || 0
-
-  const toggleReactionMutation = useToggleReactionMutation()
-
-  // Flatten infinite query pages
-  const allPosts = useMemo(() => {
-    return infiniteFeed?.pages.flatMap((page) => page.items || []) || []
-  }, [infiniteFeed])
-
-  // Filter posts based on active tab and selected subject
-  const filteredPosts = useMemo(() => {
-    let list: PostResponseDto[] = [...allPosts]
-
-    if (selectedSubjectId) {
-      list = list.filter((p) => p.subject_id === selectedSubjectId)
-    } else if (activeTab === 'MY_SUBJECTS' && subjects.length > 0) {
-      const mySubjectIds = new Set(subjects.map((s) => s.subject_id).filter(Boolean))
-      list = list.filter((p) => p.subject_id && mySubjectIds.has(p.subject_id))
-    }
-
-    if (activeTab === 'LECTURERS') {
-      list = list.filter((p) => Boolean(p.lecturer_note))
-    }
-
-    return list
-  }, [allPosts, selectedSubjectId, activeTab, subjects])
-
-  async function handleToggleReact(postId: number, reactionType: 'LIKE' | 'LOVE' | 'WOW' = 'LIKE') {
-    await toggleReactionMutation.mutateAsync({
-      target_type: 'POST',
-      target_id: postId,
-      reaction_type: reactionType,
+  const [params, setParams] = useSearchParams()
+  const tab = params.get('tab') ?? 'ALL'
+  const subjectId = Number(params.get('subject')) || undefined
+  const [creating, setCreating] = useState(false)
+  const [since, setSince] = useState(() => String(Date.now()))
+  const { currentUser, subjects, createPost } = useSocialFeed()
+  const activity = useInfiniteActivityFeedQuery()
+  const mine = useInfinitePostsFeedQuery()
+  const query = tab === 'MINE' ? mine : activity
+  const counter = useNewFeedCountQuery(since)
+  const recent = useQuery<PostResponseDto[]>({
+    queryKey: queryKeys.posts.recentlyCreated(),
+    queryFn: () => [],
+    initialData: [],
+    staleTime: Infinity,
+    enabled: false,
+  })
+  const posts = mine.data?.pages.flatMap((page) => page.items ?? []) ?? []
+  const events = activity.data?.pages.flatMap((page) => page.items ?? []) ?? []
+  const recentPosts = recent.data
+  const recentIds = new Set(recentPosts.map((post) => post.post_id))
+  const matches = (post: PostResponseDto) =>
+    (!subjectId || post.subject_id === subjectId) &&
+    (tab !== 'LECTURERS' || Boolean(post.lecturer_note))
+  function update(key: string, value: string) {
+    setParams((previous) => {
+      const next = new URLSearchParams(previous)
+      if (value) next.set(key, value)
+      else next.delete(key)
+      return next
     })
   }
-
-  function renderFeedStream() {
-    if (isFeedError) return <QueryFeedback error={feedError} onRetry={refetchFeed} />
-    if (isLoadingFeed) {
-      return (
-        /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Loading state layout container] */
-        <div className="py-12 text-center space-y-2">
-          <Text size="sm" tone="muted">
-            {t('feed.loading', 'Đang tải dữ liệu bài viết từ máy chủ SQB HUST...')}
-          </Text>
-        </div>
-      )
-    }
-
-    if (filteredPosts.length > 0) {
-      return (
-        /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Feed list stream wrapper] */
-        <div className="space-y-4">
-          {newCount > 0 ? (
-            <Button
-              variant="secondary"
-              onClick={() => refetchFeed()}
-              leftIcon={<RefreshCw size={14} className="animate-spin" />}
-              className="w-full justify-center text-xs text-action-accent border border-action-accent/30 bg-action-accent/10 hover:bg-action-accent/20 min-h-11"
-            >
-              {t('feed.newPostsAvailable', { count: newCount, defaultValue: `Có ${newCount} bài viết mới. Bấm để làm mới.` })}
-            </Button>
-          ) : null}
-
-          {filteredPosts.map((post, idx) => (
-            <PostCard
-              key={post.post_id ? `post-${post.post_id}` : `feed-post-${idx}`}
-              post={post}
-              currentUserAvatar={currentUser?.avatar_url || undefined}
-              currentUserName={currentUser?.full_name || 'Bạn'}
-              onToggleReact={handleToggleReact}
-            />
-          ))}
-
-          {hasNextPage ? (
-            /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Load more button wrapper] */
-            <div className="pt-2 text-center">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => fetchNextPage()}
-                loading={isFetchingNextPage}
-                loadingText={t('common.loading', 'Đang tải thêm...')}
-                className="min-h-11 px-6 text-xs"
-              >
-                {t('feed.loadMore', 'Tải thêm bài viết cũ hơn')}
-              </Button>
-            </div>
-          ) : null}
-        </div>
-      )
-    }
-
-    return <EmptyFeedState onOpenCreateModal={() => setIsCreateModalOpen(true)} />
+  async function refresh() {
+    const nextSince = String(Date.now())
+    const result = await query.refetch()
+    if (!result.isError) setSince(nextSince)
   }
-
   return (
-    <Page maxWidth="2xl" className="space-y-6">
-      {/* Page Header */}
-      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-line-subtle">
-        <hgroup>
-          {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Header badge and semester row] */}
-          <div className="flex items-center gap-2 mb-1">
-            <Badge tone="accent" size="sm">
-              {t('feed.network_badge', 'Mạng Xã Hội Học Tập')}
-            </Badge>
-            <strong className="font-normal text-xs text-text-muted">
-              {t('feed.semester_badge', 'Kỳ 2024.1 HUST')}
-            </strong>
-          </div>
-          <Heading
-            level={1}
-            className="text-2xl sm:text-3xl font-extrabold tracking-tight text-text-primary"
+    <section className="mx-auto max-w-3xl space-y-5">
+      <Heading level={1} className="text-2xl font-bold">
+        {t('feed.title')}
+      </Heading>
+      <CreatePostBox user={currentUser} onOpenCreateModal={() => setCreating(true)} />
+      <nav aria-label={t('social.feedFilters')} className="flex gap-2 overflow-x-auto">
+        {(['ALL', 'MINE', 'LECTURERS'] as const).map((value) => (
+          <Button
+            key={value}
+            variant={tab === value ? 'secondary' : 'ghost'}
+            aria-pressed={tab === value}
+            onClick={() => update('tab', value)}
           >
-            {t('feed.title', 'Bảng tin & Hoạt động')}
-          </Heading>
-        </hgroup>
-      </header>
-
-      {/* 3-Column Social Layout */}
-      <SocialFeedLayout
-        leftSidebar={
-          <SocialLeftSidebar
-            user={currentUser}
-            subjects={subjects}
-            selectedSubjectId={selectedSubjectId}
-            onSelectSubject={setSelectedSubjectId}
+            {t(`social.feedTabs.${value}`)}
+          </Button>
+        ))}
+      </nav>
+      <Select
+        ariaLabel={t('social.subjectFilter')}
+        value={subjectId ? String(subjectId) : ''}
+        placeholder={t('social.allSubjects')}
+        onValueChange={(value) => update('subject', value)}
+        options={[
+          { value: '', label: t('social.allSubjects') },
+          ...subjects
+            .filter((subject) => subject.subject_id)
+            .map((subject) => ({
+              value: String(subject.subject_id),
+              label: `${subject.code} · ${subject.name}`,
+            })),
+        ]}
+      />
+      {(counter.data?.new_count ?? 0) > 0 ? (
+        <Button
+          variant="secondary"
+          className="w-full"
+          loading={query.isRefetching}
+          onClick={() => {
+            void refresh()
+          }}
+        >
+          {t('feed.newPostsAvailable', { count: counter.data?.new_count })}
+        </Button>
+      ) : null}
+      {query.isPending || (query.isError && !query.data) ? (
+        <QueryFeedback pending={query.isPending} error={query.error} onRetry={query.refetch} />
+      ) : null}
+      {recentPosts.map((post) =>
+        post.post_id ? (
+          <ActivityPost
+            key={post.post_id}
+            postId={post.post_id}
+            currentUser={currentUser}
+            subjectId={subjectId}
+            lecturers={tab === 'LECTURERS'}
           />
-        }
-        centerFeed={
-          /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Center column feed stream container] */
-          <div className="space-y-5">
-            {/* Quick Post Creator Trigger Box */}
-            <CreatePostBox
-              user={currentUser}
-              onOpenCreateModal={() => setIsCreateModalOpen(true)}
-            />
-
-            {/* Filter Tabs Component */}
-            <Tabs
-              value={activeTab}
-              onValueChange={(val) => {
-                setActiveTab(val as typeof activeTab)
-                if (val !== 'MY_SUBJECTS') setSelectedSubjectId(undefined)
-              }}
-              variant="pills"
-              className="space-y-4"
-            >
-              <TabsList aria-label={t('feed.tabs.label', 'Bộ lọc bảng tin')} className="overflow-x-auto">
-                <TabsTrigger value="ALL" leftIcon={<Sparkles size={15} />}>
-                  {t('feed.tabs.all', 'Tất cả bảng tin')}
-                </TabsTrigger>
-                <TabsTrigger value="MY_SUBJECTS" leftIcon={<BookOpen size={15} />}>
-                  {t('feed.tabs.my_subjects', 'Môn học')} ({subjects.length})
-                </TabsTrigger>
-                <TabsTrigger value="LECTURERS" leftIcon={<GraduationCap size={15} />}>
-                  {t('feed.tabs.lecturers', 'Ghi chú Giảng viên')}
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value={activeTab}>
-                {renderFeedStream()}
-              </TabsContent>
-            </Tabs>
-          </div>
-        }
-        rightSidebar={<SocialRightSidebar friends={friends} />}
-      />
-
-      {/* Create Post Modal (MODAL-05) */}
-      <CreatePostModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onSubmit={createPost}
-        subjects={subjects}
-      />
-    </Page>
+        ) : null
+      )}
+      {tab === 'MINE'
+        ? posts
+            .filter((post) => !recentIds.has(post.post_id) && matches(post))
+            .map((post) => <PostCard key={post.post_id} post={post} />)
+        : events
+            .filter((item) => item.target_type !== 'POST' || !recentIds.has(item.target_id))
+            .map((item) => (
+              <ActivityFeedEntry
+                key={item.feed_id}
+                item={item}
+                currentUser={currentUser}
+                subjectId={subjectId}
+                lecturers={tab === 'LECTURERS'}
+              />
+            ))}
+      {query.isSuccess &&
+      (tab === 'MINE' ? posts.length : events.length) === 0 &&
+      recentPosts.length === 0 ? (
+        <p className="py-8 text-center text-text-muted">{t('social.emptyFeed')}</p>
+      ) : null}
+      <LoadMore query={query} />
+      {creating ? (
+        <CreatePostModal
+          isOpen
+          onClose={() => setCreating(false)}
+          onSubmit={createPost}
+          subjects={subjects}
+          authorRole={currentUser?.role}
+        />
+      ) : null}
+    </section>
   )
 }

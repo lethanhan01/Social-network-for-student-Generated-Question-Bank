@@ -30,9 +30,13 @@ export const queryKeys = {
   posts: {
     all: ['posts'] as const,
     feed: (params?: Record<string, unknown>) => ['posts', 'feed', params] as const,
+    infiniteFeed: (limit: number) => ['posts', 'infiniteFeed', limit] as const,
+    infiniteUserPosts: (userId: number, limit: number) =>
+      ['posts', 'infiniteUserPosts', userId, limit] as const,
     detail: (id: string | number) => ['posts', 'detail', id] as const,
     comments: (postId: string | number) => ['posts', postId, 'comments'] as const,
-    userPosts: (userId: number, params?: Record<string, unknown>) => ['posts', 'user', userId, params] as const,
+    userPosts: (userId: number, params?: Record<string, unknown>) =>
+      ['posts', 'user', userId, params] as const,
     videos: (params?: Record<string, unknown>) => ['posts', 'videos', params] as const,
     /** Client-side cache of the reaction type the current user picked (API only exposes a boolean on posts). */
     myReaction: (id: string | number) => ['posts', 'myReaction', id] as const,
@@ -41,7 +45,8 @@ export const queryKeys = {
   },
   comments: {
     all: ['comments'] as const,
-    byPost: (postId: number, params?: Record<string, unknown>) => ['comments', 'post', postId, params] as const,
+    byPost: (postId: number, params?: Record<string, unknown>) =>
+      ['comments', 'post', postId, params] as const,
     replies: (postId: number, parentId: number, params?: Record<string, unknown>) =>
       ['comments', 'replies', postId, parentId, params] as const,
   },
@@ -53,16 +58,22 @@ export const queryKeys = {
   },
   relationships: {
     all: ['relationships'] as const,
+    infinite: (tab: string) => ['relationships', 'infinite', tab] as const,
     friends: (params?: Record<string, unknown>) => ['relationships', 'friends', params] as const,
-    sentRequests: (params?: Record<string, unknown>) => ['relationships', 'requests', 'sent', params] as const,
-    receivedRequests: (params?: Record<string, unknown>) => ['relationships', 'requests', 'received', params] as const,
-    followers: (params?: Record<string, unknown>) => ['relationships', 'followers', params] as const,
-    following: (params?: Record<string, unknown>) => ['relationships', 'following', params] as const,
+    sentRequests: (params?: Record<string, unknown>) =>
+      ['relationships', 'requests', 'sent', params] as const,
+    receivedRequests: (params?: Record<string, unknown>) =>
+      ['relationships', 'requests', 'received', params] as const,
+    followers: (params?: Record<string, unknown>) =>
+      ['relationships', 'followers', params] as const,
+    following: (params?: Record<string, unknown>) =>
+      ['relationships', 'following', params] as const,
     blocked: (params?: Record<string, unknown>) => ['relationships', 'blocked', params] as const,
   },
   feed: {
     all: ['feed'] as const,
     activity: (params?: Record<string, unknown>) => ['feed', 'activity', params] as const,
+    infiniteActivity: (limit: number) => ['feed', 'infiniteActivity', limit] as const,
     newCount: (since?: string) => ['feed', 'newCount', since] as const,
   },
   conversations: {
@@ -70,7 +81,10 @@ export const queryKeys = {
     list: (params?: Record<string, unknown>) => ['conversations', 'list', params] as const,
     detail: (id: number) => ['conversations', 'detail', id] as const,
     members: (id: number) => ['conversations', 'members', id] as const,
-    messages: (id: number, params?: Record<string, unknown>) => ['conversations', 'messages', id, params] as const,
+    messages: (id: number, params?: Record<string, unknown>) =>
+      ['conversations', 'messages', id, params] as const,
+    infiniteList: () => ['conversations', 'infiniteList'] as const,
+    infiniteMessages: (id: number) => ['conversations', 'infiniteMessages', id] as const,
     hidden: () => ['conversations', 'hidden'] as const,
   },
   courses: {
@@ -83,21 +97,27 @@ export const queryKeys = {
   },
   sessions: {
     all: ['sessions'] as const,
-    mySubmissions: (params?: Record<string, unknown>) => ['sessions', 'mySubmissions', params] as const,
+    mySubmissions: (params?: Record<string, unknown>) =>
+      ['sessions', 'mySubmissions', params] as const,
     detail: (id: number) => ['sessions', 'detail', id] as const,
     enrolledSubjects: () => ['sessions', 'enrolledSubjects'] as const,
+    enrolledClasses: () => ['sessions', 'enrolledClasses'] as const,
     pending: (params?: Record<string, unknown>) => ['sessions', 'pending', params] as const,
   },
   practice: {
     all: ['practice'] as const,
+    answer: (questionId: number, updatedAt?: string) =>
+      ['practice', 'answer', questionId, updatedAt] as const,
     questions: (sessionId: number) => ['practice', 'session', sessionId, 'questions'] as const,
     userSessions: (userId: number) => ['practice', 'user', userId, 'sessions'] as const,
   },
   gamification: {
     all: ['gamification'] as const,
     checkIn: () => ['gamification', 'checkIn'] as const,
-    leaderboard: (params?: Record<string, unknown>) => ['gamification', 'leaderboard', params] as const,
-    myPredictions: (params?: Record<string, unknown>) => ['gamification', 'predictions', params] as const,
+    leaderboard: (params?: Record<string, unknown>) =>
+      ['gamification', 'leaderboard', params] as const,
+    myPredictions: (params?: Record<string, unknown>) =>
+      ['gamification', 'predictions', params] as const,
     activeSession: () => ['gamification', 'activeSession'] as const,
     game1Classes: () => ['gamification', 'game1Classes'] as const,
     badges: () => ['gamification', 'badges'] as const,

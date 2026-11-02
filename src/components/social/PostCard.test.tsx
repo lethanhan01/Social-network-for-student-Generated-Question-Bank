@@ -24,8 +24,30 @@ const mockPost: PostResponseDto = {
 }
 
 describe('PostCard Component', () => {
+  it('keeps the reaction total when changing LIKE to LOVE', async () => {
+    const toggle = vi
+      .fn()
+      .mockResolvedValueOnce({ my_reaction: 'LIKE', total_count: 6 })
+      .mockResolvedValueOnce({ my_reaction: 'LOVE', total_count: 6 })
+    const user = userEvent.setup()
+    renderWithQueryClient(
+      <MemoryRouter>
+        <PostCard post={mockPost} onToggleReact={toggle} />
+      </MemoryRouter>
+    )
+    await user.click(screen.getByRole('button', { name: 'Thích' }))
+    await user.click(await screen.findByRole('menuitem', { name: 'Thích' }))
+    await user.click(screen.getByRole('button', { name: 'Đã thích' }))
+    await user.click(await screen.findByRole('menuitem', { name: 'Yêu thích' }))
+    expect(screen.getByText(/6 lượt/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Đã thích' })).toBeInTheDocument()
+  })
   it('renders author, content, subject tag and lecturer note', () => {
-    renderWithQueryClient(<MemoryRouter><PostCard post={mockPost} /></MemoryRouter>)
+    renderWithQueryClient(
+      <MemoryRouter>
+        <PostCard post={mockPost} />
+      </MemoryRouter>
+    )
 
     expect(screen.getByText('Lê Thành An')).toBeInTheDocument()
     expect(screen.getByText('MI1110')).toBeInTheDocument()
@@ -39,7 +61,9 @@ describe('PostCard Component', () => {
     const handleToggleReact = vi.fn().mockResolvedValue({})
 
     renderWithQueryClient(
-      <MemoryRouter><PostCard post={mockPost} onToggleReact={handleToggleReact} /></MemoryRouter>
+      <MemoryRouter>
+        <PostCard post={mockPost} onToggleReact={handleToggleReact} />
+      </MemoryRouter>
     )
 
     const likeBtn = screen.getByRole('button', { name: /Thích/i })
@@ -53,16 +77,30 @@ describe('PostCard Component', () => {
 
   it('persists reactions when the parent does not provide a callback', async () => {
     vi.mocked(reactionService.toggleReact).mockResolvedValue({})
-    renderWithQueryClient(<MemoryRouter><PostCard post={mockPost} /></MemoryRouter>)
+    renderWithQueryClient(
+      <MemoryRouter>
+        <PostCard post={mockPost} />
+      </MemoryRouter>
+    )
     const user = userEvent.setup()
     await user.click(screen.getByRole('button', { name: 'Thích' }))
     await user.click(await screen.findByRole('menuitem', { name: 'Thích' }))
-    await waitFor(() => expect(reactionService.toggleReact).toHaveBeenCalledWith({ target_type: 'POST', target_id: 101, reaction_type: 'LIKE' }))
+    await waitFor(() =>
+      expect(reactionService.toggleReact).toHaveBeenCalledWith({
+        target_type: 'POST',
+        target_id: 101,
+        reaction_type: 'LIKE',
+      })
+    )
   })
 
   it('rolls back the reaction count when saving fails', async () => {
     const onToggleReact = vi.fn().mockRejectedValue(new Error('Unavailable'))
-    renderWithQueryClient(<MemoryRouter><PostCard post={mockPost} onToggleReact={onToggleReact} /></MemoryRouter>)
+    renderWithQueryClient(
+      <MemoryRouter>
+        <PostCard post={mockPost} onToggleReact={onToggleReact} />
+      </MemoryRouter>
+    )
     const user = userEvent.setup()
     await user.click(screen.getByRole('button', { name: 'Thích' }))
     await user.click(await screen.findByRole('menuitem', { name: 'Thích' }))

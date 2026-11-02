@@ -1,4 +1,5 @@
 import api, { requestData, type GlobalResponse } from './api'
+import { afterParams } from '@/lib/pagination'
 import type {
   ConversationListResponseDto,
   ConversationDetailDto,
@@ -17,12 +18,12 @@ import type {
 
 export const chatService = {
   async getConversations(
-    params?: { after?: number; limit?: number },
+    params?: { after?: number; cursor?: string; limit?: number },
     options?: { signal?: AbortSignal }
   ): Promise<ConversationListResponseDto> {
     return requestData<ConversationListResponseDto>(
       api.get<GlobalResponse<ConversationListResponseDto>>('/conversations', {
-        params,
+        params: afterParams(params),
         signal: options?.signal,
       })
     )
@@ -99,18 +100,18 @@ export const chatService = {
 
   async getMessages(
     id: number,
-    params?: { after?: number; limit?: number },
+    params?: { after?: number; cursor?: string; limit?: number },
     options?: { signal?: AbortSignal }
   ): Promise<MessageListResponseDto> {
     try {
       return await requestData<MessageListResponseDto>(
         api.get<GlobalResponse<MessageListResponseDto>>(`/conversations/${id}/messages`, {
-          params,
+          params: afterParams(params),
           signal: options?.signal,
         })
       )
     } catch (error) {
-      if (params?.after == null) {
+      if (params?.after == null && params?.cursor == null && !options?.signal?.aborted) {
         const fallback = await this.recoverMessagesFallback(id, params?.limit ?? 20, options?.signal)
         if (fallback) return fallback
       }
@@ -196,7 +197,9 @@ export const chatService = {
 
   async recallMessage(id: number, params?: { mode?: 'ME' | 'EVERYONE' }): Promise<DeleteMessageResponseDto> {
     return requestData<DeleteMessageResponseDto>(
-      api.delete<GlobalResponse<DeleteMessageResponseDto>>(`/messages/${id}`, { params })
+      api.delete<GlobalResponse<DeleteMessageResponseDto>>(`/messages/${id}`, {
+        data: { scope: params?.mode ?? 'ME' },
+      })
     )
   },
 }

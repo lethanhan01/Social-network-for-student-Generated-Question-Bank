@@ -1,6 +1,9 @@
 node_modules
 # Dependencies
 node_modules/
+test-results/
+playwright-report/
+.vercel/
 .pnp
 .pnp.js
 
@@ -127,4 +130,3 @@ client/design-system-kit/
 templates/*
 
 facebook-clone-master/*
-.vercel/

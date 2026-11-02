@@ -5,7 +5,7 @@ import { Client } from '@stomp/stompjs'
 
 vi.mock('@stomp/stompjs', () => {
   return {
-    Client: vi.fn().mockImplementation((config: { onConnect?: () => void }) => {
+    Client: vi.fn().mockImplementation((config: { onConnect?: () => void; onWebSocketClose?: () => void }) => {
       const mockInstance = {
         active: false,
         activate: vi.fn().mockImplementation(() => {
@@ -51,7 +51,7 @@ describe('websocketService', () => {
     websocketService.connect()
     expect(Client).toHaveBeenCalledWith(
       expect.objectContaining({
-        brokerURL: expect.stringContaining('/websocket?token=test-jwt-token'),
+        brokerURL: expect.stringContaining('/api/v1/ws/websocket'),
         connectHeaders: {
           Authorization: 'Bearer test-jwt-token',
         },
@@ -59,16 +59,7 @@ describe('websocketService', () => {
     )
   })
 
-  it('sendMessage returns false when client is not connected', () => {
-    const payload = {
-      conversation_id: 10,
-      content: 'Hello offline',
-    }
-    const result = websocketService.sendMessage(payload)
-    expect(result).toBe(false)
-  })
-
-  it('sendMessage publishes JSON body to /app/chat.send and returns true', () => {
+  it('sendMessage publishes JSON body to /app/chat.send', () => {
     useAuthStore.getState().setAuth(
       {
         user_id: 1,
@@ -84,10 +75,10 @@ describe('websocketService', () => {
 
     const payload = {
       conversation_id: 10,
+      client_msg_id: 'client-1',
       content: 'Hello STOMP',
     }
-    const result = websocketService.sendMessage(payload)
-    expect(result).toBe(true)
+    websocketService.sendMessage(payload)
 
     const clientInstance = vi.mocked(Client).mock.results[0]?.value
     expect(clientInstance.publish).toHaveBeenCalledWith({
@@ -140,5 +131,23 @@ describe('websocketService', () => {
 
     websocketService.disconnect()
     expect(clientInstance.deactivate).toHaveBeenCalled()
+  })
+
+  it('notifies both chat consumers when the transport closes', () => {
+    useAuthStore.setState({ token: 'test-token' })
+    const status = vi.fn()
+    const connected = vi.fn()
+    const unsubscribeStatus = websocketService.onStatusChange(status)
+    const unsubscribeConnection = websocketService.onConnection(connected)
+    websocketService.connect()
+    expect(status).toHaveBeenLastCalledWith('CONNECTED')
+    expect(connected).toHaveBeenLastCalledWith(true)
+
+    vi.mocked(Client).mock.calls[0][0]?.onWebSocketClose?.({} as CloseEvent)
+    expect(status).toHaveBeenLastCalledWith('DISCONNECTED')
+    expect(connected).toHaveBeenLastCalledWith(false)
+    expect(websocketService.sendMessage({ conversation_id: 10, content: 'Offline' })).toBe(false)
+    unsubscribeStatus()
+    unsubscribeConnection()
   })
 })

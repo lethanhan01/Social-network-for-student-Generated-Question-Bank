@@ -52,9 +52,7 @@ describe('PracticePage', () => {
   it('requires an option before submitting', async () => {
     renderPage()
 
-    fireEvent.click(await screen.findByRole('button', { name: /nộp bài/i }))
-
-    expect(await screen.findByRole('alert')).toHaveTextContent(/chọn một đáp án/i)
+    expect(await screen.findByRole('button', { name: /kiểm tra đáp án/i })).toBeDisabled()
     expect(service.answerQuestion).not.toHaveBeenCalled()
   })
 
@@ -62,8 +60,8 @@ describe('PracticePage', () => {
     service.answerQuestion.mockResolvedValue({ is_correct: true, correct_answer: 'B', explanation: 'Quy tắc lũy thừa' })
     renderPage()
 
-    fireEvent.click(await screen.findByLabelText(/B\. 2x/))
-    fireEvent.click(screen.getByRole('button', { name: /nộp bài/i }))
+    fireEvent.click(await screen.findByRole('button', { name: /B\. 2x/ }))
+    fireEvent.click(screen.getByRole('button', { name: /kiểm tra đáp án/i }))
 
     await waitFor(() =>
       expect(service.answerQuestion).toHaveBeenCalledWith(11, {

@@ -1,176 +1,68 @@
 import { useState } from 'react'
-import { Plus } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
-import { Button } from '@/components/ui/actions'
-import { Grid, Page, PageEmptyState, PageErrorState, PageHeader, PageSkeleton } from '@/components/ui/layout'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/forms'
-import { Pagination } from '@/components/ui/navigation'
-import { ConfirmDialog, Modal } from '@/components/ui/overlay'
-import { ProposalFormLoader } from '@/components/academic/ProposalForm'
-import { ProposalSessionCard } from '@/components/academic/ProposalSessionCard'
-import {
-  useDeleteSubmissionMutation,
-  useEnrolledSubjectsQuery,
-  useMySubmissionsQuery,
-} from '@/hooks/queries'
-import { getApiError } from '@/lib/api-error'
-import { toast } from '@/lib/toast'
-import type { SubmissionSessionSummaryDto } from '@/types'
+import { PenLine, Plus } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { AcademicLayout } from '@/components/academic/AcademicLayout'
+import { AcademicFeedback } from '@/components/academic/AcademicFeedback'
+import { useAcademicSessionsQuery } from '@/hooks/queries/useAcademicQuery'
+import { useEnrolledSubjectsQuery } from '@/hooks/queries/useSessionsQuery'
+import { Button } from '@/components/ui/actions/Button'
+import { Card } from '@/components/ui/data-display/Card'
+import { Select } from '@/components/ui/forms/Select'
+import { positiveId, readSessionStatus, type AcademicSession } from '@/types/academic.types'
+import { ProposalCard } from './ProposalCard'
+import { ProposalDetailModal } from './ProposalDetailModal'
+import { ProposalComposer } from './ProposalComposer'
 
-const PAGE_SIZE = 12
-const ALL_SUBJECTS = 'ALL'
-
-type FormState = { mode: 'create' } | { mode: 'edit'; sessionId: number } | null
-
-interface SubjectOptionItem {
-  subject_id?: number
-  code?: string
-  subject_code?: string
-  name?: string
-  subject_name?: string
-}
+const FILTERS = ['ALL', 'PENDING', 'REVIEWING', 'APPROVED', 'REJECTED', 'RESOLVED'] as const
 
 export default function ProposalsPage() {
   const { t } = useTranslation('academic')
-  const [searchParams, setSearchParams] = useSearchParams()
-  const subjectFilter = searchParams.get('subject') ?? ALL_SUBJECTS
-  const [cursors, setCursors] = useState<string[]>([])
-  const [formState, setFormState] = useState<FormState>(null)
-  const [deleteTarget, setDeleteTarget] = useState<SubmissionSessionSummaryDto | null>(null)
+  const [params, setParams] = useSearchParams()
+  const status = FILTERS.find((value) => value === params.get('status')) ?? 'ALL'
+  const subjectId = positiveId(params.get('subjectId'))
+  const selectedId = positiveId(params.get('session'))
+  const [creating, setCreating] = useState(false)
+  const sessions = useAcademicSessionsQuery(status === 'ALL' ? undefined : status)
+  const enrolled = useEnrolledSubjectsQuery()
+  const all: AcademicSession[] = sessions.data?.pages.flatMap((page) => page.contents ?? []) ?? []
+  const visible = all.filter((session) => (!subjectId || session.subject_id === subjectId) &&
+    (status === 'ALL' || readSessionStatus(session) === 'UNKNOWN' || readSessionStatus(session) === status))
 
-  const cursor = cursors.at(-1)
-  const submissionsQuery = useMySubmissionsQuery({ cursor, limit: PAGE_SIZE })
-  const subjectsQuery = useEnrolledSubjectsQuery()
-  const deleteMutation = useDeleteSubmissionMutation()
-
-  const pagination = submissionsQuery.data?.pagination
-  const sessions = (submissionsQuery.data?.contents ?? []).filter(
-    (session) => subjectFilter === ALL_SUBJECTS || String(session.subject_id) === subjectFilter
-  )
-
-  function changeSubject(value: string) {
-    setSearchParams(value === ALL_SUBJECTS ? {} : { subject: value }, { replace: true })
-  }
-
-  function goToPage(page: number) {
-    if (page > cursors.length + 1 && pagination?.after !== undefined) {
-      setCursors((prev) => [...prev, String(pagination.after)])
-    } else if (page <= cursors.length) {
-      setCursors((prev) => prev.slice(0, page - 1))
-    }
-  }
-
-  async function confirmDelete() {
-    if (!deleteTarget?.session_id) return
-    try {
-      await deleteMutation.mutateAsync(deleteTarget.session_id)
-      toast.success(t('proposals.deleteSuccess'))
-      setDeleteTarget(null)
-    } catch (error) {
-      toast.error(getApiError(error, t('proposals.deleteError')))
-    }
-  }
-
-  function renderList() {
-    if (submissionsQuery.isLoading) return <PageSkeleton rows={3} />
-    if (submissionsQuery.isError) {
-      return (
-        <PageErrorState
-          message={getApiError(submissionsQuery.error, t('proposals.loadError'))}
-          onRetry={() => void submissionsQuery.refetch()}
-        />
-      )
-    }
-    if (sessions.length === 0) {
-      return (
-        <PageEmptyState
-          title={t('proposals.empty.title')}
-          description={t('proposals.empty.description')}
-          action={<Button onClick={() => setFormState({ mode: 'create' })}>{t('proposals.create')}</Button>}
-        />
-      )
-    }
-    return (
-      <Grid cols={1} smCols={2} lgCols={3} gap={4} as="section" aria-label={t('proposals.listLabel')}>
-        {sessions.map((session) => (
-          <ProposalSessionCard
-            key={session.session_id}
-            session={session}
-            onEdit={(sessionId) => setFormState({ mode: 'edit', sessionId })}
-            onDelete={setDeleteTarget}
-          />
-        ))}
-      </Grid>
-    )
+  function update(key: string, value?: string) {
+    setParams((previous) => { const next = new URLSearchParams(previous); if (value) next.set(key, value); else next.delete(key); return next })
   }
 
   return (
-    <Page>
-      <PageHeader
-        eyebrow={t('eyebrow')}
-        title={t('proposals.title')}
-        description={t('proposals.description')}
-        actions={
-          <Button leftIcon={<Plus size={16} />} onClick={() => setFormState({ mode: 'create' })}>
-            {t('proposals.create')}
-          </Button>
-        }
-      />
-
-      <Select value={subjectFilter} onValueChange={changeSubject}>
-        <SelectTrigger aria-label={t('proposals.filter.label')} className="min-h-11 w-full sm:w-72">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={ALL_SUBJECTS}>{t('proposals.filter.all')}</SelectItem>
-          {(subjectsQuery.data ?? []).map((subject) => {
-            const item = subject as unknown as SubjectOptionItem
-            return (
-              <SelectItem key={item.subject_id} value={String(item.subject_id)}>
-                {(item.code ?? item.subject_code)} - {(item.name ?? item.subject_name)}
-              </SelectItem>
-            )
-          })}
-        </SelectContent>
-      </Select>
-
-      {renderList()}
-
-      {cursors.length > 0 || pagination?.has_next ? (
-        <Pagination
-          page={cursors.length + 1}
-          totalPages={cursors.length + (pagination?.has_next ? 2 : 1)}
-          onPageChange={goToPage}
-        />
-      ) : null}
-
-      <Modal
-        open={formState !== null}
-        onClose={() => setFormState(null)}
-        size="2xl"
-        title={t(formState?.mode === 'edit' ? 'proposals.form.editTitle' : 'proposals.form.createTitle')}
-      >
-        {formState ? (
-          <ProposalFormLoader
-            editSessionId={formState.mode === 'edit' ? formState.sessionId : undefined}
-            defaultSubjectId={subjectFilter === ALL_SUBJECTS ? undefined : subjectFilter}
-            onDone={() => setFormState(null)}
-          />
-        ) : null}
-      </Modal>
-
-      <ConfirmDialog
-        open={deleteTarget !== null}
-        onClose={() => setDeleteTarget(null)}
-        onConfirm={confirmDelete}
-        title={t('proposals.deleteConfirm.title')}
-        description={t('proposals.deleteConfirm.description', { title: deleteTarget?.title ?? '' })}
-        confirmLabel={t('proposals.card.delete')}
-        variant="danger"
-        loading={deleteMutation.isPending}
-      />
-    </Page>
+    <AcademicLayout title={t('proposals.title')} subtitle={t('proposals.subtitle')}>
+      <Card as="section" className="space-y-4 rounded-2xl">
+        <Button variant="secondary" className="min-h-14 w-full justify-start rounded-full px-5 text-text-muted"
+          leftIcon={<PenLine size={24} />} onClick={() => setCreating(true)}>{t('proposals.composer')}</Button>
+        <footer className="border-t border-line-subtle pt-3">
+          <Button variant="ghost" className="w-full" onClick={() => setCreating(true)} leftIcon={<Plus size={18} />}>{t('proposals.create')}</Button>
+        </footer>
+      </Card>
+      <nav aria-label={t('proposals.filters')} className="flex gap-1 overflow-x-auto border-b border-line-subtle pb-2">
+        {FILTERS.map((value) => <Button key={value} variant={status === value ? 'secondary' : 'ghost'}
+          aria-pressed={status === value} className="shrink-0" onClick={() => update('status', value)}>{t(`status.${value}`)}</Button>)}
+      </nav>
+      <Select ariaLabel={t('subjects.filter')} value={subjectId ? String(subjectId) : ''}
+        placeholder={t('subjects.all')} onValueChange={(value) => update('subjectId', value)}
+        options={(enrolled.data ?? []).filter((subject) => subject.subject_id).map((subject) => ({ value: String(subject.subject_id), label: `${subject.code} · ${subject.name}` }))} />
+      {sessions.isPending ? <AcademicFeedback pending /> : sessions.isError ? <AcademicFeedback error={sessions.error} onRetry={sessions.refetch} /> : (
+        <section className="space-y-4" aria-label={t('proposals.history')}>
+          {visible.length === 0 ? <AcademicFeedback empty={t('proposals.empty')} /> : visible.map((session) => (
+            <ProposalCard key={session.session_id} session={session} onOpen={(id) => update('session', String(id))} />
+          ))}
+          {sessions.hasNextPage ? <Button variant="outline" className="w-full" loading={sessions.isFetchingNextPage}
+            onClick={() => { void sessions.fetchNextPage() }}>{t('loadMore')}</Button> : null}
+        </section>
+      )}
+      {creating ? <ProposalComposer subjects={enrolled.data ?? []} subjectId={subjectId}
+        subjectsPending={enrolled.isPending} subjectsError={enrolled.error} retrySubjects={enrolled.refetch}
+        onClose={() => setCreating(false)} /> : null}
+      {selectedId ? <ProposalDetailModal key={selectedId} sessionId={selectedId} onClose={() => update('session')}
+        summary={all.find((session) => session.session_id === selectedId)} subjects={enrolled.data ?? []} /> : null}
+    </AcademicLayout>
   )
 }
-

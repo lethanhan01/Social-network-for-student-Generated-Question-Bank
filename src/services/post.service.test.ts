@@ -102,7 +102,7 @@ describe('postService', () => {
     )
 
     expect(api.get).toHaveBeenCalledWith('/video-posts', {
-      params: { cursor: 'prev-cursor', limit: 10 },
+      params: { after: 'prev-cursor', limit: 10 },
       signal: controller.signal,
     })
     expect(result).toEqual(mockCursorResponse)

@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { onLogout } from './stores/authStore'
+import { webSocketService } from './services/websocket.service'
 import './styles/globals.css'
 
 const queryClient = new QueryClient({
@@ -21,6 +22,7 @@ const queryClient = new QueryClient({
 // Clear query cache on logout to avoid session leaks
 onLogout(() => {
   queryClient.clear()
+  webSocketService.disconnect()
 })
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

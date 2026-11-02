@@ -1,183 +1,77 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Send } from 'lucide-react'
-import { Form, FormField, Input } from '@/components/ui/forms'
-import { Button, SubmitButton } from '@/components/ui/actions'
-import { Avatar } from '@/components/ui/data-display'
-import { Text } from '@/components/ui/typography'
+import { Select } from '@/components/ui/forms/Select'
 import { useAuthStore } from '@/stores/authStore'
 import {
-  usePostCommentsQuery,
+  useInfinitePostCommentsQuery,
   useCreateCommentMutation,
   useUpdateCommentMutation,
   useDeleteCommentMutation,
 } from '@/hooks/queries/useCommentsQuery'
 import { CommentItem } from './CommentItem'
-import { toast } from '@/lib/toast'
-
-interface PostCommentSectionProps {
-  postId: number
-  currentUserAvatar?: string
-  currentUserName?: string
-}
+import { CommentForm } from './CommentForm'
+import { QueryFeedback } from './QueryFeedback'
+import { LoadMore } from './LoadMore'
 
 export function PostCommentSection({
   postId,
-  currentUserAvatar,
-  currentUserName = 'Bạn',
-}: Readonly<PostCommentSectionProps>) {
+}: Readonly<{ postId: number; currentUserAvatar?: string; currentUserName?: string }>) {
   const { t } = useTranslation()
-  const [commentText, setCommentText] = useState('')
-  const currentUser = useAuthStore((s) => s.user)
-  const isStaff = currentUser?.role === 'LECTURER' || currentUser?.role === 'ADMIN'
-
-  const { data, isLoading, isError, refetch } = usePostCommentsQuery(postId)
-  const createMutation = useCreateCommentMutation(postId)
-  const updateMutation = useUpdateCommentMutation(postId)
-  const deleteMutation = useDeleteCommentMutation(postId)
-
-  async function handleSendComment(e?: React.SubmitEvent) {
-    e?.preventDefault()
-    if (!commentText.trim()) return
-    try {
-      await createMutation.mutateAsync({
-        target_type: 'POST',
-        target_id: postId,
-        content: commentText.trim(),
-      })
-      setCommentText('')
-    } catch {
-      toast.error(t('comment.createError', 'Không thể gửi bình luận. Vui lòng thử lại.'))
-    }
-  }
-
-  async function handleReply(parentId: number, text: string) {
-    try {
-      await createMutation.mutateAsync({
-        target_type: 'POST',
-        target_id: postId,
-        parent_comment_id: parentId,
-        content: text,
-      })
-    } catch {
-      toast.error(t('comment.replyError', 'Không thể gửi câu trả lời.'))
-    }
-  }
-
-  async function handleUpdate(commentId: number, text: string) {
-    try {
-      await updateMutation.mutateAsync({
-        commentId,
-        payload: { content: text },
-      })
-      toast.success(t('comment.updateSuccess', 'Đã cập nhật bình luận.'))
-    } catch {
-      toast.error(t('comment.updateError', 'Không thể cập nhật bình luận.'))
-    }
-  }
-
-  async function handleDelete(commentId: number) {
-    try {
-      await deleteMutation.mutateAsync(commentId)
-      toast.success(t('comment.deleteSuccess', 'Đã xóa bình luận.'))
-    } catch {
-      toast.error(t('comment.deleteError', 'Không thể xóa bình luận.'))
-    }
-  }
-
-  const comments = data?.items || []
-
-  function renderCommentsList() {
-    if (isError) {
-      return (
-        /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Comment list error state container] */
-        <div className="text-center py-2 space-y-1">
-          <Text size="xs" tone="danger">
-            {t('comment.loadError', 'Không thể tải danh sách bình luận.')}
-          </Text>
-          <Button
-            variant="link"
-            tone="accent"
-            size="sm"
-            onClick={() => { void refetch() }}
-            className="text-xs"
-          >
-            {t('common.retry', 'Thử lại')}
-          </Button>
-        </div>
-      )
-    }
-
-    if (isLoading) {
-      return (
-        <Text size="xs" tone="muted" className="italic text-center py-2">
-          {t('comment.loading', 'Đang tải bình luận...')}
-        </Text>
-      )
-    }
-
-    if (comments.length > 0) {
-      return (
-        <section aria-label="Danh sách bình luận" className="space-y-3 pt-1">
-          {comments.map((comment) => (
-            <CommentItem
-              key={comment.comment_id}
-              comment={comment}
-              currentUserId={currentUser?.user_id}
-              isStaff={isStaff}
-              onReply={handleReply}
-              onUpdate={handleUpdate}
-              onDelete={handleDelete}
-            />
-          ))}
-        </section>
-      )
-    }
-
-    return (
-      <Text size="xs" tone="muted" className="italic text-center py-1">
-        {t('comment.empty', 'Chưa có bình luận nào. Hãy là người đầu tiên thảo luận!')}
-      </Text>
-    )
-  }
-
+  const user = useAuthStore((state) => state.user)
+  const [sort, setSort] = useState<'newest' | 'oldest'>('newest')
+  const query = useInfinitePostCommentsQuery(postId, undefined, true, sort)
+  const create = useCreateCommentMutation(postId)
+  const update = useUpdateCommentMutation(postId)
+  const remove = useDeleteCommentMutation(postId)
+  const comments = query.data?.pages.flatMap((page) => page.items ?? []) ?? []
+  const send = (content: string, media_url?: string, parent_comment_id?: number) =>
+    create.mutateAsync({
+      target_type: 'POST',
+      target_id: postId,
+      content,
+      media_url,
+      parent_comment_id,
+    })
   return (
-    <section aria-label="Bình luận bài viết" className="pt-3 border-t border-line-subtle space-y-3">
-      {/* Input Form */}
-      {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Flex container for comment input] */}
-      <div className="flex items-center gap-2.5">
-        <Avatar
-          src={currentUserAvatar}
-          name={currentUserName}
-          fallback={currentUserName.charAt(0)}
-          size="sm"
-          tone="accent"
+    <section
+      aria-label={t('social.comments')}
+      className="space-y-4 border-t border-line-subtle pt-4"
+    >
+      <CommentForm label={t('social.commentInput')} onSend={(text, media) => send(text, media)} />
+      <Select
+        ariaLabel={t('social.commentList')}
+        value={sort}
+        clearable={false}
+        onValueChange={(value) => setSort(value as typeof sort)}
+        options={[
+          { value: 'newest', label: t('social.sortNewest') },
+          { value: 'oldest', label: t('social.sortOldest') },
+        ]}
+      />
+      {query.isPending || (query.isError && !query.data) ? (
+        <QueryFeedback pending={query.isPending} error={query.error} onRetry={query.refetch} />
+      ) : null}
+      {query.isSuccess && comments.length === 0 ? (
+        <p className="text-sm text-text-muted">{t('comment.empty')}</p>
+      ) : null}
+      {comments.map((comment) => (
+        <CommentItem
+          key={comment.comment_id}
+          comment={comment}
+          postId={postId}
+          currentUserId={user?.user_id ?? Number(user?.userId)}
+          isStaff={user?.role === 'ADMIN'}
+          onReply={(parentId, text, media) => send(text, media, parentId)}
+          onUpdate={(commentId, content, media_url) =>
+            update.mutateAsync({
+              commentId,
+              payload: { content, ...(media_url ? { media_url } : {}) },
+            })
+          }
+          onDelete={(commentId) => remove.mutateAsync(commentId)}
         />
-        <Form onSubmit={handleSendComment} noValidate className="flex-1 flex gap-2">
-          <FormField className="flex-1 mb-0">
-            <Input
-              aria-label="Viết bình luận"
-              placeholder={t('comment.inputPlaceholder', 'Viết câu trả lời hoặc thảo luận...')}
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              className="text-xs h-10 rounded-full bg-surface-hover"
-            />
-          </FormField>
-          <SubmitButton
-            loading={createMutation.isPending}
-            disabled={!commentText.trim()}
-            variant="primary"
-            size="sm"
-            className="rounded-full w-11 h-11 p-0 shrink-0 min-h-11 min-w-11"
-            aria-label="Gửi bình luận"
-          >
-            <Send size={15} />
-          </SubmitButton>
-        </Form>
-      </div>
-
-      {/* Comments List */}
-      {renderCommentsList()}
+      ))}
+      <LoadMore query={query} />
     </section>
   )
 }

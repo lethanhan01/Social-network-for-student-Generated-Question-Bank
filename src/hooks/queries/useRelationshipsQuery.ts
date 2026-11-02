@@ -50,6 +50,8 @@ export function useSendFriendRequestMutation() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.relationships.all })
       void queryClient.invalidateQueries({ queryKey: queryKeys.users.all })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.feed.all })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
     },
   })
 }
@@ -57,11 +59,13 @@ export function useSendFriendRequestMutation() {
 export function useAcceptFriendRequestMutation() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (payload: AcceptFriendRequestDto) => relationshipService.acceptFriendRequest(payload),
+    mutationFn: (payload: AcceptFriendRequestDto) =>
+      relationshipService.acceptFriendRequest(payload),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.relationships.all })
       void queryClient.invalidateQueries({ queryKey: queryKeys.users.all })
-      void queryClient.invalidateQueries({ queryKey: queryKeys.feed.activity() })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.feed.all })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
     },
   })
 }
@@ -84,6 +88,8 @@ export function useUnfriendMutation() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.relationships.all })
       void queryClient.invalidateQueries({ queryKey: queryKeys.users.all })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.feed.all })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
     },
   })
 }
@@ -95,7 +101,8 @@ export function useBlockUserMutation() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.relationships.all })
       void queryClient.invalidateQueries({ queryKey: queryKeys.users.all })
-      void queryClient.invalidateQueries({ queryKey: queryKeys.feed.activity() })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.feed.all })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
     },
   })
 }
@@ -107,6 +114,8 @@ export function useUnblockUserMutation() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.relationships.all })
       void queryClient.invalidateQueries({ queryKey: queryKeys.users.all })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.feed.all })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
     },
   })
 }

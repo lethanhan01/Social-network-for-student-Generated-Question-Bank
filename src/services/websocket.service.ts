@@ -24,6 +24,10 @@ class WebSocketService {
     return this.status
   }
 
+  public onConnection(callback: (connected: boolean) => void): () => void {
+    return this.onStatusChange((status) => callback(status === 'CONNECTED'))
+  }
+
   public onStatusChange(callback: (status: WsConnectionStatus) => void): () => void {
     this.statusListeners.add(callback)
     callback(this.status)
@@ -42,7 +46,10 @@ class WebSocketService {
     if (!token || this.client?.active) return
 
     this.setStatus('CONNECTING')
-    const rawWsUrl = import.meta.env.VITE_WS_URL || 'wss://snsqb.duckdns.org/api/v1/ws'
+    const apiUrl = new URL(import.meta.env.VITE_API_URL || '/api/v1', window.location.origin)
+    apiUrl.protocol = apiUrl.protocol === 'https:' ? 'wss:' : 'ws:'
+    apiUrl.pathname = `${apiUrl.pathname.replace(/\/$/, '')}/ws`
+    const rawWsUrl = import.meta.env.VITE_WS_URL || apiUrl.toString()
     const normalizedWsUrl = rawWsUrl.endsWith('/websocket')
       ? rawWsUrl
       : `${rawWsUrl.replace(/\/+$/, '')}/websocket`
@@ -64,6 +71,11 @@ class WebSocketService {
       },
       onDisconnect: () => {
         this.isConnected = false
+        this.setStatus('DISCONNECTED')
+      },
+      onWebSocketClose: () => {
+        this.isConnected = false
+        this.activeTypingSubs.clear()
         this.setStatus('DISCONNECTED')
       },
       onStompError: (frame) => {

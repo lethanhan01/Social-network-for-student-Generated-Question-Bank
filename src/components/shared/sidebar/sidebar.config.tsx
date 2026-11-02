@@ -10,16 +10,20 @@ import {
   CalendarCheck,
   ShoppingBag,
   Gamepad2,
-  GraduationCap,
-  FilePenLine,
+  PenLine,
+  Play,
 } from 'lucide-react'
 import type { NavSection } from './sidebar.types'
+import i18n from '@/lib/i18n'
 
 export function getSQBNavSections(): NavSection[] {
   return [
     {
       label: 'Học tập & Đề thi',
       items: [
+        { label: i18n.t('academic:subjects.title'), to: '/subjects', icon: <BookOpen size={20} /> },
+        { label: i18n.t('academic:proposals.title'), to: '/proposals', icon: <PenLine size={20} /> },
+        { label: i18n.t('academic:practice.title'), to: '/practice', icon: <Play size={20} /> },
         {
           label: 'Tổng quan',
           to: '/dashboard',
@@ -34,16 +38,6 @@ export function getSQBNavSections(): NavSection[] {
           label: 'Ngân hàng câu hỏi',
           to: '/questions',
           icon: <HelpCircle size={20} />,
-        },
-        {
-          label: 'Môn học',
-          to: '/subjects',
-          icon: <GraduationCap size={20} />,
-        },
-        {
-          label: 'Phiên đề xuất câu hỏi',
-          to: '/proposals',
-          icon: <FilePenLine size={20} />,
         },
         {
           label: 'Mạng xã hội học tập',

@@ -69,12 +69,12 @@ describe('commentService', () => {
 
     expect(api.get).toHaveBeenCalledWith('/comments', {
       params: {
-        limit: 50,
+        limit: undefined,
         sort: 'newest',
         target_type: 'POST',
         target_id: 60,
         parent_comment_id: 5,
-        after: 12,
+        after: '12',
       },
       signal: undefined,
     })

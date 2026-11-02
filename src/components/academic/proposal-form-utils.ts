@@ -94,7 +94,7 @@ function isValidUrl(value: string): boolean {
 export function validateDraft(draft: ProposalDraft): ProposalErrors {
   const errors: ProposalErrors = {}
   if (!draft.title.trim()) errors.title = 'titleRequired'
-  if (!draft.subjectId) errors.subject = 'subjectRequired'
+  if (!draft.subjectId || !Number.isSafeInteger(Number(draft.courseClassId)) || Number(draft.courseClassId) <= 0) errors.subject = 'subjectRequired'
   if (draft.sourceUrl.trim() && !isValidUrl(draft.sourceUrl.trim())) errors.sourceUrl = 'sourceUrlInvalid'
   if (draft.questions.length === 0) errors.questions = 'questionsRequired'
   draft.questions.forEach((question) => {
@@ -118,8 +118,7 @@ export function toProposeRequest(draft: ProposalDraft): ProposeSessionRequest {
     title: draft.title.trim(),
     content: draft.content.trim() || undefined,
     source_url: draft.sourceUrl.trim() || undefined,
-    subject_id: Number(draft.subjectId),
-    ...(draft.courseClassId ? { course_class_id: Number(draft.courseClassId), courseClassId: Number(draft.courseClassId) } : {}),
+    course_class_id: Number(draft.courseClassId),
     questions: draft.questions.map((question) => ({
       content: question.content.trim(),
       options: toOptions(question),
@@ -136,7 +135,6 @@ export function toUpdateRequest(draft: ProposalDraft): UpdateSubmissionSessionRe
     content: draft.content.trim() || undefined,
     source_url: draft.sourceUrl.trim() || undefined,
     subject_id: Number(draft.subjectId),
-    ...(draft.courseClassId ? { course_class_id: Number(draft.courseClassId), courseClassId: Number(draft.courseClassId) } : {}),
     questions: draft.questions.map((question) => ({
       question_id: question.questionId,
       content: question.content.trim(),

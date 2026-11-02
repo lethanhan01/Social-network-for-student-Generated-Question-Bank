@@ -16,7 +16,7 @@ import {
 import { Skeleton } from '@/components/ui/feedback'
 import { Flex } from '@/components/ui/layout'
 import {
-  useEnrolledSubjectsQuery,
+  useEnrolledCourseClassesQuery,
   useMySubmissionDetailQuery,
   useProposeSessionMutation,
   useUpdateSubmissionMutation,
@@ -56,12 +56,12 @@ export function ProposalForm({ initialDraft, editSessionId, onDone }: Readonly<P
   const { t } = useTranslation('academic')
   const [draft, setDraft] = useState(initialDraft)
   const [errors, setErrors] = useState<ProposalErrors>({})
-  const subjectsQuery = useEnrolledSubjectsQuery()
+  const subjectsQuery = useEnrolledCourseClassesQuery()
   const proposeMutation = useProposeSessionMutation()
   const updateMutation = useUpdateSubmissionMutation()
   const isEdit = editSessionId !== undefined
   const pending = proposeMutation.isPending || updateMutation.isPending
-  const subjects = subjectsQuery.data ?? []
+  const subjects = (subjectsQuery.data ?? []).filter((item) => item.can_propose === true)
 
   function clearError(...keys: string[]) {
     setErrors((prev) => {

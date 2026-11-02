@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { renderWithQueryClient } from '@/test/query-test-utils'
@@ -7,7 +7,12 @@ import { userService } from '@/services/user.service'
 import { gamificationService } from '@/services/gamification.service'
 import { postService } from '@/services/post.service'
 import { useAuthStore } from '@/stores/authStore'
+import { relationshipService } from '@/services/relationship.service'
 import ProfilePage from './ProfilePage'
+
+vi.mock('@/services/relationship.service', () => ({
+  relationshipService: { getRelationshipStats: vi.fn() },
+}))
 
 vi.mock('@/services/user.service', () => ({
   userService: {
@@ -31,8 +36,27 @@ vi.mock('@/services/post.service', () => ({
 }))
 
 describe('ProfilePage Component', () => {
+  it('updates the current account name after saving the profile', async () => {
+    const user = userEvent.setup()
+    vi.mocked(userService.updateMyProfile).mockResolvedValue({ user_id: 100, role: 'STUDENT', full_name: 'Updated account name' })
+    renderWithQueryClient(<MemoryRouter initialEntries={['/profile/me']}><Routes><Route path="/profile/:userId" element={<ProfilePage />} /></Routes></MemoryRouter>)
+    await user.click(await screen.findByRole('button', { name: 'Chỉnh sửa hồ sơ' }))
+    const name = screen.getByRole('textbox', { name: 'Họ và tên' })
+    await user.clear(name)
+    await user.type(name, 'Updated account name')
+    await user.click(screen.getByRole('button', { name: 'Lưu thay đổi' }))
+    await waitFor(() => expect(useAuthStore.getState().user?.fullName).toBe('Updated account name'))
+  })
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(relationshipService.getRelationshipStats).mockResolvedValue({
+      relationship_with_me: {
+        friend: false,
+        following: false,
+        blocked: false,
+        friend_request_status: 'NONE',
+      },
+    })
     useAuthStore.setState({
       user: {
         user_id: 100,
@@ -48,7 +72,11 @@ describe('ProfilePage Component', () => {
       items: [],
       pagination: { has_next: false },
     })
-    vi.mocked(userService.getMyProfile).mockResolvedValue({ user_id: 100, role: 'STUDENT', full_name: 'Nguyễn Văn Minh' })
+    vi.mocked(userService.getMyProfile).mockResolvedValue({
+      user_id: 100,
+      role: 'STUDENT',
+      full_name: 'Nguyễn Văn Minh',
+    })
 
     vi.mocked(gamificationService.getMyBadges).mockResolvedValue([
       { badge_id: 1, name: 'Chiến binh Giải tích', description: 'Đạt 10 bài điểm tối đa' },
@@ -108,15 +136,31 @@ describe('ProfilePage Component', () => {
   })
 
   it('opens the user report dialog from another profile', async () => {
-    vi.mocked(userService.getUserProfile).mockResolvedValue({ user_id: 200, role: 'STUDENT', full_name: 'Hoàng Thị Lan' })
-    renderWithQueryClient(<MemoryRouter initialEntries={['/profile/200']}><Routes><Route path="/profile/:userId" element={<ProfilePage />} /></Routes></MemoryRouter>)
+    vi.mocked(userService.getUserProfile).mockResolvedValue({
+      user_id: 200,
+      role: 'STUDENT',
+      full_name: 'Hoàng Thị Lan',
+    })
+    renderWithQueryClient(
+      <MemoryRouter initialEntries={['/profile/200']}>
+        <Routes>
+          <Route path="/profile/:userId" element={<ProfilePage />} />
+        </Routes>
+      </MemoryRouter>
+    )
     await userEvent.click(await screen.findByRole('button', { name: 'Gửi báo cáo' }))
     expect(await screen.findByRole('dialog')).toBeInTheDocument()
   })
 
   it('recognizes my numeric route when the auth user uses the userId alias', async () => {
     useAuthStore.setState({ user: { userId: '100', roles: ['STUDENT'] } })
-    renderWithQueryClient(<MemoryRouter initialEntries={['/profile/100']}><Routes><Route path="/profile/:userId" element={<ProfilePage />} /></Routes></MemoryRouter>)
+    renderWithQueryClient(
+      <MemoryRouter initialEntries={['/profile/100']}>
+        <Routes>
+          <Route path="/profile/:userId" element={<ProfilePage />} />
+        </Routes>
+      </MemoryRouter>
+    )
     expect(await screen.findByRole('button', { name: /Chỉnh sửa hồ sơ/ })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Gửi báo cáo' })).not.toBeInTheDocument()
   })

@@ -1,95 +1,68 @@
-import { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { BackButton } from '@/components/ui/actions'
-import { Badge } from '@/components/ui/data-display'
-import { ProgressBar } from '@/components/ui/feedback'
-import { Page, PageEmptyState, PageErrorState, PageHeader, PageSkeleton } from '@/components/ui/layout'
-import { PracticeQuestionCard } from '@/components/academic/PracticeQuestionCard'
-import { QuestionRatingModal } from '@/components/academic/QuestionRatingModal'
-import { useSessionQuestionsQuery } from '@/hooks/queries'
-import { getApiError } from '@/lib/api-error'
+import { useQueryClient } from '@tanstack/react-query'
+import { queryKeys } from '@/lib/query-keys'
+import { AcademicLayout } from '@/components/academic/AcademicLayout'
+import { AcademicFeedback } from '@/components/academic/AcademicFeedback'
+import { useAcademicSessionsQuery, useSessionQuestionsQuery } from '@/hooks/queries/useAcademicQuery'
+import { ButtonLink } from '@/components/ui/actions/Button'
+import { Button } from '@/components/ui/actions/Button'
+import { Card } from '@/components/ui/data-display/Card'
+import { canPracticeSession, positiveId, type AcademicSession } from '@/types/academic.types'
+import { PracticeQuestion } from './PracticeQuestion'
 
 export default function PracticePage() {
   const { t } = useTranslation('academic')
-  const { sessionId: sessionIdParam } = useParams<{ sessionId: string }>()
-  const sessionId = Number(sessionIdParam)
-  const sessionQuery = useSessionQuestionsQuery(sessionId)
-  const [results, setResults] = useState<Record<number, boolean | undefined>>({})
-  const [ratedIds, setRatedIds] = useState<number[]>([])
-  const [ratingTarget, setRatingTarget] = useState<number | undefined>()
-
-  const session = sessionQuery.data
-  const questions = session?.questions ?? []
-  const answeredCount = questions.filter(
-    (question) => question.my_interaction?.answered || (question.question_id ?? 0) in results
-  ).length
-  const correctCount = Object.values(results).filter(Boolean).length
-
-  function handleAnswered(questionId: number, isCorrect: boolean | undefined) {
-    setResults((prev) => ({ ...prev, [questionId]: isCorrect }))
-  }
-
-  function renderBody() {
-    if (!Number.isFinite(sessionId) || sessionId <= 0) {
-      return <PageEmptyState title={t('practice.invalidSession')} />
-    }
-    if (sessionQuery.isLoading) return <PageSkeleton rows={3} />
-    if (sessionQuery.isError) {
-      return (
-        <PageErrorState
-          message={getApiError(sessionQuery.error, t('practice.loadError'))}
-          onRetry={() => void sessionQuery.refetch()}
-        />
-      )
-    }
-    if (questions.length === 0) {
-      return <PageEmptyState title={t('practice.empty.title')} description={t('practice.empty.description')} />
-    }
-    return (
-      <>
-        <ProgressBar
-          value={answeredCount}
-          max={questions.length}
-          tone="accent"
-          label={t('practice.progress', { answered: answeredCount, total: questions.length })}
-          hint={t('practice.correctCount', { count: correctCount })}
-        />
-        <ol className="space-y-4" aria-label={t('practice.listLabel')}>
-          {questions.map((question, index) => (
-            <li key={question.question_id}>
-              <PracticeQuestionCard
-                question={question}
-                index={index}
-                rated={ratedIds.includes(question.question_id ?? 0)}
-                onAnswered={handleAnswered}
-                onRate={setRatingTarget}
-              />
-            </li>
-          ))}
-        </ol>
-      </>
-    )
-  }
-
+  const client = useQueryClient()
+  const { sessionId: rawId } = useParams()
+  const id = positiveId(rawId)
+  const [params, setParams] = useSearchParams()
+  const subjectId = positiveId(params.get('subjectId'))
+  const sessions = useAcademicSessionsQuery('RESOLVED', !rawId)
+  const query = useSessionQuestionsQuery(id)
+  const questions = query.data?.questions ?? []
+  const rawIndex = Number(params.get('question'))
+  const index = Number.isSafeInteger(rawIndex) && rawIndex >= 0 ? rawIndex : 0
+  const validIndex = /^\d+$/.test(params.get('question') ?? '0') && Number.isSafeInteger(rawIndex) && rawIndex >= 0
+  const current = validIndex ? questions[index] : undefined
+  const list = (sessions.data?.pages.flatMap((page) => page.contents ?? []) ?? []).filter((session) =>
+    (!subjectId || session.subject_id === subjectId) &&
+    (!('status' in session) || canPracticeSession(session as AcademicSession)))
   return (
-    <Page>
-      <BackButton to="/proposals" label={t('common.back')} />
-      <PageHeader
-        eyebrow={session?.subject_code ?? t('eyebrow')}
-        title={session?.title ?? t('practice.title')}
-        description={session?.content ?? t('practice.description')}
-        actions={
-          session?.subject_name ? <Badge tone="accent">{session.subject_name}</Badge> : undefined
-        }
-      />
-      {renderBody()}
-      <QuestionRatingModal
-        questionId={ratingTarget}
-        sessionId={Number.isFinite(sessionId) ? sessionId : undefined}
-        onClose={() => setRatingTarget(undefined)}
-        onRated={(questionId) => setRatedIds((prev) => [...prev, questionId])}
-      />
-    </Page>
+    <AcademicLayout title={query.data?.title ?? t('practice.title')} subtitle={t('practice.subtitle')}>
+      {rawId && !id ? <AcademicFeedback empty={t('practice.invalid')} /> : !id ? (
+        sessions.isPending ? <AcademicFeedback pending /> : sessions.isError ? <AcademicFeedback error={sessions.error} onRetry={sessions.refetch} /> : (
+          <section className="space-y-4">
+            {list.length === 0 ? <AcademicFeedback empty={t('practice.empty')} /> : list.map((session) => (
+              <Card as="article" key={session.session_id} className="space-y-4 rounded-2xl">
+                <h2 className="text-lg font-bold">{session.title}</h2><p className="text-sm text-text-muted">{session.subject_name}</p>
+                {session.session_id ? <ButtonLink to={`/practice/${session.session_id}`} variant="primary">{t('practice.open')}</ButtonLink> : null}
+              </Card>
+            ))}
+            {sessions.hasNextPage ? <Button loading={sessions.isFetchingNextPage} onClick={() => { void sessions.fetchNextPage() }}>{t('loadMore')}</Button> : null}
+          </section>
+        )
+      ) : query.isPending ? <AcademicFeedback pending /> : query.isError ? <AcademicFeedback error={query.error} onRetry={query.refetch} /> : !current ? (
+        <section className="space-y-3">
+          <AcademicFeedback empty={t(questions.length ? (validIndex && index === questions.length && params.get('completed') === '1' ? 'practice.completed' : 'practice.invalid') : 'practice.empty')} />
+          {questions.length > 0 ? <Button onClick={() => {
+            questions.forEach((question) => client.removeQueries({ queryKey: queryKeys.practice.answer(question.question_id ?? 0, question.updated_at) }))
+            setParams((previous) => { const next = new URLSearchParams(previous); next.set('question', '0'); next.delete('completed'); return next })
+          }}>{t('practice.restart')}</Button> : null}
+        </section>
+      ) : (
+        <section className="space-y-4">
+          <p className="text-sm text-text-muted">{t('practice.progress', { current: index + 1, total: questions.length })}</p>
+          <PracticeQuestion key={`${id}-${index}-${current.question_id}-${current.updated_at}`} question={current} sessionId={id} questionIndex={index}
+            onNext={() => setParams((previous) => {
+              const next = new URLSearchParams(previous)
+              next.set('question', String(index + 1))
+              if (index + 1 === questions.length) next.set('completed', '1')
+              return next
+            })} />
+        </section>
+      )}
+      {id ? <ButtonLink to="/practice" variant="ghost">{t('practice.choose')}</ButtonLink> : null}
+    </AcademicLayout>
   )
 }

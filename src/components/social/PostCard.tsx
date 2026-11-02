@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ThumbsUp } from 'lucide-react'
 import { Card } from '@/components/ui/data-display'
@@ -12,7 +13,10 @@ import { PostMediaGrid } from './PostMediaGrid'
 import { PostCardHeader } from './PostCardHeader'
 import { PostCardActions } from './PostCardActions'
 import { toast } from '@/lib/toast'
-import { useToggleReactionMutation } from '@/hooks/queries/usePostsQuery'
+import { useDeletePostMutation } from '@/hooks/queries/usePostsQuery'
+import { usePostReaction } from '@/hooks/usePostReaction'
+import { ConfirmDialog } from '@/components/ui/overlay/ConfirmDialog'
+import { EditPostModal } from './EditPostModal'
 import { getApiError } from '@/lib/api-error'
 import type { PostResponseDto } from '@/types'
 
@@ -31,35 +35,33 @@ export function PostCard({
 }: Readonly<PostCardProps>) {
   const { t } = useTranslation()
   const currentRole = useAuthStore((s) => s.user?.role)
+  const userId = useAuthStore((s) => s.user?.user_id ?? Number(s.user?.userId))
   const isLecturer = currentRole === 'LECTURER'
+  const canManage = Boolean(userId && post.author?.user_id === userId)
+  const [editing, setEditing] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const remove = useDeletePostMutation()
+  const navigate = useNavigate()
+  const { pathname } = useLocation()
 
   const [showComments, setShowComments] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const [isReportOpen, setIsReportOpen] = useState(false)
   const [isLecturerNoteOpen, setIsLecturerNoteOpen] = useState(false)
-  const [localReacted, setLocalReacted] = useState(post.reacted_by_me || false)
-  const [localReactCount, setLocalReactCount] = useState(post.react_count || 0)
-  const [reactPending, setReactPending] = useState(false)
-  const reactionMutation = useToggleReactionMutation()
+  const reaction = usePostReaction(post, onToggleReact)
 
   const content = post.content || ''
   const isLongText = content.length > 200
 
-  async function handleReact(type: 'LIKE' | 'LOVE' | 'WOW' = 'LIKE') {
-    if (reactPending || !post.post_id) return
-    setReactPending(true)
-    const nextReacted = !localReacted
-    setLocalReacted(nextReacted)
-    setLocalReactCount((prev) => (nextReacted ? prev + 1 : Math.max(0, prev - 1)))
+  async function deletePost() {
+    if (!post.post_id || remove.isPending) return
     try {
-      if (onToggleReact) await onToggleReact(post.post_id, type)
-      else await reactionMutation.mutateAsync({ target_type: 'POST', target_id: post.post_id, reaction_type: type })
+      await remove.mutateAsync(post.post_id)
+      toast.success(t('social.postDeleted'))
+      setDeleting(false)
+      if (pathname === `/posts/${post.post_id}`) navigate('/feed', { replace: true })
     } catch (error) {
-      setLocalReacted(!nextReacted)
-      setLocalReactCount((prev) => (!nextReacted ? prev + 1 : Math.max(0, prev - 1)))
       toast.error(getApiError(error, t('zone2.actionError')))
-    } finally {
-      setReactPending(false)
     }
   }
 
@@ -83,6 +85,9 @@ export function PostCard({
         onOpenLecturerNote={() => setIsLecturerNoteOpen(true)}
         onOpenReport={() => setIsReportOpen(true)}
         onCopyLink={handleCopyLink}
+        canManage={canManage}
+        onEdit={() => setEditing(true)}
+        onDelete={() => setDeleting(true)}
       />
 
       {/* Post Body Content */}
@@ -124,7 +129,7 @@ export function PostCard({
       <footer className="flex items-center justify-between text-xs text-text-muted pt-1 border-t border-line-subtle">
         <strong className="font-normal flex items-center gap-1">
           <ThumbsUp size={13} className="text-action-accent" />
-          {localReactCount} {t('post.likeCountUnit', 'lượt tương tác')}
+          {reaction.count} {t('post.likeCountUnit', 'lượt tương tác')}
         </strong>
         <Button
           variant="link"
@@ -139,9 +144,9 @@ export function PostCard({
 
       {/* Action Buttons */}
       <PostCardActions
-        disabled={reactPending || !post.post_id}
-        localReacted={localReacted}
-        onReact={handleReact}
+        disabled={reaction.pending || !post.post_id}
+        localReacted={reaction.reacted}
+        onReact={reaction.react}
         onToggleComments={() => setShowComments((prev) => !prev)}
         onShare={handleCopyLink}
       />
@@ -164,7 +169,19 @@ export function PostCard({
       />
 
       {/* Lecturer Note Modal */}
-      {post.post_id ? (
+      {editing ? <EditPostModal post={post} onClose={() => setEditing(false)} /> : null}
+      <ConfirmDialog
+        open={deleting}
+        title={t('social.deletePost')}
+        description={t('social.deletePostConfirm')}
+        variant="danger"
+        loading={remove.isPending}
+        onClose={() => {
+          if (!remove.isPending) setDeleting(false)
+        }}
+        onConfirm={deletePost}
+      />
+      {post.post_id && isLecturerNoteOpen ? (
         <LecturerNoteModal
           isOpen={isLecturerNoteOpen}
           postId={post.post_id}

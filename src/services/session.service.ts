@@ -1,4 +1,5 @@
 import api, { requestData, type GlobalResponse } from './api'
+import type { EnrolledCourseClass } from '@/types/academic.types'
 import type {
   ProposeSessionRequest,
   ProposeSessionResponse,
@@ -7,17 +8,6 @@ import type {
   UpdateSubmissionSessionRequest,
   SubjectResponse,
 } from '@/types'
-
-export interface EnrolledSubjectResponse extends SubjectResponse {
-  course_class_id?: number
-  class_code?: string
-  subject_code?: string
-  subject_name?: string
-  semester_id?: number
-  semester_name?: string
-  active_semester?: boolean
-  can_propose?: boolean
-}
 
 export const sessionService = {
   async proposeSession(payload: ProposeSessionRequest): Promise<ProposeSessionResponse> {
@@ -51,7 +41,7 @@ export const sessionService = {
 
   async updateMySubmissionSession(
     sessionId: number,
-    payload: UpdateSubmissionSessionRequest
+    payload: UpdateSubmissionSessionRequest & { course_class_id?: number }
   ): Promise<void> {
     await api.put<GlobalResponse<void>>(`/sessions/my-submissions/${sessionId}`, payload)
   },
@@ -60,11 +50,14 @@ export const sessionService = {
     await api.delete<GlobalResponse<void>>(`/sessions/my-submissions/${sessionId}`)
   },
 
-  async getMyEnrolledSubjects(options?: { signal?: AbortSignal }): Promise<EnrolledSubjectResponse[]> {
-    return requestData<EnrolledSubjectResponse[]>(
-      api.get<GlobalResponse<EnrolledSubjectResponse[]>>('/sessions/my-enrolled-course-classes', {
-        signal: options?.signal,
-      })
-    )
+  async getMyEnrolledSubjects(options?: { signal?: AbortSignal }): Promise<SubjectResponse[]> {
+    const classes = await sessionService.getMyEnrolledCourseClasses(options)
+    return Array.from(new Map(classes.filter((item) => item.subject_id != null).map((item) => [item.subject_id,
+      { subject_id: item.subject_id, code: item.subject_code, name: item.subject_name }])).values())
+  },
+
+  async getMyEnrolledCourseClasses(options?: { signal?: AbortSignal }): Promise<EnrolledCourseClass[]> {
+    return requestData<EnrolledCourseClass[]>(api.get<GlobalResponse<EnrolledCourseClass[]>>(
+      '/sessions/my-enrolled-course-classes', { signal: options?.signal }))
   },
 }

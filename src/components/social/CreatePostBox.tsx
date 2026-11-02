@@ -3,17 +3,16 @@ import { Card, Avatar } from '@/components/ui/data-display'
 import { Button } from '@/components/ui/actions'
 import { Separator } from '@/components/ui/layout'
 import type { ProfileResponse } from '@/types'
+import { useTranslation } from 'react-i18next'
 
 interface CreatePostBoxProps {
   user?: ProfileResponse
   onOpenCreateModal: () => void
 }
 
-export function CreatePostBox({
-  user,
-  onOpenCreateModal,
-}: Readonly<CreatePostBoxProps>) {
-  const displayName = user?.full_name || 'Bạn'
+export function CreatePostBox({ user, onOpenCreateModal }: Readonly<CreatePostBoxProps>) {
+  const { t } = useTranslation()
+  const displayName = user?.full_name || t('social.member')
   const initials = displayName.trim().charAt(0).toUpperCase()
 
   return (
@@ -34,7 +33,7 @@ export function CreatePostBox({
           onClick={onOpenCreateModal}
           className="flex-1 justify-start text-text-muted hover:text-text-primary bg-surface-hover rounded-full px-4 h-11 text-sm font-normal border border-line-subtle"
         >
-          Bạn muốn thảo luận bài tập hoặc chia sẻ tài liệu gì hôm nay?
+          {t('social.composerPrompt')}
         </Button>
       </div>
 
@@ -50,8 +49,7 @@ export function CreatePostBox({
           className="justify-center gap-2 text-xs min-h-11"
           leftIcon={<HelpCircle size={18} className="text-tone-warning" />}
         >
-          <strong className="font-normal hidden sm:inline">Hỏi bài tập</strong>
-          <strong className="font-normal sm:hidden">Hỏi bài</strong>
+          <strong className="font-normal">{t('social.discussion')}</strong>
         </Button>
         <Button
           variant="ghost"
@@ -60,8 +58,7 @@ export function CreatePostBox({
           className="justify-center gap-2 text-xs min-h-11"
           leftIcon={<ImageIcon size={18} className="text-action-accent" />}
         >
-          <strong className="font-normal hidden sm:inline">Ảnh / Tài liệu</strong>
-          <strong className="font-normal sm:hidden">Tài liệu</strong>
+          <strong className="font-normal">{t('social.attachment')}</strong>
         </Button>
         <Button
           variant="ghost"
@@ -70,8 +67,7 @@ export function CreatePostBox({
           className="justify-center gap-2 text-xs min-h-11"
           leftIcon={<Sparkles size={18} className="text-tone-info" />}
         >
-          <strong className="font-normal hidden sm:inline">Đố vui nhanh</strong>
-          <strong className="font-normal sm:hidden">Đố vui</strong>
+          <strong className="font-normal">{t('social.share')}</strong>
         </Button>
       </div>
     </Card>
