@@ -37,25 +37,19 @@ export function PostMediaGrid({ media }: Readonly<PostMediaGridProps>) {
                   aria-label={item.name || 'Video bài viết'}
                 />
               ) : (
-                /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Image clickable wrapper] */
-                <div
-                  className="w-full h-full cursor-pointer hover:scale-105 transition-transform"
-                  role="button"
-                  tabIndex={0}
+                /* rogym-convention-exempt: NO_RAW_INTERACTIVE_ELEMENTS [Accessible image button for modal viewer] */
+                <button
+                  type="button"
+                  className="w-full h-full cursor-pointer hover:scale-105 transition-transform bg-transparent p-0 border-0 block text-left"
                   onClick={() => setSelectedImage(item.url || null)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault()
-                      setSelectedImage(item.url || null)
-                    }
-                  }}
+                  aria-label={item.name || `Hình ảnh bài viết ${idx + 1}`}
                 >
                   <Image
                     src={item.url}
                     alt={item.name || `Hình ảnh bài viết ${idx + 1}`}
                     className="w-full h-full object-cover"
                   />
-                </div>
+                </button>
               )}
             </div>
           )
