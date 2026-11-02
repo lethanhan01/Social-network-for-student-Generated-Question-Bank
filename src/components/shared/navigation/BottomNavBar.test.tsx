@@ -21,7 +21,7 @@ describe('BottomNavBar', () => {
 
     expect(screen.getByRole('link', { name: /bạn bè & kết nối/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /ngân hàng câu hỏi/i })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /cửa hàng & túi đồ/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /ngân hàng đề thi/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /đấu trường minigame/i })).toBeInTheDocument()
 
     // No visible text inside the links

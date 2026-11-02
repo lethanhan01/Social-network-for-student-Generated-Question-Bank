@@ -1,4 +1,5 @@
-import { NavLink, useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
+import { ButtonLink } from '@/components/ui/actions/Button'
 import { useTranslation } from 'react-i18next'
 import { Tooltip } from '@/components/ui/overlay'
 import { PRIMARY_NAV_ITEMS } from '@/config/navigation.config'
@@ -25,19 +26,21 @@ export function TopbarNav({ className }: Readonly<TopbarNavProps>) {
 
         return (
           <Tooltip key={item.id} content={label} side="bottom" delayDuration={300}>
-            <NavLink
+            <ButtonLink
               to={item.to}
+              variant="ghost"
               aria-label={label}
+              aria-current={isActive ? 'page' : undefined}
               title={label}
               className={cn(
-                'h-full flex-1 max-w-[110px] min-w-[56px] px-2 flex items-center justify-center transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-line-focus min-h-11',
+                'h-full flex-1 max-w-24 min-w-11 rounded-none px-2 flex items-center justify-center transition-colors duration-200 min-h-11 border-b-2',
                 isActive
-                  ? 'border-b-[3px] border-action-accent text-action-accent font-semibold'
-                  : 'border-b-[3px] border-transparent text-fg-muted hover:text-fg-primary hover:bg-surface-card-hover hover:rounded-xl'
+                  ? 'border-action-accent text-action-accent font-semibold'
+                  : 'border-transparent text-fg-muted hover:text-fg-primary hover:bg-surface-card-hover'
               )}
             >
               {item.icon}
-            </NavLink>
+            </ButtonLink>
           </Tooltip>
         )
       })}

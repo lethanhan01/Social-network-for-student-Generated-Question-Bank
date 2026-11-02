@@ -22,6 +22,7 @@ vi.mock('@/services/relationship.service', () => ({
 describe('FriendsPage Component', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    window.history.replaceState({}, '', '/friends')
     vi.mocked(relationshipService.getMyFriends).mockResolvedValue({
       items: [
         {
@@ -62,8 +63,8 @@ describe('FriendsPage Component', () => {
     )
 
     expect(screen.getByRole('heading', { level: 1, name: /Bạn bè & Kết nối/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Bạn bè/i, pressed: true })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Lời mời nhận/i })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: /Bạn bè/i, selected: true })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: /Lời mời nhận/i })).toBeInTheDocument()
     expect(await screen.findByText(/Đặng Tuấn Anh/i)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Nhắn tin/i })).toBeInTheDocument()
   })
@@ -103,5 +104,14 @@ describe('FriendsPage Component', () => {
       { cursor: '100', limit: 20 },
       expect.objectContaining({ signal: expect.any(AbortSignal) })
     )
+  })
+
+  it('shows received requests with accept and decline actions in the restored tabs', async () => {
+    const user = userEvent.setup()
+    renderWithQueryClient(<BrowserRouter><FriendsPage /></BrowserRouter>)
+    await user.click(screen.getByRole('tab', { name: /Lời mời nhận/ }))
+    expect(await screen.findByText('Vũ Thị Hạnh')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Chấp nhận kết bạn' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Từ chối' })).toBeInTheDocument()
   })
 })

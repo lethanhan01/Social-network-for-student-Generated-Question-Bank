@@ -16,7 +16,8 @@ describe('TopbarNav', () => {
 
     const feedLink = screen.getByRole('link', { name: /mạng xã hội học tập/i })
     expect(feedLink).toHaveAttribute('href', '/feed')
-    expect(feedLink).toHaveClass('text-action-accent', 'border-b-[3px]', 'border-action-accent')
+    expect(feedLink).toHaveClass('text-action-accent', 'border-b-2', 'border-action-accent')
+    expect(feedLink).toHaveAttribute('aria-current', 'page')
 
     const friendsLink = screen.getByRole('link', { name: /bạn bè & kết nối/i })
     expect(friendsLink).toHaveAttribute('href', '/friends')
@@ -25,8 +26,8 @@ describe('TopbarNav', () => {
     const questionsLink = screen.getByRole('link', { name: /ngân hàng câu hỏi/i })
     expect(questionsLink).toHaveAttribute('href', '/questions')
 
-    const shopLink = screen.getByRole('link', { name: /cửa hàng & túi đồ/i })
-    expect(shopLink).toHaveAttribute('href', '/shop')
+    const examsLink = screen.getByRole('link', { name: /ngân hàng đề thi/i })
+    expect(examsLink).toHaveAttribute('href', '/exams')
 
     const minigamesLink = screen.getByRole('link', { name: /đấu trường minigame/i })
     expect(minigamesLink).toHaveAttribute('href', '/gamification/minigames')

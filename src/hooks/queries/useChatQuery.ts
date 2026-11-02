@@ -38,7 +38,7 @@ export function useConversationMessagesQuery(
 
 export function useConversationMessagesInfiniteQuery(conversationId: number) {
   return useInfiniteQuery({
-    queryKey: queryKeys.conversations.messages(conversationId),
+    queryKey: queryKeys.conversations.infiniteMessages(conversationId),
     queryFn: ({ pageParam, signal }) =>
       chatService.getMessages(
         conversationId,
@@ -106,6 +106,10 @@ export function useSendMessageMutation() {
       mediaUrls,
       replyTo,
     }: SendMessagePayload) => {
+      if (websocketService.getStatus() !== 'CONNECTED') {
+        websocketService.connect()
+        throw new Error('WS_DISCONNECTED')
+      }
       const user = useAuthStore.getState().user
       const optimisticId = -Date.now()
 
@@ -130,7 +134,7 @@ export function useSendMessageMutation() {
 
       // 1. Optimistic insert into infinite query cache
       queryClient.setQueriesData<InfiniteData<MessageListResponseDto>>(
-        { queryKey: queryKeys.conversations.messages(conversationId) },
+        { queryKey: queryKeys.conversations.infiniteMessages(conversationId) },
         (old) => {
           if (!old?.pages?.length) {
             return {
@@ -192,14 +196,18 @@ export function useSendMessageMutation() {
 
       return optimisticMsg
     },
+    onError: (_error, variables) => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.conversations.infiniteMessages(variables.conversationId) })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.conversations.infiniteList() })
+    },
     onSuccess: (_data, variables) => {
       // 4. Reconcile with server ID after 500ms
       setTimeout(() => {
         void queryClient.invalidateQueries({
-          queryKey: queryKeys.conversations.messages(variables.conversationId),
+          queryKey: queryKeys.conversations.infiniteMessages(variables.conversationId),
         })
         void queryClient.invalidateQueries({
-          queryKey: queryKeys.conversations.list(),
+          queryKey: queryKeys.conversations.infiniteList(),
         })
       }, 500)
     },
@@ -219,9 +227,10 @@ export function useChatRealtimeSync(activeConversationId?: number) {
     const unsubStatus = websocketService.onStatusChange(setConnectionStatus)
 
     const unsubMsg = websocketService.onMessage((msg) => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.conversations.infiniteList() })
       // 1. Append message to active conversation cache if open
       queryClient.setQueriesData<InfiniteData<MessageListResponseDto>>(
-        { queryKey: queryKeys.conversations.messages(msg.conversation_id) },
+        { queryKey: queryKeys.conversations.infiniteMessages(msg.conversation_id) },
         (old) => {
           if (!old?.pages?.length) return old
           const exists = old.pages.some((page) =>
@@ -254,9 +263,9 @@ export function useChatRealtimeSync(activeConversationId?: number) {
       )
 
       if (activeConversationId === msg.conversation_id) {
-        const queryState = queryClient.getQueryState(queryKeys.conversations.messages(msg.conversation_id))
+        const queryState = queryClient.getQueryState(queryKeys.conversations.infiniteMessages(msg.conversation_id))
         if (queryState?.status === 'error') {
-          void queryClient.invalidateQueries({ queryKey: queryKeys.conversations.messages(msg.conversation_id) })
+          void queryClient.invalidateQueries({ queryKey: queryKeys.conversations.infiniteMessages(msg.conversation_id) })
         }
       }
 
@@ -361,15 +370,16 @@ export function useAutoMarkAsRead(
     if (!conversationId || !unreadCount || unreadCount <= 0 || !lastMessageId) return
 
     // 1. Optimistic clear unread badge in conversation list
-    queryClient.setQueriesData<ConversationListResponseDto>(
-      { queryKey: queryKeys.conversations.list() },
+    queryClient.setQueryData<InfiniteData<ConversationListResponseDto>>(
+      queryKeys.conversations.infiniteList(),
       (old) => {
-        if (!old?.items) return old
+        if (!old?.pages) return old
         return {
           ...old,
-          items: old.items.map((c) =>
-            c.conversation_id === conversationId ? { ...c, unread_count: 0 } : c
-          ),
+          pages: old.pages.map((page) => ({
+            ...page,
+            items: page.items?.map((c) => c.conversation_id === conversationId ? { ...c, unread_count: 0 } : c),
+          })),
         }
       }
     )
@@ -383,7 +393,7 @@ export function useAutoMarkAsRead(
     // 3. Reconcile with server after 400ms
     const timer = setTimeout(() => {
       void queryClient.invalidateQueries({
-        queryKey: queryKeys.conversations.messages(conversationId),
+        queryKey: queryKeys.conversations.infiniteMessages(conversationId),
       })
     }, 400)
 

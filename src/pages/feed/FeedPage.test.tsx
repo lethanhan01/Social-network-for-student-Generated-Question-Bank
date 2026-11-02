@@ -8,7 +8,12 @@ import { feedService } from '@/services/feed.service'
 import { userService } from '@/services/user.service'
 import { courseService } from '@/services/course.service'
 import { relationshipService } from '@/services/relationship.service'
+import { sessionService } from '@/services/session.service'
 import FeedPage from './FeedPage'
+
+vi.mock('@/services/session.service', () => ({
+  sessionService: { getMyEnrolledSubjects: vi.fn() },
+}))
 
 vi.mock('@/services/post.service', () => ({
   postService: {
@@ -50,6 +55,7 @@ vi.mock('@/services/relationship.service', () => ({
 describe('FeedPage Component', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    window.history.replaceState({}, '', '/feed')
     vi.mocked(userService.getMyProfile).mockResolvedValue({
       user_id: 235,
       full_name: 'Lê Thành An',
@@ -57,6 +63,9 @@ describe('FeedPage Component', () => {
       role: 'STUDENT',
     })
     vi.mocked(courseService.getSubjects).mockResolvedValue([
+      { subject_id: 1, code: 'IT4409', name: 'Công nghệ Web' },
+    ])
+    vi.mocked(sessionService.getMyEnrolledSubjects).mockResolvedValue([
       { subject_id: 1, code: 'IT4409', name: 'Công nghệ Web' },
     ])
     vi.mocked(relationshipService.getMyFriends).mockResolvedValue({
@@ -97,10 +106,37 @@ describe('FeedPage Component', () => {
       screen.getByRole('heading', { level: 1, name: /Bảng tin & Hoạt động/i })
     ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Tất cả bảng tin/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Bài viết của tôi/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Môn học của tôi/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Ghi chú Giảng viên/i })).toBeInTheDocument()
     expect(await screen.findByText(/Bài viết kiểm thử trên FeedPage/i)).toBeInTheDocument()
+    expect(screen.getByRole('navigation', { name: 'Lối tắt tính năng' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Tìm kiếm & Kết nối' })).toHaveAttribute('href', '/friends')
   })
+
+  it('syncs the sidebar subject filter with the feed URL and subject selector', async () => {
+    const user = userEvent.setup()
+    renderWithQueryClient(<BrowserRouter><FeedPage /></BrowserRouter>)
+
+    await user.click(await screen.findByRole('button', { name: /Công nghệ Web/ }))
+    expect(new URLSearchParams(window.location.search).get('subject')).toBe('1')
+    expect(screen.getByRole('combobox', { name: 'Lọc theo môn học' })).toHaveTextContent('IT4409')
+
+    await user.click(screen.getByRole('button', { name: /Công nghệ Web/ }))
+    expect(new URLSearchParams(window.location.search).has('subject')).toBe(false)
+  })
+  it('filters posts by enrolled subjects and restores them when returning to all posts', async () => {
+    vi.mocked(postService.getPostById).mockResolvedValue({
+      post_id: 102, subject_id: 2, content: 'A post from another subject',
+    })
+    const user = userEvent.setup()
+    renderWithQueryClient(<BrowserRouter><FeedPage /></BrowserRouter>)
+    expect(await screen.findByText('A post from another subject')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Môn học của tôi' }))
+    expect(screen.queryByText('A post from another subject')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Tất cả bảng tin' }))
+    expect(await screen.findByText('A post from another subject')).toBeInTheDocument()
+  })
+
   it('keeps pagination available when no loaded posts match the lecturer filter', async () => {
     vi.mocked(feedService.getActivityFeeds)
       .mockResolvedValueOnce({
