@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { Routes, Route, Navigate, useSearchParams } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { ProtectedRoute } from './components/shared/protected-route/ProtectedRoute'
 import { FullScreenLoader } from './components/shared/spinner/Spinner'
@@ -17,7 +17,6 @@ const PostDetailPage = lazy(() => import('./pages/post/PostDetailPage'))
 const ProfilePage = lazy(() => import('./pages/profile/ProfilePage'))
 const FriendsPage = lazy(() => import('./pages/friends/FriendsPage'))
 const SearchPage = lazy(() => import('./pages/search/SearchPage'))
-const MessagesPage = lazy(() => import('./pages/messages/MessagesPage'))
 const ChatPage = lazy(() => import('./pages/chat/ChatPage'))
 const DesignSystemShowcasePage = lazy(() => import('./pages/dev/DesignSystemShowcasePage'))
 const LeaderboardPage = lazy(() => import('./pages/gamification/LeaderboardPage'))
@@ -27,11 +26,6 @@ const SubjectsPage = lazy(() => import('./pages/subjects/SubjectsPage'))
 const ProposalsPage = lazy(() => import('./pages/proposals/ProposalsPage'))
 const PracticePage = lazy(() => import('./pages/practice/PracticePage'))
 const QuestionAnalyticsPage = lazy(() => import('./pages/questions/QuestionAnalyticsPage'))
-
-function MessagesRoute() {
-  const [params] = useSearchParams()
-  return params.has('userId') || params.has('conversation') ? <MessagesPage /> : <ChatPage />
-}
 
 export default function App() {
   // Sync global theme
@@ -60,7 +54,7 @@ export default function App() {
               <Route path="/search" element={<SearchPage />} />
             </Route>
             <Route element={<DashboardLayout />}>
-              <Route path="/messages" element={<MessagesRoute />} />
+              <Route path="/messages" element={<ChatPage />} />
               <Route path="/messages/:conversationId" element={<ChatPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/exams" element={<DashboardPage />} />

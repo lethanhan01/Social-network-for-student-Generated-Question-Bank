@@ -3,7 +3,6 @@ import {
   Home,
   Users,
   HelpCircle,
-  ShoppingBag,
   Gamepad2,
   LayoutDashboard,
   BookOpen,
@@ -43,11 +42,11 @@ export const PRIMARY_NAV_ITEMS: NavItemConfig[] = [
     icon: <HelpCircle size={24} />,
   },
   {
-    id: 'shop',
-    labelKey: 'nav.shop',
-    defaultLabel: 'Cửa hàng & túi đồ',
-    to: '/shop',
-    icon: <ShoppingBag size={24} />,
+    id: 'exams',
+    labelKey: 'nav.exams',
+    defaultLabel: 'Ngân hàng đề thi',
+    to: '/exams',
+    icon: <BookOpen size={24} />,
   },
   {
     id: 'minigames',
@@ -66,13 +65,6 @@ export const SECONDARY_SHORTCUT_ITEMS: NavItemConfig[] = [
     defaultLabel: 'Tổng quan học tập',
     to: '/dashboard',
     icon: <LayoutDashboard size={18} />,
-  },
-  {
-    id: 'exams',
-    labelKey: 'nav.exams',
-    defaultLabel: 'Ngân hàng đề thi',
-    to: '/exams',
-    icon: <BookOpen size={18} />,
   },
   {
     id: 'leaderboard',

@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { Users, UserPlus, Send, ShieldBan, UserCheck, UserRound } from 'lucide-react'
 import { Heading } from '@/components/ui/typography/Heading'
-import { Button } from '@/components/ui/actions/Button'
+import { Page } from '@/components/ui/layout/PageUI'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/navigation/Tabs'
 import { ConfirmDialog } from '@/components/ui/overlay/ConfirmDialog'
 import { QueryFeedback } from '@/components/social/QueryFeedback'
 import { LoadMore } from '@/components/social/LoadMore'
@@ -19,9 +21,13 @@ import {
 } from '@/hooks/queries/useRelationshipsQuery'
 import { getApiError } from '@/lib/api-error'
 import { toast } from '@/lib/toast'
-import { ConnectionCard, type ConnectionAction } from './ConnectionCard'
+import { ConnectionGrid, type ConnectionAction } from './ConnectionCard'
 
-const TABS: ConnectionTab[] = ['FRIENDS', 'RECEIVED', 'SENT', 'FOLLOWING', 'FOLLOWERS', 'BLOCKED']
+const TABS: ConnectionTab[] = ['FRIENDS', 'RECEIVED', 'SENT', 'BLOCKED', 'FOLLOWING', 'FOLLOWERS']
+const TAB_ICONS = {
+  FRIENDS: Users, RECEIVED: UserPlus, SENT: Send, BLOCKED: ShieldBan,
+  FOLLOWING: UserCheck, FOLLOWERS: UserRound,
+}
 export default function FriendsPage() {
   const { t } = useTranslation()
   const [params, setParams] = useSearchParams()
@@ -60,41 +66,37 @@ export default function FriendsPage() {
     else void perform(action, id)
   }
   return (
-    <section className="space-y-5">
-      <Heading level={1} className="text-2xl font-bold">
-        {t('social.connectionsTitle')}
-      </Heading>
-      <nav aria-label={t('social.connectionsTitle')} className="flex gap-2 overflow-x-auto pb-2">
-        {TABS.map((value) => (
-          <Button
-            key={value}
-            variant={tab === value ? 'secondary' : 'ghost'}
-            aria-pressed={tab === value}
-            className="shrink-0"
-            onClick={() => setParams({ tab: value })}
-          >
-            {t(`social.connections.${value}`)}
-          </Button>
-        ))}
-      </nav>
-      {query.isPending || (query.isError && !query.data) ? (
-        <QueryFeedback pending={query.isPending} error={query.error} onRetry={query.refetch} />
-      ) : null}
-      {query.isSuccess && entries.length === 0 ? (
-        <p className="py-8 text-center text-text-muted">{t('social.emptyConnections')}</p>
-      ) : null}
-      <section className="grid gap-4 sm:grid-cols-2">
-        {entries.map((entry) => (
-          <ConnectionCard
-            key={entry.user_id ?? entry.requester?.user_id ?? entry.receiver?.user_id}
-            entry={entry}
-            tab={tab}
-            busy={busy}
-            onAction={onAction}
-          />
-        ))}
-      </section>
-      <LoadMore query={query} />
+    <Page className="max-w-5xl space-y-6">
+      <header className="space-y-2 pb-4 border-b border-line-subtle">
+        <Heading level={1} className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+          {t('social.connectionsTitle')}
+        </Heading>
+        <p className="text-sm text-fg-muted">{t('social.connectionsSubtitle')}</p>
+      </header>
+      <Tabs value={tab} onValueChange={(value) => setParams({ tab: value })} variant="pills" className="space-y-6">
+        <TabsList aria-label={t('social.connectionsTitle')} className="max-w-full overflow-x-auto">
+          {TABS.map((value) => {
+            const Icon = TAB_ICONS[value]
+            return (
+              <TabsTrigger key={value} value={value} leftIcon={<Icon size={16} />} className="min-h-11 text-xs shrink-0">
+                {t(`social.connections.${value}`)}{tab === value && query.isSuccess ? ` (${entries.length})` : ''}
+              </TabsTrigger>
+            )
+          })}
+        </TabsList>
+        <TabsContent value={tab} className="space-y-4">
+          {query.isPending || (query.isError && !query.data) ? (
+            <QueryFeedback pending={query.isPending} error={query.error} onRetry={query.refetch} />
+          ) : null}
+          {query.isSuccess && entries.length === 0 ? (
+            <section className="rounded-2xl border border-line-subtle bg-surface-card p-8 text-center text-fg-muted">
+              <p>{t('social.emptyConnections')}</p>
+            </section>
+          ) : null}
+          <ConnectionGrid entries={entries} tab={tab} busy={busy} onAction={onAction} />
+          <LoadMore query={query} />
+        </TabsContent>
+      </Tabs>
       <ConfirmDialog
         open={Boolean(confirmation)}
         title={t('social.confirmAction')}
@@ -105,6 +107,6 @@ export default function FriendsPage() {
         }}
         onConfirm={() => (confirmation ? perform(confirmation.action, confirmation.id) : undefined)}
       />
-    </section>
+    </Page>
   )
 }

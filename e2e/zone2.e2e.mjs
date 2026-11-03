@@ -70,7 +70,7 @@ test('Zone 2 routes render without runtime errors or horizontal overflow', async
     ['/friends', 'Bạn bè & Kết nối'],
     ['/search?q=Web', 'Tìm kiếm toàn cục'],
     ['/profile/me', null],
-    ['/messages', 'Tin nhắn'],
+    ['/messages', 'Đoạn chat'],
   ]) {
     await page.goto(route)
     await expect(page.locator('h1')).toBeVisible()
@@ -92,7 +92,7 @@ test('private post create, edit and delete works through the client', async ({ p
   page.on('pageerror', (error) => errors.push(error.message))
   try {
     await page.goto('/feed')
-    await page.getByRole('button', { name: 'Bạn muốn chia sẻ điều gì hôm nay?' }).click()
+    await page.getByRole('button', { name: 'Bạn muốn thảo luận bài tập hoặc chia sẻ tài liệu gì hôm nay?' }).click()
     await page.getByRole('textbox', { name: 'Nội dung bài viết' }).fill(marker)
     await page.getByRole('combobox', { name: 'Chọn quyền riêng tư' }).click()
     await page.getByRole('option', { name: 'Chỉ mình tôi', exact: true }).click()
@@ -141,15 +141,6 @@ test('messaging links resolve to the messenger page', async ({ page }) => {
   {
     await messageLink.click()
     await expect(page).toHaveURL(/\/messages\?userId=\d+/)
-    await expect(page.getByRole('heading', { name: 'Tin nhắn', level: 1 })).toBeVisible()
-    const conversations = page
-      .getByRole('navigation', { name: 'Tin nhắn', exact: true })
-      .getByRole('button')
-    await page.waitForLoadState('networkidle')
-    if (await conversations.count()) {
-      await conversations.first().click()
-      await expect(page.getByRole('textbox', { name: 'Nhập tin nhắn' })).toBeVisible()
-      await expect(page.getByText('Đang kết nối trò chuyện…', { exact: true })).toHaveCount(0)
-    }
+    await expect(page.getByRole('button', { name: 'Bắt đầu trò chuyện' })).toBeVisible()
   }
 })

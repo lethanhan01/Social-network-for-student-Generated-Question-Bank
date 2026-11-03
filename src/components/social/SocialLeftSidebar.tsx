@@ -26,9 +26,9 @@ export function SocialLeftSidebar({
   onSelectSubject,
 }: Readonly<SocialLeftSidebarProps>) {
   const { t } = useTranslation('common')
-  const displayName = user?.full_name || user?.email || 'Sinh viên HUST'
+  const displayName = user?.full_name || user?.email || t('social.member')
   const initials = displayName.trim().charAt(0).toUpperCase()
-  const studentCode = user?.student_lecturer_code || 'K68 HUST'
+  const studentCode = user?.student_lecturer_code || '—'
 
   return (
     <Card className="p-4 bg-surface-card border-line-subtle shadow-card rounded-2xl space-y-4">
@@ -49,10 +49,10 @@ export function SocialLeftSidebar({
           {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [User student code and role badge flex row] */}
           <div className="flex items-center gap-2 mt-1 flex-wrap">
             <Text size="xs" tone="muted" className="truncate">
-              MSSV: {studentCode}
+              {t('social.studentCode', { code: studentCode })}
             </Text>
             <Badge tone="accent" size="xs">
-              {user?.role === 'LECTURER' ? 'Giảng viên' : 'Sinh viên'}
+              {t(user?.role === 'LECTURER' ? 'social.roleLecturer' : 'social.roleStudent')}
             </Badge>
           </div>
         </div>
@@ -67,7 +67,7 @@ export function SocialLeftSidebar({
       <Separator />
 
       {/* Group 1: Navigation Shortcuts */}
-      <nav aria-label="Lối tắt tính năng" className="space-y-1">
+      <nav aria-label={t('nav.shortcuts')} className="space-y-1">
         <Text size="xs" tone="muted" className="font-semibold uppercase tracking-wider px-2 mb-2 block">
           {t('nav.shortcuts', 'Lối tắt tính năng')}
         </Text>
@@ -133,7 +133,8 @@ export function SocialLeftSidebar({
               const isSelected = selectedSubjectId === sub.subject_id
               return (
                 <Button
-                  variant={isSelected ? 'secondary' : 'ghost'}
+                  variant={isSelected ? 'primary' : 'ghost'}
+                  aria-pressed={isSelected}
                   size="sm"
                   key={sub.subject_id}
                   onClick={() => onSelectSubject?.(isSelected ? undefined : sub.subject_id)}
@@ -148,7 +149,7 @@ export function SocialLeftSidebar({
           </div>
         ) : (
           <Text size="xs" tone="muted" className="px-2 italic">
-            Chưa có danh mục môn học.
+            {t('social.noSubjects')}
           </Text>
         )}
       </section>

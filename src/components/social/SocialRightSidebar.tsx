@@ -23,7 +23,7 @@ export function SocialRightSidebar({ friends = [] }: Readonly<SocialRightSidebar
           <div className="flex items-center gap-2">
             <Users size={18} className="text-action-accent" />
             <Heading level={4} className="text-sm font-bold text-fg-primary">
-              {t('friends.title', 'Bạn bè & Kết nối')}
+              {t('social.connectionsTitle')}
             </Heading>
           </div>
           <Badge emphasis="outline" size="sm">
