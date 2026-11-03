@@ -34,7 +34,8 @@ export function TopbarAvatarDropdown() {
 
   function goDashboard() {
     setOpen(false)
-    navigate('/dashboard')
+    const isTeacher = user?.roles?.some((r) => ['teacher', 'LECTURER', 'admin', 'ADMIN'].includes(r))
+    navigate(isTeacher ? '/teacher/dashboard' : '/student/dashboard')
   }
 
   function goSettings() {

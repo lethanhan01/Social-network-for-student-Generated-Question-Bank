@@ -5,12 +5,12 @@ import { MemoryRouter } from 'react-router-dom'
 import { renderWithQueryClient } from '@/test/query-test-utils'
 import { PinModal } from './PinModal'
 import { ReportModal } from '@/components/social/ReportPostModal'
-import HiddenVaultPage from '@/pages/messages/HiddenVaultPage'
+import HiddenVaultPage from '@/pages/common/messages/HiddenVaultPage'
 import { chatService } from '@/services/chat.service'
 import { userService } from '@/services/user.service'
 import { utilityService } from '@/services/utility.service'
 import i18n from '@/lib/i18n'
-import { notificationPath } from '@/pages/notifications/notification-target'
+import { notificationPath } from '@/pages/common/notifications/notification-target'
 
 vi.mock('@/lib/toast', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
 describe('Portal security and forms', () => {

@@ -55,20 +55,9 @@ export default function ChatPage() {
       {/* Right Conversation View: visible on desktop always; on mobile only when conversation is active */}
       <section className={cn(
         'flex-1 h-full min-w-0 min-h-0 flex flex-col transition-all duration-200',
-        !activeId ? 'hidden md:flex' : 'flex'
-      )} aria-label="Nội dung hội thoại">
-        {activeId ? <ChatPortalActions key={activeId} conversationId={activeId} /> : null}
-        <ChatConversationView
-          conversationId={activeId}
-          onBackToList={handleBackToList}
-          onOpenNewChat={() => setIsNewChatOpen(true)}
-          connectionStatus={connectionStatus}
-          typingUsers={typingUsers}
-          onSendTyping={sendTypingStatus}
-        />
-
         !showConversation ? 'hidden md:flex' : 'flex'
       )} aria-label={t('conversationContent')}>
+        {activeId ? <ChatPortalActions key={activeId} conversationId={activeId} /> : null}
         {targetId ? (
           <StartConversationPanel key={targetId} targetId={targetId} onCreated={handleSelectConversation} onBack={handleBackToList} />
         ) : (
@@ -93,4 +82,3 @@ export default function ChatPage() {
     </div>
   )
 }
-

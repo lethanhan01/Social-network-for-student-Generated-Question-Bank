@@ -19,7 +19,7 @@ Sau khi đồng bộ main, giao diện chat mới của nhóm tiếp tục phụ
 ## Tổ chức mã nguồn
 
 - [Components](./): hộp thoại dùng Sheet/Radix để giữ focus, Escape và khôi phục focus; danh sách hội thoại, khung tin nhắn, bộ chọn người dùng.
-- [Pages](../../pages/messages/MessagesPage.tsx): điều phối route; các trang thông báo và cài đặt nằm cạnh thư mục messages.
+- [Pages](../../pages/common/messages/MessagesPage.tsx): điều phối route; các trang thông báo và cài đặt nằm cạnh thư mục messages.
 - [Query hooks](../../hooks/queries/usePortalQuery.ts): API state, phân trang cursor, invalidation và AbortSignal.
 - [Realtime hook](../../hooks/useChatRealtime.ts): kết nối STOMP và cập nhật query cache.
 - [Styles](../../styles/portal.css): bố cục hộp thư dùng semantic tokens; các primitive và thành phần khác dùng hệ thống styles có sẵn.
