@@ -1,80 +1,125 @@
+import { StartDirectConversation } from '@/components/portal/StartDirectConversation'
+import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Heading } from '@/components/ui/typography/Heading'
-import { Button } from '@/components/ui/actions/Button'
-import { useInfiniteConversationsQuery } from '@/hooks/queries/useMessengerQuery'
-import { useCreateDirectConversationMutation } from '@/hooks/queries/useChatQuery'
-import { QueryFeedback } from '@/components/social/QueryFeedback'
-import { LoadMore } from '@/components/social/LoadMore'
-import { getApiError } from '@/lib/api-error'
-import { toast } from '@/lib/toast'
-import { MessageThread } from './MessageThread'
+import { LockKeyhole, Plus, MessageCircle } from 'lucide-react'
+import { Page, PageHeader } from '@/components/ui/layout'
+import { Button, ButtonLink } from '@/components/ui/actions'
+import { EmptyState } from '@/components/ui/feedback/EmptyState'
+import { ConversationList } from '@/components/portal/ConversationList'
+import { MessageThread } from '@/components/portal/MessageThread'
+import { GroupSettingsModal } from '@/components/portal/GroupSettingsModal'
+import { NewConversationModal } from '@/components/portal/NewConversationModal'
+import { ReportModal } from '@/components/social/ReportPostModal'
+import { useInboxQuery } from '@/hooks/queries/usePortalQuery'
+import { useChatRealtime } from '@/hooks/useChatRealtime'
 
-function validId(raw: string | null) {
-  return raw && /^[1-9]\d*$/.test(raw) && Number.isSafeInteger(Number(raw)) ? Number(raw) : 0
-}
-export default function MessagesPage() {
-  const { t } = useTranslation()
+export function Inbox({ hidden = false }: { hidden?: boolean }) {
+  const { t } = useTranslation('portal')
   const [params, setParams] = useSearchParams()
-  const conversationId = validId(params.get('conversation'))
-  const targetId = validId(params.get('userId'))
-  const query = useInfiniteConversationsQuery()
-  const create = useCreateDirectConversationMutation()
-  const items = query.data?.pages.flatMap((page) => page.items ?? []) ?? []
-  async function start() {
-    if (!targetId || create.isPending) return
-    try {
-      const conversation = await create.mutateAsync({ target_user_id: targetId })
-      if (!conversation.conversation_id) throw new Error(t('zone2.actionError'))
-      setParams({ conversation: String(conversation.conversation_id) })
-    } catch (cause) {
-      toast.error(getApiError(cause, t('zone2.actionError')))
-    }
+  const selected = Number(params.get('conversation')) || 0
+  const [isGroupOpen, setIsGroupOpen] = useState(false)
+  const [isNewOpen, setIsNewOpen] = useState(false)
+  const [reportId, setReportId] = useState<number | null>(null)
+  const query = useInboxQuery(hidden)
+  const connected = useChatRealtime()
+  const items = [
+    ...new Map(query.data?.pages.flatMap((p) => p.items ?? []).map((item) => [item.conversation_id, item])).values(),
+  ]
+  const conversation = items.find((item) => item.conversation_id === selected)
+  function handleSelect(id: number) {
+    setParams((previous) => {
+      const next = new URLSearchParams(previous)
+      if (id > 0) next.set('conversation', String(id))
+      else next.delete('conversation')
+      return next
+    })
   }
   return (
-    <section className="space-y-5">
-      <Heading level={1} className="text-2xl font-bold">
-        {t('social.messages')}
-      </Heading>
-      {targetId ? (
-        <Button
-          loading={create.isPending}
-          onClick={() => {
-            void start()
-          }}
-        >
-          {t('social.startConversation')}
+    <>
+      <section className="portal-inbox" aria-label={t(hidden ? 'vault.title' : 'messages.title')}>
+        <ConversationList
+          onNew={!hidden ? () => setIsNewOpen(true) : undefined}
+          items={items}
+          selected={conversation ? selected : 0}
+          onSelect={handleSelect}
+          loading={query.isLoading}
+          error={query.error}
+          retry={() => void query.refetch()}
+          hasMore={!!query.hasNextPage}
+          loadingMore={query.isFetchingNextPage}
+          loadMore={() => void query.fetchNextPage()}
+        />
+        {conversation ? (
+          <MessageThread
+            key={conversation.conversation_id}
+            conversation={conversation}
+            hidden={hidden}
+            connected={connected}
+            onBack={() => handleSelect(0)}
+            onSettings={() => setIsGroupOpen(true)}
+            onReport={setReportId}
+          />
+        ) : (
+          <section className="hidden md:flex flex-1 items-center justify-center p-4 md:p-8">
+            <EmptyState
+              icon={<MessageCircle size={36} />}
+              title={t('messages.welcome')}
+              description={t('messages.welcomeDescription')}
+              action={
+                !hidden ? (
+                  <Button onClick={() => setIsNewOpen(true)}>
+                    <Plus size={18} />
+                    {t('messages.new')}
+                  </Button>
+                ) : undefined
+              }
+            />
+          </section>
+        )}
+      </section>
+      {!hidden ? (
+        <Button variant="outline" className="mt-4 min-h-11 md:hidden" onClick={() => setIsNewOpen(true)}>
+          <Plus size={18} />
+          {t('messages.new')}
         </Button>
       ) : null}
-      <section className="grid gap-4 2xl:grid-cols-3">
-        <nav aria-label={t('social.messages')} className="space-y-2">
-          {query.isPending || (query.isError && !query.data) ? (
-            <QueryFeedback pending={query.isPending} error={query.error} onRetry={query.refetch} />
-          ) : null}
-          {query.isSuccess && items.length === 0 ? (
-            <p className="text-sm text-text-muted">{t('social.noConversations')}</p>
-          ) : null}
-          {items.map((item) => (
-            <Button
-              key={item.conversation_id}
-              variant={conversationId === item.conversation_id ? 'secondary' : 'ghost'}
-              className="min-h-14 w-full justify-start whitespace-normal text-left"
-              onClick={() => setParams({ conversation: String(item.conversation_id) })}
-            >
-              {item.display_name ?? t('social.member')}
-              {item.unread_count ? ` (${item.unread_count})` : ''}
-            </Button>
-          ))}
-          <LoadMore query={query} />
-        </nav>
-        <section className="min-w-0 2xl:col-span-2">
-          {conversationId ? (
-            <MessageThread key={conversationId} id={conversationId} />
-          ) : (
-            <p>{t('social.chooseConversation')}</p>
-          )}
-        </section>
-      </section>
-    </section>
+      {isGroupOpen && conversation ? (
+        <GroupSettingsModal
+          conversation={conversation}
+          onClose={() => setIsGroupOpen(false)}
+          onLeft={() => {
+            setIsGroupOpen(false)
+            handleSelect(0)
+          }}
+        />
+      ) : null}
+      {isNewOpen ? (
+        <NewConversationModal
+          onClose={() => setIsNewOpen(false)}
+          onCreated={(id) => {
+            setIsNewOpen(false)
+            handleSelect(id)
+          }}
+        />
+      ) : null}
+      {reportId ? <ReportModal isOpen targetType="USER" targetId={reportId} onClose={() => setReportId(null)} /> : null}
+    </>
+  )
+}
+export default function MessagesPage() {
+  const { t } = useTranslation('portal')
+  return (
+    <Page className="h-full overflow-y-auto p-4 sm:p-6">
+      <PageHeader eyebrow={t('eyebrow')} title={t('messages.title')} description={t('messages.description')} />
+      <nav className="mb-4 flex justify-end">
+        <ButtonLink to="/messages/hidden-vault" variant="outline">
+          <LockKeyhole size={18} />
+          {t('vault.title')}
+        </ButtonLink>
+      </nav>
+      <StartDirectConversation />
+      <Inbox />
+    </Page>
   )
 }

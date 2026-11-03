@@ -41,6 +41,8 @@ class WebSocketService {
     this.statusListeners.forEach((fn) => fn(newStatus))
   }
 
+  public get connected(): boolean { return this.isConnected && !!this.client?.connected }
+
   public connect(): void {
     const token = useAuthStore.getState().token
     if (!token || this.client?.active) return

@@ -1,3 +1,4 @@
+import { MemoryRouter } from 'react-router-dom'
 import { screen, fireEvent, render } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { createRef } from 'react'
@@ -161,10 +162,7 @@ describe('Messenger Chat Components', () => {
   describe('ChatSidebar', () => {
     it('renders sidebar title, action buttons, and search input', () => {
       renderWithQueryClient(
-        <ChatSidebar
-          onSelectConversation={vi.fn()}
-          onOpenNewChat={vi.fn()}
-        />
+        <MemoryRouter><ChatSidebar onSelectConversation={vi.fn()} onOpenNewChat={vi.fn()} /></MemoryRouter>
       )
 
       expect(screen.getByRole('heading', { level: 1, name: /đoạn chat/i })).toBeInTheDocument()

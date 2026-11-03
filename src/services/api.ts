@@ -29,11 +29,17 @@ const api = axios.create({
   withCredentials: true,
 })
 
-// Attach Bearer token and Device ID to every request
+// Login/refresh failures must never recursively enter the refresh queue.
+function isSessionEndpoint(url?: string): boolean {
+  const path = url?.split('?')[0]
+  return path === '/auth/login' || path === '/auth/refresh'
+}
+
+// Attach Bearer token and Device ID to authenticated requests
 api.interceptors.request.use((config) => {
   const token = useAuthStore.getState().token
   const headers = AxiosHeaders.from(config.headers)
-  if (token && !headers.has('Authorization')) {
+  if (token && !isSessionEndpoint(config.url) && !headers.has('Authorization')) {
     headers.set('Authorization', `Bearer ${token}`)
   }
   if (!headers.has('X-Device-Id')) {
@@ -54,6 +60,7 @@ api.interceptors.response.use(
     if (
       error.response?.status === 401 &&
       originalRequest &&
+      !isSessionEndpoint(originalRequest.url) &&
       !originalRequest._retry &&
       !originalRequest.suppressAuthRedirect
     ) {

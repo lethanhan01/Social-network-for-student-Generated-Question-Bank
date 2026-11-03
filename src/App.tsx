@@ -17,6 +17,11 @@ const PostDetailPage = lazy(() => import('./pages/post/PostDetailPage'))
 const ProfilePage = lazy(() => import('./pages/profile/ProfilePage'))
 const FriendsPage = lazy(() => import('./pages/friends/FriendsPage'))
 const SearchPage = lazy(() => import('./pages/search/SearchPage'))
+const MessagesPage = lazy(() => import('./pages/messages/MessagesPage'))
+const HiddenVaultPage = lazy(() => import('./pages/messages/HiddenVaultPage'))
+const SettingsPage = lazy(() => import('./pages/settings/SettingsPage'))
+const NotificationsPage = lazy(() => import('./pages/notifications/NotificationsPage'))
+
 const ChatPage = lazy(() => import('./pages/chat/ChatPage'))
 const DesignSystemShowcasePage = lazy(() => import('./pages/dev/DesignSystemShowcasePage'))
 const LeaderboardPage = lazy(() => import('./pages/gamification/LeaderboardPage'))
@@ -64,7 +69,9 @@ export default function App() {
               <Route path="/practice" element={<PracticePage />} />
               <Route path="/practice/:sessionId" element={<PracticePage />} />
               <Route path="/questions/:id/analytics" element={<QuestionAnalyticsPage />} />
-              <Route path="/settings" element={<DashboardPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/messages/hidden-vault" element={<HiddenVaultPage />} />
+              <Route path="/notifications" element={<NotificationsPage />} />
               <Route path="/gamification/leaderboard" element={<LeaderboardPage />} />
               <Route path="/gamification/minigames" element={<MinigamesPage />} />
               <Route path="/shop" element={<ShopPage />} />

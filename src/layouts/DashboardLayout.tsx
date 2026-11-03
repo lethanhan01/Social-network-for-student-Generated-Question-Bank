@@ -10,7 +10,7 @@ import { cn } from '@/utils/cn'
 export default function DashboardLayout() {
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const location = useLocation()
-  const isMessagesRoute = location.pathname.startsWith('/messages')
+  const isMessagesRoute = /^\/messages(?:\/\d+)?$/.test(location.pathname)
 
   const handleToggleMobile = useCallback(() => {
     setIsMobileOpen((prev) => !prev)
