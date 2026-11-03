@@ -1,0 +1,23 @@
+.social-feed-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.social-feed-sidebar {
+  max-height: calc(100dvh - 6rem);
+}
+
+@media (min-width: 1024px) {
+  .social-feed-layout {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 7fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .social-feed-layout {
+    grid-template-columns: minmax(0, 23fr) minmax(0, 52fr) minmax(0, 23fr);
+  }
+}

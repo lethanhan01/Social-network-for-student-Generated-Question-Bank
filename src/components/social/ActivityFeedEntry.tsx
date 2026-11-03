@@ -12,11 +12,13 @@ export function ActivityPost({
   postId,
   currentUser,
   subjectId,
+  subjectIds,
   lecturers,
 }: Readonly<{
   postId: number
   currentUser?: ProfileResponse
   subjectId?: number
+  subjectIds?: number[]
   lecturers?: boolean
 }>) {
   const { t } = useTranslation()
@@ -37,6 +39,7 @@ export function ActivityPost({
   if (
     !query.data ||
     (subjectId && query.data.subject_id !== subjectId) ||
+    (subjectIds && !subjectIds.includes(query.data.subject_id ?? 0)) ||
     (lecturers && !query.data.lecturer_note)
   )
     return null
@@ -53,11 +56,13 @@ export function ActivityFeedEntry({
   item,
   currentUser,
   subjectId,
+  subjectIds,
   lecturers,
 }: Readonly<{
   item: ActivityFeedItemDto
   currentUser?: ProfileResponse
   subjectId?: number
+  subjectIds?: number[]
   lecturers?: boolean
 }>) {
   const { t } = useTranslation()
@@ -67,10 +72,11 @@ export function ActivityFeedEntry({
         postId={item.target_id}
         currentUser={currentUser}
         subjectId={subjectId}
+        subjectIds={subjectIds}
         lecturers={lecturers}
       />
     )
-  if (subjectId || lecturers) return null
+  if (subjectId || subjectIds || lecturers) return null
   const destination =
     item.target_type === 'SESSION'
       ? `/practice/${item.target_id}`

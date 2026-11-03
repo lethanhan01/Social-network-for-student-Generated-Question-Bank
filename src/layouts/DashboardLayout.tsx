@@ -22,7 +22,7 @@ export default function DashboardLayout() {
 
   return (
     /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Root dashboard layout flex wrapper] */
-    <div className={cn('bg-surface-base text-fg-primary flex flex-col', isMessagesRoute ? 'h-screen overflow-hidden' : 'min-h-screen')}>
+    <div className={cn('bg-surface-base text-fg-primary flex flex-col', isMessagesRoute ? 'h-dvh overflow-hidden' : 'min-h-screen')}>
       {/* Topbar: Fixed full-width header (h-16, z-20) */}
       <Topbar
         isMobileMenuOpen={isMobileOpen}
@@ -37,7 +37,7 @@ export default function DashboardLayout() {
 
       {/* Main Content Area: Offset by Topbar (pt-16), full-width without sidebar offset */}
       {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Main content container without sidebar offset] */}
-      <div className={cn('flex-1 flex flex-col pt-16 min-w-0 transition-all duration-300', isMessagesRoute && 'h-[calc(100vh-4rem)] min-h-0 overflow-hidden')}>
+      <div className={cn('flex-1 flex flex-col pt-16 min-w-0 transition-all duration-300', isMessagesRoute && 'min-h-0 overflow-hidden')}>
         {/* Page Content: Full bleed for messages, pb-20 on mobile for other pages */}
         <main
           className={cn(

@@ -25,7 +25,7 @@ export function TopbarSearch() {
     <div className="flex items-center">
       {/* Desktop Search: Pill Form with SearchInput */}
       {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Desktop pill search wrapper] */}
-      <div className="hidden lg:flex items-center">
+      <div className="hidden xl:flex items-center">
         <Form
           onSubmit={handleSubmit}
           noValidate
@@ -39,7 +39,7 @@ export function TopbarSearch() {
             placeholder={t('common.searchPlaceholder', 'Tìm kiếm trên SQB HUST')}
             size="sm"
             aria-label={t('common.searchPlaceholder', 'Tìm kiếm trên SQB HUST')}
-            className="w-48 xl:w-64"
+            className="w-48 2xl:w-64"
           />
         </Form>
       </div>
@@ -51,7 +51,7 @@ export function TopbarSearch() {
         size="sm"
         aria-label={t('common.search', 'Tìm kiếm')}
         title={t('common.search', 'Tìm kiếm')}
-        className="hidden md:flex lg:hidden min-h-11 min-w-11 w-10 h-10 p-0 rounded-full items-center justify-center bg-surface-base border border-line-subtle text-fg-muted hover:text-fg-primary hover:bg-surface-card-hover"
+        className="flex xl:hidden min-h-11 min-w-11 p-0 rounded-full items-center justify-center bg-surface-base border border-line-subtle text-fg-muted hover:text-fg-primary hover:bg-surface-card-hover"
       >
         <Search size={18} />
       </ButtonLink>

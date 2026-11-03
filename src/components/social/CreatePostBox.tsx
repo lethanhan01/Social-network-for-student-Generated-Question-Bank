@@ -31,7 +31,7 @@ export function CreatePostBox({ user, onOpenCreateModal }: Readonly<CreatePostBo
           variant="secondary"
           size="md"
           onClick={onOpenCreateModal}
-          className="flex-1 justify-start text-text-muted hover:text-text-primary bg-surface-hover rounded-full px-4 h-11 text-sm font-normal border border-line-subtle"
+          className="flex-1 min-w-0 justify-start text-text-muted hover:text-text-primary bg-surface-hover rounded-full px-4 h-auto min-h-11 py-3 text-left text-sm font-normal border border-line-subtle whitespace-normal"
         >
           {t('social.composerPrompt')}
         </Button>

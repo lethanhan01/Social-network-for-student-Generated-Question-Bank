@@ -15,7 +15,7 @@ export function LanguageSwitcher() {
     <button
       data-no-sweep
       onClick={toggle}
-      className="inline-flex items-center gap-1 px-2.5 py-1 border border-line-default rounded-full bg-surface-elevated font-body text-xs font-bold tracking-[0.04em] cursor-pointer transition-colors duration-200 hover:border-line-hover"
+      className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1 px-2 py-1 border border-line-default rounded-full bg-surface-elevated font-body text-xs font-bold tracking-wide cursor-pointer transition-colors duration-200 hover:border-line-hover"
       aria-label={isVi ? 'Switch to Japanese' : 'Switch to Vietnamese'}
     >
       <span className={isVi ? 'text-action-primary' : 'text-fg-muted'}>

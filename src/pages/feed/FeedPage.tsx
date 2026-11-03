@@ -1,10 +1,16 @@
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
+import { Sparkles, BookOpen, GraduationCap } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Heading } from '@/components/ui/typography/Heading'
 import { Button } from '@/components/ui/actions/Button'
 import { Select } from '@/components/ui/forms/Select'
+import { Page } from '@/components/ui/layout/PageUI'
+import { Badge } from '@/components/ui/data-display/Badge'
+import { SocialFeedLayout } from '@/components/social/SocialFeedLayout'
+import { SocialLeftSidebar } from '@/components/social/SocialLeftSidebar'
+import { SocialRightSidebar } from '@/components/social/SocialRightSidebar'
 import { CreatePostBox } from '@/components/social/CreatePostBox'
 import { CreatePostModal } from '@/components/social/CreatePostModal'
 import { PostCard } from '@/components/social/PostCard'
@@ -12,6 +18,7 @@ import { QueryFeedback } from '@/components/social/QueryFeedback'
 import { ActivityFeedEntry, ActivityPost } from '@/components/social/ActivityFeedEntry'
 import { LoadMore } from '@/components/social/LoadMore'
 import { useSocialFeed } from '@/hooks/useSocialFeed'
+import { useEnrolledSubjectsQuery } from '@/hooks/queries/useSessionsQuery'
 import {
   useInfiniteActivityFeedQuery,
   useInfinitePostsFeedQuery,
@@ -27,7 +34,9 @@ export default function FeedPage() {
   const subjectId = Number(params.get('subject')) || undefined
   const [creating, setCreating] = useState(false)
   const [since, setSince] = useState(() => String(Date.now()))
-  const { currentUser, subjects, createPost } = useSocialFeed()
+  const { currentUser, subjects, friends, createPost } = useSocialFeed()
+  const enrolled = useEnrolledSubjectsQuery()
+  const mySubjects = enrolled.data ?? []
   const activity = useInfiniteActivityFeedQuery()
   const mine = useInfinitePostsFeedQuery()
   const query = tab === 'MINE' ? mine : activity
@@ -43,6 +52,7 @@ export default function FeedPage() {
   const events = activity.data?.pages.flatMap((page) => page.items ?? []) ?? []
   const recentPosts = recent.data
   const recentIds = new Set(recentPosts.map((post) => post.post_id))
+  const subjectIds = tab === 'MY_SUBJECTS' ? mySubjects.flatMap((subject) => subject.subject_id ? [subject.subject_id] : []) : undefined
   const matches = (post: PostResponseDto) =>
     (!subjectId || post.subject_id === subjectId) &&
     (tab !== 'LECTURERS' || Boolean(post.lecturer_note))
@@ -59,17 +69,23 @@ export default function FeedPage() {
     const result = await query.refetch()
     if (!result.isError) setSince(nextSince)
   }
-  return (
-    <section className="mx-auto max-w-3xl space-y-5">
-      <Heading level={1} className="text-2xl font-bold">
-        {t('feed.title')}
-      </Heading>
+  const centerFeed = (
+    <section className="space-y-5">
+      <header className="space-y-3 pb-2">
+        <Badge tone="accent" emphasis="outline">{t('feed.network_badge')}</Badge>
+        <p className="text-xs text-fg-muted">{t('social.currentSemester', { count: mySubjects.length })}</p>
+        <Heading level={1} className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+          {t('feed.title')}
+        </Heading>
+      </header>
       <CreatePostBox user={currentUser} onOpenCreateModal={() => setCreating(true)} />
       <nav aria-label={t('social.feedFilters')} className="flex gap-2 overflow-x-auto">
-        {(['ALL', 'MINE', 'LECTURERS'] as const).map((value) => (
+        {(['ALL', 'MY_SUBJECTS', 'LECTURERS'] as const).map((value) => (
           <Button
             key={value}
-            variant={tab === value ? 'secondary' : 'ghost'}
+            variant={tab === value ? 'primary' : 'ghost'}
+            leftIcon={value === 'ALL' ? <Sparkles size={16} /> : value === 'MY_SUBJECTS' ? <BookOpen size={16} /> : <GraduationCap size={16} />}
+            className="min-h-11 text-xs"
             aria-pressed={tab === value}
             onClick={() => update('tab', value)}
           >
@@ -107,6 +123,9 @@ export default function FeedPage() {
       {query.isPending || (query.isError && !query.data) ? (
         <QueryFeedback pending={query.isPending} error={query.error} onRetry={query.refetch} />
       ) : null}
+      {tab === 'MY_SUBJECTS' && (enrolled.isPending || enrolled.isError) ? (
+        <QueryFeedback pending={enrolled.isPending} error={enrolled.error} onRetry={enrolled.refetch} />
+      ) : null}
       {recentPosts.map((post) =>
         post.post_id ? (
           <ActivityPost
@@ -114,6 +133,7 @@ export default function FeedPage() {
             postId={post.post_id}
             currentUser={currentUser}
             subjectId={subjectId}
+            subjectIds={subjectIds}
             lecturers={tab === 'LECTURERS'}
           />
         ) : null
@@ -130,6 +150,7 @@ export default function FeedPage() {
                 item={item}
                 currentUser={currentUser}
                 subjectId={subjectId}
+                subjectIds={subjectIds}
                 lecturers={tab === 'LECTURERS'}
               />
             ))}
@@ -149,5 +170,22 @@ export default function FeedPage() {
         />
       ) : null}
     </section>
+  )
+
+  return (
+    <Page maxWidth="2xl">
+      <SocialFeedLayout
+        leftSidebar={
+          <SocialLeftSidebar
+            user={currentUser}
+            subjects={mySubjects}
+            selectedSubjectId={subjectId}
+            onSelectSubject={(id) => update('subject', id ? String(id) : '')}
+          />
+        }
+        centerFeed={centerFeed}
+        rightSidebar={<SocialRightSidebar friends={friends} />}
+      />
+    </Page>
   )
 }

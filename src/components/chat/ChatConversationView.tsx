@@ -10,10 +10,10 @@ import { Popover, PopoverTrigger, PopoverContent, ConfirmDialog } from '@/compon
 import {
   useConversationMessagesInfiniteQuery,
   useRecallMessageMutation,
-  useConversationsQuery,
   useSendMessageMutation,
   useAutoMarkAsRead,
 } from '@/hooks/queries/useChatQuery'
+import { useInfiniteConversationsQuery } from '@/hooks/queries/useMessengerQuery'
 import { type WsConnectionStatus } from '@/services/websocket.service'
 import { uploadSingleMedia } from '@/services/media-upload.service'
 import { useAuthStore } from '@/stores/authStore'
@@ -39,7 +39,7 @@ export function ChatConversationView({
   connectionStatus, typingUsers, onSendTyping,
 }: Readonly<ChatConversationViewProps>) {
   const { t } = useTranslation('chat')
-  const currentUserId = useAuthStore((state) => state.user?.user_id)
+  const currentUserId = useAuthStore((state) => state.user?.user_id ?? Number(state.user?.userId))
   const resolvedTheme = useThemeStore((state) => state.resolvedTheme)
   const [text, setText] = useState('')
   const [mediaUrl, setMediaUrl] = useState<string | null>(null)
@@ -51,10 +51,10 @@ export function ChatConversationView({
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const { data: convListData } = useConversationsQuery()
+  const { data: convListData } = useInfiniteConversationsQuery()
   const activeConv = useMemo(
-    () => convListData?.items?.find((c) => c.conversation_id === conversationId),
-    [convListData?.items, conversationId]
+    () => convListData?.pages.flatMap((page) => page.items ?? []).find((c) => c.conversation_id === conversationId),
+    [convListData, conversationId]
   )
 
   const messagesQuery = useConversationMessagesInfiniteQuery(conversationId ?? 0)
@@ -83,7 +83,7 @@ export function ChatConversationView({
     if (!file) return
     setIsUploading(true)
     try {
-      const res = await uploadSingleMedia(file, 'POST')
+      const res = await uploadSingleMedia(file, 'CHAT')
       setMediaUrl(res.url ?? null)
     } catch (err) {
       toast.error(getApiError(err))
@@ -168,16 +168,15 @@ export function ChatConversationView({
       <header className="h-16 px-4 bg-surface-card border-b border-line-subtle flex items-center justify-between shrink-0 z-10">
         {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Header profile and status row] */}
         <div className="flex items-center gap-3 min-w-0">
-          {onBackToList ? <BackButton onClick={onBackToList} className="md:hidden mr-1" /> : null}
+          {onBackToList ? <BackButton iconOnly onClick={onBackToList} className="md:hidden mr-1 min-h-11 min-w-11" /> : null}
           {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Avatar relative wrap for online dot] */}
           <div className="relative shrink-0">
             <Avatar src={activeConv?.display_avatar_url ?? undefined} name={activeConv?.display_name ?? 'Chat'} size="sm" tone="accent" />
-            <Badge tone="success" className="absolute bottom-0 right-0 w-2.5 h-2.5 p-0 rounded-full border-2 border-surface-card" />
           </div>
           {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Header chat name and status text block] */}
           <div className="truncate">
             <p className="text-sm font-bold text-fg-primary truncate">{activeConv?.display_name || t('messengerTitle', 'Đoạn chat')}</p>
-            <p className="text-xs text-status-success-fg flex items-center gap-1.5">{t('online', 'Đang hoạt động')}</p>
+            <p className="text-xs text-fg-muted">{t(activeConv?.type === 'GROUP' ? 'newGroup' : 'newDirect')}</p>
           </div>
         </div>
         <Badge tone={connectionBadge.tone} size="xs">
@@ -220,18 +219,18 @@ export function ChatConversationView({
         <Form onSubmit={handleSubmit} noValidate className="flex items-center gap-2">
           {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS, NO_RAW_FORM_ELEMENTS [Hidden native file input for media upload] */}
           <div className="hidden"><input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageSelect} aria-label="Upload image" /></div>
-          <Button variant="ghost" size="sm" onClick={() => fileInputRef.current?.click()} loading={isUploading} className="w-9 h-9 p-0 rounded-full text-fg-muted hover:text-action-accent"><ImagePlus size={19} /></Button>
+          <Button variant="ghost" size="sm" onClick={() => fileInputRef.current?.click()} loading={isUploading} aria-label={t('uploadImage')} className="w-11 h-11 p-0 rounded-full text-fg-muted hover:text-action-accent"><ImagePlus size={19} /></Button>
           <Popover open={isEmojiOpen} onOpenChange={setIsEmojiOpen}>
-            <PopoverTrigger asChild><Button variant="ghost" size="sm" className="w-9 h-9 p-0 rounded-full text-fg-muted hover:text-action-accent"><Smile size={19} /></Button></PopoverTrigger>
+            <PopoverTrigger asChild><Button variant="ghost" size="sm" aria-label={t('emojiPicker')} className="w-11 h-11 p-0 rounded-full text-fg-muted hover:text-action-accent"><Smile size={19} /></Button></PopoverTrigger>
             <PopoverContent side="top" align="start" className="p-0 border-0 bg-transparent shadow-none z-50">
               <EmojiPicker onEmojiClick={handleEmojiClick} theme={resolvedTheme === 'dark' ? EmojiTheme.DARK : EmojiTheme.LIGHT} lazyLoadEmojis />
             </PopoverContent>
           </Popover>
-          <Input value={text} onChange={(e) => handleTextChange(e.target.value)} placeholder={t('typeMessage', 'Nhập tin nhắn...')} aria-label={t('typeMessage', 'Nhập tin nhắn...')} className="flex-1 rounded-full bg-surface-sunken" />
+          <Input value={text} onChange={(e) => handleTextChange(e.target.value)} placeholder={t('typeMessage', 'Nhập tin nhắn...')} aria-label={t('typeMessage', 'Nhập tin nhắn...')} className="flex-1 min-w-0 rounded-full bg-surface-sunken" />
           {!text.trim() && !mediaUrl ? (
-            <Button variant="ghost" size="sm" onClick={() => { void sendMessageContent('👍', 'TEXT') }} aria-label={t('likeThumb', 'Thích')} className="w-9 h-9 p-0 rounded-full text-action-accent hover:bg-action-accent/10"><ThumbsUp size={19} /></Button>
+            <Button variant="ghost" size="sm" onClick={() => { void sendMessageContent('👍', 'TEXT') }} aria-label={t('likeThumb', 'Thích')} className="w-11 h-11 p-0 rounded-full text-action-accent hover:bg-action-accent/10"><ThumbsUp size={19} /></Button>
           ) : (
-            <Button variant="primary" size="sm" type="submit" disabled={isUploading} aria-label={t('send', 'Gửi')} className="w-9 h-9 p-0 rounded-full"><Send size={16} /></Button>
+            <Button variant="primary" size="sm" type="submit" disabled={isUploading} aria-label={t('send', 'Gửi')} className="w-11 h-11 p-0 rounded-full"><Send size={16} /></Button>
           )}
         </Form>
       </footer>
