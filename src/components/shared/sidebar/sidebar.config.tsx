@@ -13,6 +13,8 @@ import {
   CalendarCheck,
   ShoppingBag,
   Gamepad2,
+  PenLine,
+  Play,
 } from 'lucide-react'
 import type { NavSection } from './sidebar.types'
 
@@ -21,6 +23,9 @@ export function getSQBNavSections(): NavSection[] {
     {
       label: 'Học tập & Đề thi',
       items: [
+        { label: i18n.t('academic:subjects.title'), to: '/subjects', icon: <BookOpen size={20} /> },
+        { label: i18n.t('academic:proposals.title'), to: '/proposals', icon: <PenLine size={20} /> },
+        { label: i18n.t('academic:practice.title'), to: '/practice', icon: <Play size={20} /> },
         {
           label: 'Tổng quan',
           to: '/dashboard',

@@ -1,143 +1,141 @@
-import { useState, useEffect } from 'react'
+import { type FormEvent } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Search as SearchIcon, Users, FileText, HelpCircle, Layers } from 'lucide-react'
-import { Heading, Text } from '@/components/ui/typography'
-import { Button } from '@/components/ui/actions'
-import { SearchInput } from '@/components/ui/forms'
-import { Card } from '@/components/ui/data-display'
-import { useGlobalSearchQuery } from '@/hooks/queries/useSearchQuery'
+import { Heading } from '@/components/ui/typography/Heading'
+import { Button } from '@/components/ui/actions/Button'
+import { SubmitButton } from '@/components/ui/actions/SubmitButton'
+import { Form } from '@/components/ui/forms/Form'
+import { FormField } from '@/components/ui/forms/FormField'
+import { SearchInput } from '@/components/ui/forms/SearchInput'
+import {
+  useInfiniteSearchQuery,
+  useRecordSearchMutation,
+  type SearchType,
+} from '@/hooks/queries/useSocialListsQuery'
+import { QueryFeedback } from '@/components/social/QueryFeedback'
+import { LoadMore } from '@/components/social/LoadMore'
 import { SearchResultItemCard } from './SearchResultItemCard'
 import { SearchHistorySection } from './SearchHistorySection'
-import { QueryFeedback } from '@/components/social/QueryFeedback'
+import { getApiError } from '@/lib/api-error'
+import { toast } from '@/lib/toast'
+import { useDebounceValue } from '@/hooks/useDebounce'
 
-type SearchType = 'ALL' | 'POST' | 'QUESTION' | 'USER'
+const TYPES: SearchType[] = ['ALL', 'USER', 'POST', 'QUESTION', 'SESSION', 'SUBJECT']
+function SearchBox({
+  keyword,
+  onSearch,
+  onChange,
+}: Readonly<{
+  keyword: string
+  onSearch: (value: string) => void
+  onChange: (value: string) => void
+}>) {
+  const { t } = useTranslation()
+  function submit(event: FormEvent) {
+    event.preventDefault()
+    onSearch(keyword.trim())
+  }
+  return (
+    <Form onSubmit={submit} noValidate className="flex gap-2">
+      <FormField className="flex-1">
+        <SearchInput
+          aria-label={t('search.placeholder')}
+          value={keyword}
+          onChange={onChange}
+          placeholder={t('search.placeholder')}
+        />
+      </FormField>
+      <SubmitButton>{t('social.searchSubmit')}</SubmitButton>
+    </Form>
+  )
+}
 
 export default function SearchPage() {
   const { t } = useTranslation()
-  const [searchParams, setSearchParams] = useSearchParams()
-
-  const queryParam = searchParams.get('q') || ''
-  const typeParam = searchParams.get('type')
-  const activeType: SearchType = typeParam === 'POST' || typeParam === 'QUESTION' || typeParam === 'USER' ? typeParam : 'ALL'
-
-  const [keyword, setKeyword] = useState(queryParam)
-
-  // Sync internal state when URL params change
-  useEffect(() => {
-    setKeyword(queryParam)
-  }, [queryParam])
-
-  // Debounced URL sync on keyword change
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const current = searchParams.get('q') || ''
-      if (keyword.trim() !== current) {
-        const nextParams = new URLSearchParams(searchParams)
-        if (keyword.trim()) {
-          nextParams.set('q', keyword.trim())
-        } else {
-          nextParams.delete('q')
-        }
-        setSearchParams(nextParams, { replace: true })
-      }
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [keyword, searchParams, setSearchParams])
-
-  function handleTypeChange(newType: SearchType) {
-    const nextParams = new URLSearchParams(searchParams)
-    if (newType === 'ALL') {
-      nextParams.delete('type')
-    } else {
-      nextParams.set('type', newType)
-    }
-    setSearchParams(nextParams, { replace: true })
+  const [params, setParams] = useSearchParams()
+  const keyword = params.get('q') ?? ''
+  const type = TYPES.find((value) => value === params.get('type')) ?? 'ALL'
+  const debounced = useDebounceValue(keyword, 300)
+  const query = useInfiniteSearchQuery(debounced, type)
+  const record = useRecordSearchMutation()
+  const items = query.data?.pages.flatMap((page) => page.items ?? []) ?? []
+  function update(value: string, confirmed = false) {
+    setParams(
+      (previous) => {
+        const next = new URLSearchParams(previous)
+        if (value) next.set('q', value)
+        else next.delete('q')
+        return next
+      },
+      { replace: !confirmed }
+    )
+    if (confirmed && value.length >= 2)
+      record.mutate(value, {
+        onError: (error) => toast.error(getApiError(error, t('zone2.actionError'))),
+      })
   }
-
-  function handleSelectHistoryKeyword(selected: string) {
-    setKeyword(selected)
-    const nextParams = new URLSearchParams(searchParams)
-    nextParams.set('q', selected)
-    setSearchParams(nextParams)
-  }
-
-  const { data, isLoading, isError, error, refetch } = useGlobalSearchQuery(
-    { keyword: queryParam, type: activeType === 'ALL' ? undefined : activeType, limit: 30 },
-    { enabled: Boolean(queryParam.trim()) }
-  )
-
-  const items = data?.items || []
-  const hasQuery = Boolean(queryParam.trim())
-
   return (
-    <main className="max-w-4xl mx-auto py-6 px-4 space-y-6">
-      <header className="space-y-1">
-        <Heading level={1} className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">
-          {t('search.title', 'Tìm kiếm toàn cục')}
+    <section className="space-y-5">
+      <header className="space-y-2">
+        <Heading level={1} className="text-2xl font-bold">
+          {t('search.title')}
         </Heading>
-        <Text size="sm" tone="muted">{t('search.subtitle', 'Tìm kiếm bạn học, giảng viên, bài viết thảo luận và ngân hàng câu hỏi ôn tập')}</Text>
+        <p className="text-sm text-text-muted">{t('social.searchSubtitle')}</p>
       </header>
-
-      {/* Search Input Bar */}
-      {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Search input wrapper] */}
-      <div className="relative">
-        <SearchInput
-          aria-label="Nhập từ khóa tìm kiếm"
-          placeholder={t('search.inputPlaceholder', 'Nhập tên sinh viên, môn học, bài viết hoặc câu hỏi ôn tập...')}
-          value={keyword}
-          onChange={(val) => setKeyword(val)}
-          className="w-full min-h-12 text-sm shadow-sm"
-        />
-      </div>
-
-      {/* Filter Tabs */}
-      <nav aria-label="Bộ lọc loại thực thể" className="flex items-center gap-2 overflow-x-auto pb-1 border-b border-line-subtle">
-        <Button variant={activeType === 'ALL' ? 'secondary' : 'ghost'} size="sm" onClick={() => handleTypeChange('ALL')} className="text-xs min-h-11" leftIcon={<Layers size={15} />}>
-          {t('search.filterAll', 'Tất cả')}
-        </Button>
-        <Button variant={activeType === 'USER' ? 'secondary' : 'ghost'} size="sm" onClick={() => handleTypeChange('USER')} className="text-xs min-h-11" leftIcon={<Users size={15} />}>
-          {t('search.filterUser', 'Người dùng')}
-        </Button>
-        <Button variant={activeType === 'POST' ? 'secondary' : 'ghost'} size="sm" onClick={() => handleTypeChange('POST')} className="text-xs min-h-11" leftIcon={<FileText size={15} />}>
-          {t('search.filterPost', 'Bài viết')}
-        </Button>
-        <Button variant={activeType === 'QUESTION' ? 'secondary' : 'ghost'} size="sm" onClick={() => handleTypeChange('QUESTION')} className="text-xs min-h-11" leftIcon={<HelpCircle size={15} />}>
-          {t('search.filterQuestion', 'Câu hỏi')}
-        </Button>
+      <SearchBox
+        keyword={keyword}
+        onChange={(value) => update(value)}
+        onSearch={(value) => update(value, true)}
+      />
+      <nav aria-label={t('search.title')} className="flex gap-2 overflow-x-auto">
+        {TYPES.map((value) => (
+          <Button
+            key={value}
+            variant={type === value ? 'secondary' : 'ghost'}
+            aria-pressed={type === value}
+            onClick={() =>
+              setParams((previous) => {
+                const next = new URLSearchParams(previous)
+                next.set('type', value)
+                return next
+              })
+            }
+          >
+            {value === 'SESSION'
+              ? t('social.searchSession')
+              : value === 'SUBJECT'
+                ? t('social.searchSubject')
+                : t(
+                    `search.filter_${value === 'ALL' ? 'all' : value === 'USER' ? 'users' : value === 'POST' ? 'posts' : 'questions'}`
+                  )}
+          </Button>
+        ))}
       </nav>
-
-      {/* Main Content: Results or History */}
-      {!hasQuery ? (
-        <SearchHistorySection onSelectKeyword={handleSelectHistoryKeyword} />
-      ) : isError ? (
-        <QueryFeedback error={error} onRetry={refetch} />
-      ) : isLoading ? (
-        <Card className="p-6 sm:p-10 text-center bg-surface border-line-subtle rounded-2xl">
-          <Text size="sm" tone="muted">{t('search.searching', 'Đang tìm kiếm kết quả...')}</Text>
-        </Card>
-      ) : items.length > 0 ? (
-        /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Search results stack] */
-        <div className="space-y-3">
-          <Text size="xs" tone="muted">
-            {t('search.resultCount', { count: items.length, defaultValue: `Tìm thấy ${items.length} kết quả phù hợp` })}
-          </Text>
-          {items.map((item, idx) => {
-            const hitKey = item.post?.post_id ? `post-${item.post.post_id}` : item.user?.user_id ? `user-${item.user.user_id}` : item.question?.question_id ? `q-${item.question.question_id}` : `hit-${idx}`
-            return <SearchResultItemCard key={hitKey} item={item} />
-          })}
-        </div>
+      {!keyword.trim() ? (
+        <SearchHistorySection onSelectKeyword={(value) => update(value, true)} />
       ) : (
-        <Card className="p-6 sm:p-10 text-center bg-surface border-line-subtle rounded-2xl space-y-2">
-          <SearchIcon size={28} className="mx-auto text-text-muted" />
-          <Heading level={3} className="text-base font-bold text-text-primary">
-            {t('search.noResultsTitle', 'Không tìm thấy kết quả phù hợp')}
-          </Heading>
-          <Text size="xs" tone="muted">
-            {t('search.noResultsDesc', 'Hãy thử tìm kiếm với từ khóa khác hoặc chuyển đổi loại danh mục bộ lọc.')}
-          </Text>
-        </Card>
+        <>
+          {query.isPending || (query.isError && !query.data) ? (
+            <QueryFeedback pending={query.isPending} error={query.error} onRetry={query.refetch} />
+          ) : null}
+          {query.isSuccess && items.length === 0 ? <p>{t('search.empty_results')}</p> : null}
+          {items.length > 0 ? (
+            <p className="text-sm text-text-muted">
+              {t('social.results', {
+                count: items.length,
+                total: query.data?.pages[0]?.total_hits ?? items.length,
+              })}
+            </p>
+          ) : null}
+          {items.map((item) => (
+            <SearchResultItemCard
+              key={`${item.type}-${item.user?.user_id ?? item.post?.post_id ?? item.question?.question_id ?? item.session?.session_id ?? item.subject?.subject_id}`}
+              item={item}
+            />
+          ))}
+          <LoadMore query={query} />
+        </>
       )}
-    </main>
+    </section>
   )
 }

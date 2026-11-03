@@ -3,10 +3,36 @@ import { AlertCircle, Search } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '../actions/Button'
 import { Card } from '../data-display/Card'
-import { cn } from '@/utils'
+import { cn } from '@/utils/cn'
 
-export function Page({ children, className }: Readonly<{ children: ReactNode; className?: string }>) {
-  return <div className={cn('mx-auto w-full max-w-[1280px] space-y-6', className)}>{children}</div>
+export interface PageProps {
+  children: ReactNode
+  className?: string
+  maxWidth?: 'default' | '2xl' | 'full'
+}
+
+const PAGE_MAX_WIDTH: Record<'default' | '2xl' | 'full', string> = {
+  default: 'max-w-7xl',
+  '2xl': 'max-w-screen-2xl',
+  full: 'max-w-full',
+}
+
+export function Page({
+  children,
+  className,
+  maxWidth = 'default',
+}: Readonly<PageProps>) {
+  return (
+    <div
+      className={cn(
+        'mx-auto w-full space-y-6',
+        PAGE_MAX_WIDTH[maxWidth],
+        className
+      )}
+    >
+      {children}
+    </div>
+  )
 }
 
 export function PageHeader({

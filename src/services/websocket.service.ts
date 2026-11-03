@@ -9,11 +9,37 @@ import type {
   WsTypingBroadcastDto,
 } from '@/types/websocket.types'
 
+export type WsConnectionStatus = 'CONNECTED' | 'CONNECTING' | 'DISCONNECTED'
+
 class WebSocketService {
   private client: Client | null = null
   private isConnected = false
+  private status: WsConnectionStatus = 'DISCONNECTED'
+  private readonly statusListeners = new Set<(status: WsConnectionStatus) => void>()
   private readonly messageListeners = new Set<(msg: WsMessageBroadcastDto) => void>()
   private readonly typingListeners = new Map<number, Set<(typing: WsTypingBroadcastDto) => void>>()
+  private readonly activeTypingSubs = new Map<number, StompSubscription>()
+
+  public getStatus(): WsConnectionStatus {
+    return this.status
+  }
+
+  public onConnection(callback: (connected: boolean) => void): () => void {
+    return this.onStatusChange((status) => callback(status === 'CONNECTED'))
+  }
+
+  public onStatusChange(callback: (status: WsConnectionStatus) => void): () => void {
+    this.statusListeners.add(callback)
+    callback(this.status)
+    return () => {
+      this.statusListeners.delete(callback)
+    }
+  }
+
+  private setStatus(newStatus: WsConnectionStatus): void {
+    this.status = newStatus
+    this.statusListeners.forEach((fn) => fn(newStatus))
+  }
 
   public get connected(): boolean { return this.isConnected && !!this.client?.connected }
 
@@ -21,7 +47,15 @@ class WebSocketService {
     const token = useAuthStore.getState().token
     if (!token || this.client?.active) return
 
-    const wsUrl = import.meta.env.VITE_WS_URL || 'wss://snsqb.duckdns.org/api/v1/ws'
+    this.setStatus('CONNECTING')
+    const apiUrl = new URL(import.meta.env.VITE_API_URL || '/api/v1', window.location.origin)
+    apiUrl.protocol = apiUrl.protocol === 'https:' ? 'wss:' : 'ws:'
+    apiUrl.pathname = `${apiUrl.pathname.replace(/\/$/, '')}/ws`
+    const rawWsUrl = import.meta.env.VITE_WS_URL || apiUrl.toString()
+    const normalizedWsUrl = rawWsUrl.endsWith('/websocket')
+      ? rawWsUrl
+      : `${rawWsUrl.replace(/\/+$/, '')}/websocket`
+    const wsUrl = `${normalizedWsUrl}?token=${encodeURIComponent(token)}`
 
     this.client = new Client({
       brokerURL: wsUrl,
@@ -33,14 +67,22 @@ class WebSocketService {
       heartbeatOutgoing: 4000,
       onConnect: () => {
         this.isConnected = true
+        this.setStatus('CONNECTED')
         this.subscribePrivateMessages()
+        this.resubscribeTypingListeners()
       },
-      onWebSocketClose: () => { this.isConnected = false },
       onDisconnect: () => {
         this.isConnected = false
+        this.setStatus('DISCONNECTED')
+      },
+      onWebSocketClose: () => {
+        this.isConnected = false
+        this.activeTypingSubs.clear()
+        this.setStatus('DISCONNECTED')
       },
       onStompError: (frame) => {
         logger.error('[STOMP Error]', { data: frame.headers['message'] })
+        this.setStatus('DISCONNECTED')
       },
     })
 
@@ -59,6 +101,23 @@ class WebSocketService {
     })
   }
 
+  private resubscribeTypingListeners(): void {
+    if (!this.client || !this.isConnected) return
+    this.typingListeners.forEach((listeners, convId) => {
+      if (listeners.size > 0 && !this.activeTypingSubs.has(convId)) {
+        const sub = this.client!.subscribe(`/topic/conv.${convId}.typing`, (msg: IMessage) => {
+          try {
+            const payload: WsTypingBroadcastDto = JSON.parse(msg.body)
+            listeners.forEach((fn) => fn(payload))
+          } catch {
+            // ignore parse error
+          }
+        })
+        this.activeTypingSubs.set(convId, sub)
+      }
+    })
+  }
+
   public subscribeTyping(
     conversationId: number,
     callback: (typing: WsTypingBroadcastDto) => void
@@ -68,21 +127,28 @@ class WebSocketService {
     }
     this.typingListeners.get(conversationId)!.add(callback)
 
-    let sub: StompSubscription | null = null
-    if (this.client && this.isConnected) {
-      sub = this.client.subscribe(`/topic/conv.${conversationId}.typing`, (msg: IMessage) => {
+    if (this.client && this.isConnected && !this.activeTypingSubs.has(conversationId)) {
+      const sub = this.client.subscribe(`/topic/conv.${conversationId}.typing`, (msg: IMessage) => {
         try {
           const payload: WsTypingBroadcastDto = JSON.parse(msg.body)
-          callback(payload)
+          this.typingListeners.get(conversationId)?.forEach((fn) => fn(payload))
         } catch {
           // ignore parse error
         }
       })
+      this.activeTypingSubs.set(conversationId, sub)
     }
 
     return () => {
-      this.typingListeners.get(conversationId)?.delete(callback)
-      sub?.unsubscribe()
+      const set = this.typingListeners.get(conversationId)
+      if (set) {
+        set.delete(callback)
+        if (set.size === 0) {
+          this.typingListeners.delete(conversationId)
+          this.activeTypingSubs.get(conversationId)?.unsubscribe()
+          this.activeTypingSubs.delete(conversationId)
+        }
+      }
     }
   }
 
@@ -93,12 +159,13 @@ class WebSocketService {
     }
   }
 
-  public sendMessage(payload: SendWsMessageRequestDto): void {
-    if (!this.client || !this.isConnected) return
+  public sendMessage(payload: SendWsMessageRequestDto): boolean {
+    if (!this.client || !this.isConnected) return false
     this.client.publish({
       destination: '/app/chat.send',
       body: JSON.stringify(payload),
     })
+    return true
   }
 
   public markAsRead(payload: ReadWsMessageRequestDto): void {
@@ -122,6 +189,8 @@ class WebSocketService {
       void this.client.deactivate()
       this.client = null
       this.isConnected = false
+      this.setStatus('DISCONNECTED')
+      this.activeTypingSubs.clear()
     }
   }
 }

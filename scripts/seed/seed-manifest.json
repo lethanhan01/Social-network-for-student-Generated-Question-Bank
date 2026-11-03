@@ -1,0 +1,150 @@
+{
+  "seeded_at": "2026-10-30T09:01:53.809Z",
+  "environment": "https://snsqb.duckdns.org/api/v1",
+  "created_entities": {
+    "sessions": [
+      {
+        "id": 53,
+        "authorId": 157,
+        "title": "Bộ câu hỏi ôn tập Chương 1: Kiến trúc Web Client-Server & HTTP Protocols #SQB_SEED"
+      },
+      {
+        "id": 54,
+        "authorId": 164,
+        "title": "Bộ câu hỏi ôn tập Chương 2: RESTful API & Bảo mật Ứng dụng Web #SQB_SEED"
+      },
+      {
+        "id": 55,
+        "authorId": 139,
+        "title": "Bộ câu hỏi ôn tập Chương 3: CSS Modern Layout & Hiệu Năng Tải Trang Web #SQB_SEED"
+      }
+    ],
+    "posts": [
+      {
+        "id": 55,
+        "authorId": 157
+      },
+      {
+        "id": 56,
+        "authorId": 164
+      },
+      {
+        "id": 57,
+        "authorId": 139
+      },
+      {
+        "id": 58,
+        "authorId": 163
+      },
+      {
+        "id": 59,
+        "authorId": 158
+      },
+      {
+        "id": 60,
+        "authorId": 157
+      },
+      {
+        "id": 61,
+        "authorId": 164
+      },
+      {
+        "id": 62,
+        "authorId": 139
+      }
+    ],
+    "comments": [
+      {
+        "id": 55,
+        "authorId": 164
+      },
+      {
+        "id": 56,
+        "authorId": 157
+      },
+      {
+        "id": 57,
+        "authorId": 139
+      },
+      {
+        "id": 58,
+        "authorId": 158
+      },
+      {
+        "id": 59,
+        "authorId": 157
+      },
+      {
+        "id": 60,
+        "authorId": 163
+      },
+      {
+        "id": 61,
+        "authorId": 164
+      },
+      {
+        "id": 62,
+        "authorId": 157
+      },
+      {
+        "id": 63,
+        "authorId": 164
+      },
+      {
+        "id": 64,
+        "authorId": 163
+      },
+      {
+        "id": 65,
+        "authorId": 157
+      },
+      {
+        "id": 66,
+        "authorId": 139
+      },
+      {
+        "id": 67,
+        "authorId": 157
+      },
+      {
+        "id": 68,
+        "authorId": 164
+      },
+      {
+        "id": 69,
+        "authorId": 139
+      },
+      {
+        "id": 70,
+        "authorId": 163
+      },
+      {
+        "id": 71,
+        "authorId": 158
+      },
+      {
+        "id": 72,
+        "authorId": 157
+      },
+      {
+        "id": 73,
+        "authorId": 139
+      }
+    ],
+    "conversations": {
+      "direct": [
+        2,
+        4
+      ],
+      "group": [
+        5
+      ]
+    },
+    "friend_requests": [
+      {
+        "requester_id": 158,
+        "addressee_id": 163
+      }
+    ]
+  }
+}

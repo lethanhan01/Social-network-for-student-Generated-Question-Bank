@@ -11,15 +11,16 @@ export function useChatRealtime() {
   useEffect(() => {
     webSocketService.connect()
     const unsubscribe = webSocketService.onMessage((message) => {
+      void client.invalidateQueries({ queryKey: queryKeys.conversations.list() })
+      void client.invalidateQueries({ queryKey: queryKeys.conversations.infiniteList() })
       void client.invalidateQueries({ queryKey: queryKeys.conversations.inbox() })
       void client.invalidateQueries({ queryKey: queryKeys.conversations.hidden() })
       void client.invalidateQueries({ queryKey: queryKeys.conversations.messageThread(message.conversation_id) })
     })
-    const timer = window.setInterval(() => setConnected(webSocketService.connected), 1000)
+    const unsubscribeStatus = webSocketService.onConnection(setConnected)
     return () => {
-      clearInterval(timer)
+      unsubscribeStatus()
       unsubscribe()
-      webSocketService.disconnect()
     }
   }, [client, token])
   return connected

@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useSearchParams } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { ProtectedRoute } from './components/shared/protected-route/ProtectedRoute'
 import { FullScreenLoader } from './components/shared/spinner/Spinner'
@@ -7,6 +7,7 @@ import { ErrorBoundary } from './components/shared/error-boundary/ErrorBoundary'
 import { useTheme } from './stores/themeStore'
 
 const DashboardLayout = lazy(() => import('./layouts/DashboardLayout'))
+const SocialLayout = lazy(() => import('./layouts/SocialLayout'))
 const AuthLayout = lazy(() => import('./layouts/AuthLayout'))
 
 const LoginPage = lazy(() => import('./pages/auth/LoginPage'))
@@ -16,15 +17,24 @@ const PostDetailPage = lazy(() => import('./pages/post/PostDetailPage'))
 const ProfilePage = lazy(() => import('./pages/profile/ProfilePage'))
 const FriendsPage = lazy(() => import('./pages/friends/FriendsPage'))
 const SearchPage = lazy(() => import('./pages/search/SearchPage'))
-const DesignSystemShowcasePage = lazy(() => import('./pages/dev/DesignSystemShowcasePage'))
-const LeaderboardPage = lazy(() => import('./pages/gamification/LeaderboardPage'))
-const ShopPage = lazy(() => import('./pages/gamification/ShopPage'))
-const MinigamesPage = lazy(() => import('./pages/gamification/MinigamesPage'))
-
 const MessagesPage = lazy(() => import('./pages/messages/MessagesPage'))
 const HiddenVaultPage = lazy(() => import('./pages/messages/HiddenVaultPage'))
 const SettingsPage = lazy(() => import('./pages/settings/SettingsPage'))
 const NotificationsPage = lazy(() => import('./pages/notifications/NotificationsPage'))
+const ChatPage = lazy(() => import('./pages/chat/ChatPage'))
+const DesignSystemShowcasePage = lazy(() => import('./pages/dev/DesignSystemShowcasePage'))
+const LeaderboardPage = lazy(() => import('./pages/gamification/LeaderboardPage'))
+const ShopPage = lazy(() => import('./pages/gamification/ShopPage'))
+const MinigamesPage = lazy(() => import('./pages/gamification/MinigamesPage'))
+const SubjectsPage = lazy(() => import('./pages/subjects/SubjectsPage'))
+const ProposalsPage = lazy(() => import('./pages/proposals/ProposalsPage'))
+const PracticePage = lazy(() => import('./pages/practice/PracticePage'))
+const QuestionAnalyticsPage = lazy(() => import('./pages/questions/QuestionAnalyticsPage'))
+
+function MessagesRoute() {
+  const [params] = useSearchParams()
+  return params.has('userId') || params.has('conversation') ? <MessagesPage /> : <ChatPage />
+}
 
 export default function App() {
   // Sync global theme
@@ -44,19 +54,26 @@ export default function App() {
 
           {/* Protected Application Flow */}
           <Route element={<ProtectedRoute />}>
-            <Route element={<DashboardLayout />}>
+            <Route element={<SocialLayout />}>
               <Route path="/feed" element={<FeedPage />} />
               <Route path="/posts/:id" element={<PostDetailPage />} />
               <Route path="/profile/:userId" element={<ProfilePage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/friends" element={<FriendsPage />} />
               <Route path="/search" element={<SearchPage />} />
-
+            </Route>
+            <Route element={<DashboardLayout />}>
+              <Route path="/messages" element={<MessagesRoute />} />
+              <Route path="/messages/:conversationId" element={<ChatPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/exams" element={<DashboardPage />} />
-              <Route path="/questions" element={<DashboardPage />} />
+              <Route path="/questions" element={<SubjectsPage />} />
+              <Route path="/subjects" element={<SubjectsPage />} />
+              <Route path="/proposals" element={<ProposalsPage />} />
+              <Route path="/practice" element={<PracticePage />} />
+              <Route path="/practice/:sessionId" element={<PracticePage />} />
+              <Route path="/questions/:id/analytics" element={<QuestionAnalyticsPage />} />
               <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/messages" element={<MessagesPage />} />
               <Route path="/messages/hidden-vault" element={<HiddenVaultPage />} />
               <Route path="/notifications" element={<NotificationsPage />} />
               <Route path="/gamification/leaderboard" element={<LeaderboardPage />} />

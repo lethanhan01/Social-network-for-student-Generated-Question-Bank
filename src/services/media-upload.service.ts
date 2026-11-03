@@ -1,15 +1,10 @@
 import axios from 'axios'
 import { utilityService } from './utility.service'
 import type { MediaItem, PresignFileItem } from '@/types'
+import i18n from '@/lib/i18n'
 
 export type UploadPurpose =
-  | 'AVATAR'
-  | 'COVER'
-  | 'QUESTION'
-  | 'POST'
-  | 'COMMENT'
-  | 'CHAT'
-  | 'DOCUMENT'
+  'AVATAR' | 'COVER' | 'QUESTION' | 'POST' | 'COMMENT' | 'CHAT' | 'DOCUMENT'
 
 function detectMediaType(file: File): 'IMAGE' | 'VIDEO' | 'DOCUMENT' {
   if (file.type.startsWith('image/')) return 'IMAGE'
@@ -26,6 +21,13 @@ export async function uploadSingleMedia(
   file: File,
   purpose: UploadPurpose = 'POST'
 ): Promise<MediaItem> {
+  if (
+    !file.size ||
+    file.size > 15 * 1024 * 1024 ||
+    (['AVATAR', 'COVER', 'COMMENT'].includes(purpose) && !file.type.startsWith('image/'))
+  ) {
+    throw new Error(i18n.t('social.fileError'))
+  }
   const mediaType = detectMediaType(file)
 
   try {
@@ -71,6 +73,7 @@ export async function uploadSingleMedia(
   } catch (err: unknown) {
     // If presign flow failed with network / CORS / 404, fallback to direct multipart upload
     const directRes = await utilityService.uploadDirectMedia(file, purpose)
+    if (!directRes.url) throw new Error(i18n.t('social.fileError'))
     return {
       url: directRes.url,
       key: directRes.object_key,
@@ -84,6 +87,7 @@ export async function uploadSingleMedia(
 
   // Fallback direct upload if presign returned empty urls
   const directRes = await utilityService.uploadDirectMedia(file, purpose)
+  if (!directRes.url) throw new Error(i18n.t('social.fileError'))
   return {
     url: directRes.url,
     key: directRes.object_key,

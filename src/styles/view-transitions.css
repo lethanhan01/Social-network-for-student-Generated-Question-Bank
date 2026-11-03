@@ -1,0 +1,50 @@
+/**
+ * @fileoverview SQB HUST Native View Transitions Architecture
+ * Tuân thủ Vercel React View Transitions & WCAG 2.1 AA Reduced Motion
+ */
+
+/* 1. Root cross-fade animation */
+::view-transition-old(root) {
+  animation: 180ms ease-out both vt-fade-out;
+}
+::view-transition-new(root) {
+  animation: 220ms ease-in both vt-fade-in;
+}
+
+@keyframes vt-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 2. Shared Element Morph: Avatar */
+.vt-avatar {
+  view-transition-name: user-avatar;
+}
+
+/* 3. Shared Element Morph: Post Detail Card */
+.vt-post-card {
+  view-transition-name: post-card-morph;
+}
+
+/* 4. Trợ năng A11Y: Vô hiệu hóa animation khi người dùng bật reduced motion (A11Y_REDUCED_MOTION) */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none;
+  }
+}
+

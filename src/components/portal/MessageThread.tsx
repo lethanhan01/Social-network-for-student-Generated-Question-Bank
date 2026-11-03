@@ -54,7 +54,10 @@ export function MessageThread({ conversation, hidden, connected, onBack, onSetti
       setError(t('messages.offline'))
       return
     }
-    webSocketService.sendMessage({ conversation_id: id, content: result.data, message_type: 'TEXT' })
+    if (!webSocketService.sendMessage({ conversation_id: id, content: result.data, message_type: 'TEXT' })) {
+      setError(t('messages.offline'))
+      return
+    }
     setDraft('')
   }
   async function handleVisibility() {

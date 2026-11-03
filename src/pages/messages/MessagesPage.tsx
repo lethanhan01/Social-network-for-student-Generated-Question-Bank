@@ -1,3 +1,4 @@
+import { StartDirectConversation } from '@/components/portal/StartDirectConversation'
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -109,7 +110,7 @@ export function Inbox({ hidden = false }: { hidden?: boolean }) {
 export default function MessagesPage() {
   const { t } = useTranslation('portal')
   return (
-    <Page>
+    <Page className="h-full overflow-y-auto p-4 sm:p-6">
       <PageHeader eyebrow={t('eyebrow')} title={t('messages.title')} description={t('messages.description')} />
       <nav className="mb-4 flex justify-end">
         <ButtonLink to="/messages/hidden-vault" variant="outline">
@@ -117,6 +118,7 @@ export default function MessagesPage() {
           {t('vault.title')}
         </ButtonLink>
       </nav>
+      <StartDirectConversation />
       <Inbox />
     </Page>
   )

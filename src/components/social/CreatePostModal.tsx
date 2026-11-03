@@ -1,219 +1,156 @@
-import { useState, useRef, type ChangeEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Image as ImageIcon, X } from 'lucide-react'
-import { Modal } from '@/components/ui/overlay'
-import {
-  Form,
-  FormField,
-  Textarea,
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from '@/components/ui/forms'
-import { Button, SubmitButton } from '@/components/ui/actions'
-import { Text } from '@/components/ui/typography'
+import { Modal } from '@/components/ui/overlay/Modal'
+import { Form } from '@/components/ui/forms/Form'
+import { FormField } from '@/components/ui/forms/FormField'
+import { Textarea } from '@/components/ui/forms/Textarea'
+import { Select } from '@/components/ui/forms/Select'
+import { Button } from '@/components/ui/actions/Button'
+import { SubmitButton } from '@/components/ui/actions/SubmitButton'
 import { uploadMultipleMedia } from '@/services/media-upload.service'
 import { toast } from '@/lib/toast'
-import type { SubjectResponse, CreatePostRequest } from '@/types'
+import { getApiError } from '@/lib/api-error'
+import { PostAttachments } from './PostAttachments'
+import type { SubjectResponse, CreatePostRequest, PostVisibility } from '@/types'
 
 interface CreatePostModalProps {
   isOpen: boolean
   onClose: () => void
   onSubmit: (payload: CreatePostRequest) => Promise<unknown>
   subjects?: SubjectResponse[]
+  authorRole?: string
 }
-
 export function CreatePostModal({
   isOpen,
   onClose,
   onSubmit,
   subjects = [],
+  authorRole,
 }: Readonly<CreatePostModalProps>) {
   const { t } = useTranslation()
   const [content, setContent] = useState('')
-  const [subjectId, setSubjectId] = useState<string>('')
-  const [visibility, setVisibility] = useState<'PUBLIC' | 'FRIENDS' | 'ONLY_ME'>('PUBLIC')
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
-  const [loading, setLoading] = useState(false)
-  const [errors, setErrors] = useState<{ content?: string }>({})
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
-  function handleFileSelect(e: ChangeEvent<HTMLInputElement>) {
-    if (!e.target.files?.length) return
-    const newFiles = Array.from(e.target.files)
-    setSelectedFiles((prev) => [...prev, ...newFiles])
-    e.target.value = ''
-  }
-
-  function handleRemoveFile(index: number) {
-    setSelectedFiles((prev) => prev.filter((_, i) => i !== index))
-  }
-
-  async function handleSubmit() {
-    if (!content.trim()) {
-      setErrors({ content: t('feed.createPost.contentRequired', 'Vui lòng nhập nội dung bài viết thảo luận') })
+  const [subjectId, setSubjectId] = useState('')
+  const [visibility, setVisibility] = useState<PostVisibility>('PUBLIC')
+  const [postType, setPostType] = useState<'SOCIAL_POST' | 'LEARNING_VIDEO'>('SOCIAL_POST')
+  const [files, setFiles] = useState<File[]>([])
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  async function submit(event: FormEvent) {
+    event.preventDefault()
+    if (busy) return
+    if (!content.trim() && files.length === 0) {
+      setError(t('feed.createPost.contentRequired'))
       return
     }
-
-    setLoading(true)
+    if (
+      postType === 'LEARNING_VIDEO' &&
+      (!subjectId || !files.some((file) => file.type.startsWith('video/')))
+    ) {
+      setError(t('social.videoRequired'))
+      return
+    }
+    setBusy(true)
     try {
-      let media_urls
-      if (selectedFiles.length > 0) {
-        media_urls = await uploadMultipleMedia(selectedFiles, 'POST')
-      }
-
+      const media_urls = files.length > 0 ? await uploadMultipleMedia(files, 'POST') : undefined
       await onSubmit({
         content: content.trim(),
         visibility,
-        post_type: 'SOCIAL_POST',
+        post_type: postType,
         subject_id: subjectId ? Number(subjectId) : undefined,
         media_urls,
       })
-
-      setContent('')
-      setSubjectId('')
-      setSelectedFiles([])
-      setErrors({})
+      toast.success(t('social.postCreated'))
       onClose()
-    } catch {
-      toast.error(t('feed.createPost.uploadFailed', 'Tải tệp đính kèm hoặc đăng bài thất bại. Vui lòng thử lại.'))
+    } catch (cause) {
+      setError(getApiError(cause, t('feed.createPost.uploadFailed')))
     } finally {
-      setLoading(false)
+      setBusy(false)
     }
   }
-
-  function handleClose() {
-    if (!loading) {
-      setErrors({})
-      onClose()
-    }
-  }
-
   return (
-    <Modal open={isOpen} onClose={handleClose} title={t('feed.createPost.title', 'Tạo bài viết thảo luận mới')} size="xl">
-      <Form onSubmit={handleSubmit} noValidate className="space-y-4">
-        {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Grid layout container for form dropdowns] */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <FormField label={t('feed.createPost.subject', 'Học phần liên quan')}>
-            <Select aria-label="Học phần liên quan" value={subjectId} onValueChange={setSubjectId}>
-              <SelectTrigger aria-label="Chọn học phần liên quan" className="min-h-11">
-                <SelectValue placeholder={t('feed.createPost.selectSubject', 'Chọn học phần (Tùy chọn)')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">-- {t('feed.createPost.noSubject', 'Không chọn học phần')} --</SelectItem>
-                {subjects.map((sub) => (
-                  <SelectItem key={sub.subject_id} value={String(sub.subject_id)}>
-                    {sub.code} - {sub.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </FormField>
-
-          <FormField label={t('feed.createPost.visibility', 'Quyền riêng tư')}>
-            <Select
-              aria-label="Quyền riêng tư"
-              value={visibility}
-              onValueChange={(val) => setVisibility(val as 'PUBLIC' | 'FRIENDS' | 'ONLY_ME')}
-            >
-              <SelectTrigger aria-label="Chọn quyền riêng tư" className="min-h-11">
-                <SelectValue placeholder={t('feed.createPost.selectVisibility', 'Chọn quyền riêng tư')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="PUBLIC">{t('feed.createPost.public', 'Công khai (Toàn trường)')}</SelectItem>
-                <SelectItem value="FRIENDS">{t('feed.createPost.friends', 'Chỉ bạn bè HUST')}</SelectItem>
-                <SelectItem value="ONLY_ME">{t('feed.createPost.onlyMe', 'Chỉ mình tôi')}</SelectItem>
-              </SelectContent>
-            </Select>
-          </FormField>
-        </div>
-
-        <FormField label={t('feed.createPost.contentLabel', 'Nội dung thảo luận')} error={errors.content} required>
-          <Textarea
-            aria-label="Nội dung bài viết"
-            placeholder={t('feed.createPost.placeholder', 'Chia sẻ câu hỏi ôn tập, thắc mắc bài giảng hoặc đề thi thử...')}
-            value={content}
-            onChange={(e) => {
-              setContent(e.target.value)
-              if (errors.content) setErrors({})
-            }}
-            rows={5}
-            maxLength={2000}
-            className="text-sm"
-          />
-          {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Character counter layout] */}
-          <div className="flex justify-end mt-1">
-            <Text size="xs" tone="muted">
-              {content.length}/2000 {t('feed.createPost.charCount', 'ký tự')}
-            </Text>
-          </div>
-        </FormField>
-
-        {/* Media Attachments Section */}
-        {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Media attachment button & list wrapper] */}
-        <div className="space-y-2">
-          {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Attach media trigger container] */}
-          <div className="flex items-center gap-2">
-            {/* rogym-convention-exempt: NO_RAW_FORM_ELEMENTS [Hidden native file input for media selection] */}
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileSelect}
-              multiple
-              accept="image/*,video/*"
-              className="hidden"
-              aria-label={t('feed.createPost.addMedia', 'Đính kèm ảnh/video')}
-            />
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={loading}
-              onClick={() => fileInputRef.current?.click()}
-              className="min-h-11 text-xs gap-1.5"
-            >
-              <ImageIcon size={16} />
-              {t('feed.createPost.addMedia', 'Đính kèm ảnh/video')}
-            </Button>
-          </div>
-
-          {selectedFiles.length > 0 ? (
-            /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Attached file preview chips container] */
-            <div className="flex flex-wrap gap-2 pt-1">
-              {selectedFiles.map((file, idx) => (
-                /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Single file chip] */
-                <div
-                  key={`${file.name}-${idx}`}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-raised border border-border text-xs"
-                >
-                  <Text size="xs" className="max-w-[140px] truncate">
-                    {file.name}
-                  </Text>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleRemoveFile(idx)}
-                    className="h-6 w-6 p-0 hover:bg-surface-elevated rounded-full"
-                    aria-label={`Xóa file ${file.name}`}
-                  >
-                    <X size={12} />
-                  </Button>
-                </div>
-              ))}
-            </div>
+    <Modal
+      open={isOpen}
+      onClose={() => {
+        if (!busy) onClose()
+      }}
+      title={t('feed.createPost.title')}
+      size="xl"
+    >
+      <Form onSubmit={submit} noValidate onInput={() => setError('')} className="space-y-4">
+        <fieldset disabled={busy} className="space-y-4">
+          {authorRole === 'LECTURER' || authorRole === 'ADMIN' ? (
+            <FormField label={t('social.postType')}>
+              <Select
+                ariaLabel={t('social.postType')}
+                value={postType}
+                disabled={busy}
+                clearable={false}
+                onValueChange={(value) => {
+                  setPostType(value as typeof postType)
+                  setError('')
+                }}
+                options={[
+                  { value: 'SOCIAL_POST', label: t('social.discussion') },
+                  { value: 'LEARNING_VIDEO', label: t('social.lectureVideo') },
+                ]}
+              />
+            </FormField>
           ) : null}
-        </div>
-
-        <footer className="flex items-center justify-end gap-3 pt-2">
-          <Button type="button" variant="outline" onClick={handleClose} disabled={loading} className="min-h-11">
-            {t('common.cancel', 'Hủy bỏ')}
+          <FormField label={t('feed.createPost.subject')}>
+            <Select
+              ariaLabel={t('feed.createPost.selectSubject')}
+              value={subjectId}
+              disabled={busy}
+              placeholder={t('feed.createPost.selectSubject')}
+              onValueChange={(value) => {
+                setSubjectId(value)
+                setError('')
+              }}
+              options={subjects
+                .filter((subject) => subject.subject_id)
+                .map((subject) => ({
+                  value: String(subject.subject_id),
+                  label: `${subject.code} · ${subject.name}`,
+                }))}
+            />
+          </FormField>
+          <FormField label={t('feed.createPost.visibility')}>
+            <Select
+              ariaLabel={t('feed.createPost.selectVisibility')}
+              value={visibility}
+              disabled={busy}
+              clearable={false}
+              onValueChange={(value) => setVisibility(value as PostVisibility)}
+              options={(['PUBLIC', 'FRIENDS', 'ONLY_ME'] as const).map((value) => ({
+                value,
+                label: t(`social.visibility.${value}`),
+              }))}
+            />
+          </FormField>
+          <FormField label={t('feed.createPost.contentLabel')} error={error}>
+            <Textarea
+              aria-label={t('social.postContentInput')}
+              placeholder={t('feed.createPost.placeholder')}
+              value={content}
+              onChange={(event) => setContent(event.target.value)}
+              rows={5}
+              maxLength={2000}
+            />
+          </FormField>
+          <PostAttachments
+            files={files}
+            disabled={busy}
+            onChange={(next) => {
+              setFiles(next)
+              setError('')
+            }}
+          />
+        </fieldset>
+        <footer className="flex justify-end gap-3 border-t border-line-subtle pt-4">
+          <Button type="button" variant="outline" disabled={busy} onClick={onClose}>
+            {t('button.cancel')}
           </Button>
-          <SubmitButton loading={loading} variant="primary" className="min-h-11 px-6">
-            {t('feed.createPost.submit', 'Đăng bài viết')}
-          </SubmitButton>
+          <SubmitButton loading={busy}>{t('feed.createPost.submit')}</SubmitButton>
         </footer>
       </Form>
     </Modal>

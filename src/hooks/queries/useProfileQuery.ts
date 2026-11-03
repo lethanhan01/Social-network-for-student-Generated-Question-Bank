@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { userService } from '@/services/user.service'
 import { queryKeys } from '@/lib/query-keys'
 import type { UpdateProfileRequest } from '@/types'
+import { useAuthStore } from '@/stores/authStore'
 
 export function useMyProfileQuery() {
   return useQuery({
@@ -25,6 +26,13 @@ export function useUpdateProfileMutation() {
   return useMutation({
     mutationFn: (payload: UpdateProfileRequest) => userService.updateMyProfile(payload),
     onSuccess: (updated) => {
+      const current = useAuthStore.getState().user
+      if (current) useAuthStore.getState().setUser({ ...current,
+        fullName: updated.full_name ?? current.fullName,
+        avatarUrl: updated.avatar_url ?? current.avatarUrl,
+        avatar_url: updated.avatar_url ?? current.avatar_url,
+        cover_url: updated.cover_url ?? current.cover_url,
+      })
       queryClient.setQueryData(queryKeys.users.profile('me'), updated)
       void queryClient.invalidateQueries({ queryKey: queryKeys.users.all })
     },

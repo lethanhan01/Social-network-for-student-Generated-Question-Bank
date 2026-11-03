@@ -12,6 +12,10 @@
 | MODAL-03: Báo cáo | Popup dùng chung của bài viết, bình luận, hồ sơ và người gửi tin nhắn |
 | MODAL-04: PIN | Kho hội thoại ẩn và Cài đặt > Bảo mật |
 
+## Tích hợp với main
+
+Sau khi đồng bộ main, giao diện chat mới của nhóm tiếp tục phục vụ các route /messages và /messages/:conversationId, giữ gửi ảnh, emoji, trả lời và trạng thái đang gõ. ChatPortalActions bổ sung quản trị nhóm và ẩn hội thoại; sidebar có lối vào kho PIN. Các liên kết /messages?userId=... và /messages?conversation=... vẫn được hỗ trợ. Namespace academic và portal cùng được đăng ký; các route học thuật của main được giữ nguyên. Kho PIN dùng bố cục trang thông thường để tránh bị cắt nội dung bởi khung chat toàn màn hình.
+
 ## Tổ chức mã nguồn
 
 - [Components](./): hộp thoại dùng Sheet/Radix để giữ focus, Escape và khôi phục focus; danh sách hội thoại, khung tin nhắn, bộ chọn người dùng.

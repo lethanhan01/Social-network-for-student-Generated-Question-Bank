@@ -1,71 +1,98 @@
 import { useState } from 'react'
-import { Image } from '@/components/ui/data-display'
-import { Modal } from '@/components/ui/overlay'
+import { useTranslation } from 'react-i18next'
+import { Image } from '@/components/ui/data-display/Image'
+import { Button, ButtonAnchor } from '@/components/ui/actions/Button'
+import { Modal } from '@/components/ui/overlay/Modal'
 import type { MediaItem } from '@/types'
 
-interface PostMediaGridProps {
-  media?: MediaItem[]
-}
-
-export function PostMediaGrid({ media }: Readonly<PostMediaGridProps>) {
-  const [selectedImage, setSelectedImage] = useState<string | null>(null)
-
-  if (!media || media.length === 0) return null
-
+export function PostMediaGrid({ media }: Readonly<{ media?: MediaItem[] | null }>) {
+  const { t } = useTranslation()
+  const [selected, setSelected] = useState<number>()
+  const items = (media ?? []).filter((item) => item.url && /^https?:\/\//i.test(item.url))
+  if (items.length === 0) return null
   return (
     <>
-      {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Media grid wrapper] */}
-      <div
-        className={`grid gap-2 rounded-xl overflow-hidden my-2.5 ${
-          media.length === 1 ? 'grid-cols-1' : 'grid-cols-2'
-        }`}
+      <section
+        aria-label={t('social.images')}
+        className={`grid gap-2 ${items.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}
       >
-        {media.slice(0, 4).map((item, idx) => {
-          const isVideo = item.type === 'VIDEO' || item.url?.endsWith('.mp4')
-          const itemKey = item.key ?? item.url ?? `item-${idx}`
-          return (
-            /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Media preview card container] */
-            <div
-              key={itemKey}
-              className="relative aspect-video bg-surface-elevated rounded-lg overflow-hidden border border-line-subtle"
-            >
-              {isVideo ? (
-                <video
+        {items.map((item, index) => (
+          <figure
+            key={item.key ?? item.url}
+            className="min-w-0 overflow-hidden rounded-xl bg-surface-hover"
+          >
+            {item.type === 'VIDEO' ? (
+              /* rogym-convention-exempt: NO_RAW_MEDIA_ELEMENTS [Native video controls provide playback and keyboard access] */
+              <video
+                src={item.url}
+                controls
+                preload="metadata"
+                className="aspect-video w-full"
+                aria-label={item.name ?? t('social.attachment')}
+              />
+            ) : item.type === 'DOCUMENT' ? (
+              <ButtonAnchor
+                href={item.url!}
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="outline"
+                className="min-h-12 w-full"
+              >
+                {item.name ?? t('social.attachment')}
+              </ButtonAnchor>
+            ) : (
+              <Button
+                variant="ghost"
+                className="h-auto w-full p-0"
+                aria-label={item.name ?? t('social.imageDetail')}
+                onClick={() => setSelected(index)}
+              >
+                <Image
                   src={item.url}
-                  controls
-                  className="w-full h-full object-cover"
-                  aria-label={item.name || 'Video bài viết'}
+                  alt={item.name ?? t('social.imageDetail')}
+                  className="aspect-video w-full object-cover"
                 />
-              ) : (
-                /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Image clickable wrapper] */
-                <div
-                  className="w-full h-full cursor-pointer hover:scale-105 transition-transform"
-                  onClick={() => setSelectedImage(item.url || null)}
-                >
-                  <Image
-                    src={item.url}
-                    alt={item.name || `Hình ảnh bài viết ${idx + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
-            </div>
-          )
-        })}
-      </div>
-
+              </Button>
+            )}
+          </figure>
+        ))}
+      </section>
       <Modal
-        open={Boolean(selectedImage)}
-        onClose={() => setSelectedImage(null)}
-        title="Chi tiết hình ảnh"
+        open={selected !== undefined}
+        onClose={() => setSelected(undefined)}
+        title={t('social.imageDetail')}
         size="xl"
       >
-        {selectedImage ? (
-          <Image
-            src={selectedImage}
-            alt="Ảnh phóng to"
-            className="max-w-full max-h-[75vh] rounded-xl object-contain mx-auto"
-          />
+        {selected !== undefined ? (
+          <section className="space-y-4">
+            <Image
+              src={items[selected]?.url}
+              alt={items[selected]?.name ?? t('social.imageDetail')}
+              className="max-h-96 w-full object-contain"
+            />
+            <nav
+              aria-label={t('social.images')}
+              className="flex items-center justify-between gap-2"
+            >
+              <Button
+                variant="ghost"
+                disabled={selected === 0}
+                onClick={() => setSelected(selected - 1)}
+              >
+                {t('social.previous')}
+              </Button>
+              <output>
+                {t('social.mediaCount', { current: selected + 1, total: items.length })}
+              </output>
+              <Button
+                variant="ghost"
+                disabled={selected === items.length - 1}
+                onClick={() => setSelected(selected + 1)}
+              >
+                {t('social.next')}
+              </Button>
+            </nav>
+          </section>
         ) : null}
       </Modal>
     </>

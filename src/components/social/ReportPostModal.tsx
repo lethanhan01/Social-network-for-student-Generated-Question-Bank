@@ -26,6 +26,7 @@ function ReportForm({ targetType = 'POST', targetId, postId, onClose }: Omit<Rep
   const [error, setError] = useState('')
   const mutation = useReportMutation()
   async function handleSubmit() {
+    if (mutation.isPending) return
     const id = targetId ?? postId ?? 0
     if (!Number.isSafeInteger(id) || id <= 0 || !reportDescriptionSchema.safeParse(description).success) {
       setError(t('report.invalid'))
@@ -85,7 +86,7 @@ function ReportForm({ targetType = 'POST', targetId, postId, onClose }: Omit<Rep
           <Button variant="outline" disabled={mutation.isPending} onClick={handleClose}>
             {t('cancel')}
           </Button>
-          <SubmitButton loading={mutation.isPending}>{t('report.submit')}</SubmitButton>
+          <SubmitButton variant="danger" loading={mutation.isPending}>{t('report.submit')}</SubmitButton>
         </footer>
       </Form>
     </PortalDialog>
