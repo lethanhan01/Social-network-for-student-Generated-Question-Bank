@@ -22,8 +22,19 @@ export async function requestData<T>(
   return response.data.data
 }
 
+export function resolveApiBaseUrl(rawUrl?: string): string {
+  const value = rawUrl?.trim()
+  if (!value) return '/api/v1'
+  if (value.startsWith('/')) return value.replace(/\/+$/, '') || '/api/v1'
+  try {
+    return new URL(value).pathname.replace(/\/+$/, '') || '/api/v1'
+  } catch {
+    return '/api/v1'
+  }
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api/v1',
+  baseURL: resolveApiBaseUrl(import.meta.env.VITE_API_URL),
   headers: { 'Content-Type': 'application/json' },
   timeout: 60000,
   withCredentials: true,
