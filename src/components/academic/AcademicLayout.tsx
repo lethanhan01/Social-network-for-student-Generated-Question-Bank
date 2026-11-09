@@ -13,9 +13,9 @@ export function AcademicLayout({ children, title, subtitle }: Readonly<{
   const { t } = useTranslation('academic')
   const { pathname } = useLocation()
   const links = [
-    { to: '/subjects', icon: BookOpen, label: t('subjects.title') },
-    { to: '/proposals', icon: PenLine, label: t('proposals.title') },
-    { to: '/practice', icon: Play, label: t('practice.title') },
+    { to: '/student/subjects', icon: BookOpen, label: t('subjects.title') },
+    { to: '/student/proposals', icon: PenLine, label: t('proposals.title') },
+    { to: '/student/practice', icon: Play, label: t('practice.title') },
   ]
   return (
     <section className="mx-auto flex max-w-screen-2xl items-start gap-6">

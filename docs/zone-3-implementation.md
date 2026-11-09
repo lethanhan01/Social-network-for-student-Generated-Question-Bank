@@ -29,8 +29,8 @@ flowchart LR
 ## Mã nguồn
 
 - [AcademicLayout.tsx](../src/components/academic/AcademicLayout.tsx)
-- [SubjectsPage.tsx](../src/pages/subjects/SubjectsPage.tsx)
-- [ProposalsPage.tsx](../src/pages/proposals/ProposalsPage.tsx)
-- [PracticePage.tsx](../src/pages/practice/PracticePage.tsx)
-- [QuestionAnalyticsPage.tsx](../src/pages/questions/QuestionAnalyticsPage.tsx)
+- [SubjectsPage.tsx](../src/pages/student/subjects/SubjectsPage.tsx)
+- [ProposalsPage.tsx](../src/pages/student/proposals/ProposalsPage.tsx)
+- [PracticePage.tsx](../src/pages/student/practice/PracticePage.tsx)
+- [QuestionAnalyticsPage.tsx](../src/pages/student/questions/QuestionAnalyticsPage.tsx)
 - [useAcademicQuery.ts](../src/hooks/queries/useAcademicQuery.ts)

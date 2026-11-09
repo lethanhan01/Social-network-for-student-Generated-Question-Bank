@@ -6,7 +6,8 @@ import { ButtonLink } from '@/components/ui/actions'
 import { Text } from '@/components/ui/typography'
 import { Separator } from '@/components/ui/layout'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/overlay/Sheet'
-import { PRIMARY_NAV_ITEMS, SECONDARY_SHORTCUT_ITEMS } from '@/config/navigation.config'
+import { getPrimaryNavItems, getSecondaryShortcutItems } from '@/config/navigation.config'
+import { useAuthStore } from '@/stores/authStore'
 import { cn } from '@/utils/cn'
 
 interface MobileNavDrawerProps {
@@ -18,6 +19,9 @@ export function MobileNavDrawer({ isOpen, onClose }: Readonly<MobileNavDrawerPro
   const { t } = useTranslation('common')
   const { pathname } = useLocation()
   const prevPathRef = useRef(pathname)
+  const user = useAuthStore((state) => state.user)
+  const primaryNavItems = getPrimaryNavItems(user?.roles)
+  const secondaryShortcutItems = getSecondaryShortcutItems(user?.roles)
 
   // Close drawer strictly when route changes
   useEffect(() => {
@@ -57,7 +61,7 @@ export function MobileNavDrawer({ isOpen, onClose }: Readonly<MobileNavDrawerPro
             <Text size="xs" tone="muted" className="font-semibold uppercase tracking-wider px-2 mb-2 block">
               Phân hệ chính
             </Text>
-            {PRIMARY_NAV_ITEMS.map((item) => {
+            {primaryNavItems.map((item) => {
               const isActive = pathname === item.to || pathname.startsWith(`${item.to}/`)
               return (
                 <ButtonLink
@@ -85,7 +89,7 @@ export function MobileNavDrawer({ isOpen, onClose }: Readonly<MobileNavDrawerPro
             <Text size="xs" tone="muted" className="font-semibold uppercase tracking-wider px-2 mb-2 block">
               {t('nav.shortcuts', 'Lối tắt tính năng')}
             </Text>
-            {SECONDARY_SHORTCUT_ITEMS.map((item) => {
+            {secondaryShortcutItems.map((item) => {
               const isActive = pathname === item.to
               return (
                 <ButtonLink
@@ -110,9 +114,12 @@ export function MobileNavDrawer({ isOpen, onClose }: Readonly<MobileNavDrawerPro
               variant={pathname === '/settings' ? 'secondary' : 'ghost'}
               size="sm"
               onClick={onClose}
-              className="w-full justify-start gap-3 min-h-11 text-xs"
+              className={cn(
+                'w-full justify-start gap-3 min-h-11 text-xs',
+                pathname === '/settings' ? 'font-semibold text-action-accent' : 'text-fg-primary'
+              )}
             >
-              <Settings size={18} className="shrink-0 text-action-accent" />
+              <span className="shrink-0 text-action-accent"><Settings size={18} /></span>
               <strong className="font-normal truncate">{t('nav.settings', 'Cài đặt hệ thống')}</strong>
             </ButtonLink>
           </nav>

@@ -24,12 +24,12 @@ describe('TopbarNav', () => {
     expect(friendsLink).toHaveClass('border-transparent')
 
     const questionsLink = screen.getByRole('link', { name: /ngân hàng câu hỏi/i })
-    expect(questionsLink).toHaveAttribute('href', '/questions')
+    expect(questionsLink).toHaveAttribute('href', '/student/subjects')
 
     const examsLink = screen.getByRole('link', { name: /ngân hàng đề thi/i })
-    expect(examsLink).toHaveAttribute('href', '/exams')
+    expect(examsLink).toHaveAttribute('href', '/student/practice')
 
     const minigamesLink = screen.getByRole('link', { name: /đấu trường minigame/i })
-    expect(minigamesLink).toHaveAttribute('href', '/gamification/minigames')
+    expect(minigamesLink).toHaveAttribute('href', '/student/gamification/minigames')
   })
 })

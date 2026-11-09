@@ -2,7 +2,8 @@ import { useLocation } from 'react-router-dom'
 import { ButtonLink } from '@/components/ui/actions/Button'
 import { useTranslation } from 'react-i18next'
 import { Tooltip } from '@/components/ui/overlay'
-import { PRIMARY_NAV_ITEMS } from '@/config/navigation.config'
+import { getPrimaryNavItems } from '@/config/navigation.config'
+import { useAuthStore } from '@/stores/authStore'
 import { cn } from '@/utils/cn'
 
 interface TopbarNavProps {
@@ -12,13 +13,15 @@ interface TopbarNavProps {
 export function TopbarNav({ className }: Readonly<TopbarNavProps>) {
   const { t } = useTranslation('common')
   const { pathname } = useLocation()
+  const user = useAuthStore((state) => state.user)
+  const navItems = getPrimaryNavItems(user?.roles)
 
   return (
     <nav
       aria-label="Thanh điều hướng chính"
       className={cn('flex items-center justify-center h-full gap-1 sm:gap-2', className)}
     >
-      {PRIMARY_NAV_ITEMS.map((item) => {
+      {navItems.map((item) => {
         const label = t(item.labelKey, item.defaultLabel)
         const isActive =
           pathname === item.to ||

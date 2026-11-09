@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { requestData, type GlobalResponse } from './api'
+import { requestData, resolveApiBaseUrl, type GlobalResponse } from './api'
 import { useAuthStore } from '@/stores/authStore'
 import * as deviceUtil from '@/utils/device'
 
@@ -7,6 +7,14 @@ describe('api core service & requestData helper', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     useAuthStore.getState().clearAuth()
+  })
+
+  it('normalizes VITE_API_URL to a same-origin relative path via resolveApiBaseUrl', () => {
+    expect(resolveApiBaseUrl(undefined)).toBe('/api/v1')
+    expect(resolveApiBaseUrl('')).toBe('/api/v1')
+    expect(resolveApiBaseUrl('/api/v1/')).toBe('/api/v1')
+    expect(resolveApiBaseUrl('https://snsqb.duckdns.org/api/v1')).toBe('/api/v1')
+    expect(resolveApiBaseUrl('https://snsqb.duckdns.org/api/v1/')).toBe('/api/v1')
   })
 
   it('unwraps data correctly from GlobalResponse envelope via requestData', async () => {
