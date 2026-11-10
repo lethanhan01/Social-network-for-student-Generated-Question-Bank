@@ -3,7 +3,7 @@ export const config = {
 }
 
 const DEFAULT_UPSTREAM = 'https://snsqb.duckdns.org'
-
+// hello
 // Mirror vite.config.ts dev proxy: rewrite Origin to upstream host so Spring Security CorsFilter accepts requests from Vercel.
 // shortcut: WebSocket (wss://) upgrades cannot be proxied via Vercel Edge Functions, whitelist Vercel origin on Backend when backend access is available.
 export default async function handler(req) {
