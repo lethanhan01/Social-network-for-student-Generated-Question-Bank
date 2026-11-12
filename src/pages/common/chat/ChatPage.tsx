@@ -1,4 +1,3 @@
-import { ChatPortalActions } from '@/components/portal/ChatPortalActions'
 import { useState, useCallback } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -54,10 +53,9 @@ export default function ChatPage() {
 
       {/* Right Conversation View: visible on desktop always; on mobile only when conversation is active */}
       <section className={cn(
-        'flex-1 h-full min-w-0 min-h-0 flex flex-col transition-all duration-200',
+        'relative flex-1 h-full min-w-0 min-h-0 flex transition-all duration-200',
         !showConversation ? 'hidden md:flex' : 'flex'
       )} aria-label={t('conversationContent')}>
-        {activeId ? <ChatPortalActions key={activeId} conversationId={activeId} /> : null}
         {targetId ? (
           <StartConversationPanel key={targetId} targetId={targetId} onCreated={handleSelectConversation} onBack={handleBackToList} />
         ) : (

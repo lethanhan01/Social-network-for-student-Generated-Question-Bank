@@ -7,7 +7,6 @@ import { Heading } from '@/components/ui/typography/Heading'
 import { Button } from '@/components/ui/actions/Button'
 import { Select } from '@/components/ui/forms/Select'
 import { Page } from '@/components/ui/layout/PageUI'
-import { Badge } from '@/components/ui/data-display/Badge'
 import { SocialFeedLayout } from '@/components/social/SocialFeedLayout'
 import { SocialLeftSidebar } from '@/components/social/SocialLeftSidebar'
 import { SocialRightSidebar } from '@/components/social/SocialRightSidebar'
@@ -70,22 +69,20 @@ export default function FeedPage() {
     if (!result.isError) setSince(nextSince)
   }
   const centerFeed = (
-    <section className="space-y-5">
-      <header className="space-y-3 pb-2">
-        <Badge tone="accent" emphasis="outline">{t('feed.network_badge')}</Badge>
-        <p className="text-xs text-fg-muted">{t('social.currentSemester', { count: mySubjects.length })}</p>
-        <Heading level={1} className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+    <section className="space-y-3">
+      <header>
+        <Heading level={1} className="text-xl font-bold tracking-tight">
           {t('feed.title')}
         </Heading>
       </header>
       <CreatePostBox user={currentUser} onOpenCreateModal={() => setCreating(true)} />
-      <nav aria-label={t('social.feedFilters')} className="flex gap-2 overflow-x-auto">
+      <nav aria-label={t('social.feedFilters')} className="flex gap-1 overflow-x-auto">
         {(['ALL', 'MY_SUBJECTS', 'LECTURERS'] as const).map((value) => (
           <Button
             key={value}
             variant={tab === value ? 'primary' : 'ghost'}
             leftIcon={value === 'ALL' ? <Sparkles size={16} /> : value === 'MY_SUBJECTS' ? <BookOpen size={16} /> : <GraduationCap size={16} />}
-            className="min-h-11 text-xs"
+            className="min-h-11 shrink-0 text-sm"
             aria-pressed={tab === value}
             onClick={() => update('tab', value)}
           >

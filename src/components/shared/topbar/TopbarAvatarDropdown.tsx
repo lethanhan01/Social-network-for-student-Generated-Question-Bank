@@ -4,7 +4,6 @@ import { User, LogOut, LayoutDashboard, Settings } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/authStore'
 import { Avatar } from '@/components/ui/data-display'
-import { ThemeSegmentedControl } from '@/components/ui/navigation'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -115,14 +114,6 @@ export function TopbarAvatarDropdown() {
           <Settings size={16} />
           <span>{tCommon('nav.settings', 'Cài đặt hệ thống')}</span>
         </DropdownMenuItem>
-
-        <DropdownMenuSeparator className="my-1 border-t border-line-subtle" />
-
-        {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Theme switcher row in dropdown] */}
-        <div className="px-3 py-1.5">
-          <p className="text-xs text-fg-muted mb-1.5 font-medium">Giao diện</p>
-          <ThemeSegmentedControl size="sm" />
-        </div>
 
         <DropdownMenuSeparator className="my-1 border-t border-line-subtle" />
 

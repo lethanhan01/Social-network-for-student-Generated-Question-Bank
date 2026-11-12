@@ -148,7 +148,8 @@ describe('ProfilePage Component', () => {
         </Routes>
       </MemoryRouter>
     )
-    await userEvent.click(await screen.findByRole('button', { name: 'Gửi báo cáo' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Tùy chọn hồ sơ' }))
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Gửi báo cáo' }))
     expect(await screen.findByRole('dialog')).toBeInTheDocument()
   })
 
@@ -162,6 +163,6 @@ describe('ProfilePage Component', () => {
       </MemoryRouter>
     )
     expect(await screen.findByRole('button', { name: /Chỉnh sửa hồ sơ/ })).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Gửi báo cáo' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Tùy chọn hồ sơ' })).not.toBeInTheDocument()
   })
 })

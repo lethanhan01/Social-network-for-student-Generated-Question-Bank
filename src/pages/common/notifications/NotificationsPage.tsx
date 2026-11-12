@@ -53,7 +53,7 @@ export default function NotificationsPage() {
         title={t('notifications.title')}
         description={t('notifications.description')}
       />
-      <section className="mx-auto w-full max-w-4xl space-y-5">
+      <section className="mx-auto w-full max-w-2xl space-y-3">
         <header className="flex flex-wrap items-center justify-between gap-3">
           <SegmentedControl
             size="sm"
@@ -76,7 +76,7 @@ export default function NotificationsPage() {
             </ButtonLink>
           </nav>
         </header>
-        <Card as="section" className="overflow-hidden" padding="none">
+        <Card as="section" className="social-card overflow-hidden" padding="none">
           <QueryFeedback loading={query.isLoading} error={query.error} retry={() => void query.refetch()} />
           {!query.isLoading && !query.error && visible.length === 0 ? (
             <EmptyState

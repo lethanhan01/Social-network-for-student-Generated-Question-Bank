@@ -17,8 +17,8 @@ export function SocialRightSidebar({ friends = [] }: Readonly<SocialRightSidebar
     /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Right sidebar container] */
     <div className="space-y-4">
       {/* Friends Connection Card */}
-      <Card className="p-4 bg-surface-card border-line-subtle shadow-card rounded-2xl space-y-3">
-        <header className="flex items-center justify-between">
+      <Card as="section" padding="none" className="space-y-2 border-transparent bg-transparent p-2 shadow-none">
+        <header className="flex items-center justify-between gap-2">
           {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Friends header title flex layout] */}
           <div className="flex items-center gap-2">
             <Users size={18} className="text-action-accent" />
@@ -54,8 +54,8 @@ export function SocialRightSidebar({ friends = [] }: Readonly<SocialRightSidebar
                   />
                   {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Friend info text container] */}
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold text-fg-primary truncate">{name}</p>
-                    <p className="text-[11px] text-fg-muted truncate">
+                    <p className="text-sm font-semibold text-fg-primary truncate">{name}</p>
+                    <p className="text-xs text-fg-muted truncate">
                       {friend.mutual_friends_count
                         ? `${friend.mutual_friends_count} ${t('friends.mutualCount', 'bạn chung')}`
                         : t('friends.connected', 'Bạn bè HUST')}

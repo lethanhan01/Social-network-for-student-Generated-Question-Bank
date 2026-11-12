@@ -26,13 +26,13 @@ export function SearchHistorySection({ onSelectKeyword }: Readonly<SearchHistory
 
   return (
     /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [History & trending container stack] */
-    <div className="space-y-6">
+    <div className="space-y-3">
       {/* Saved Searches (UC30) */}
       {savedSearches.length > 0 ? (
-        <Card className="p-4 bg-surface border-line-subtle rounded-2xl shadow-card space-y-3">
+        <Card as="section" padding="none" className="social-card space-y-2 border-line-subtle p-3">
           <header className="flex items-center gap-2">
             <Icon icon={History} size="sm" tone="accent" />
-            <Heading level={3} className="text-xs font-bold text-text-primary">
+            <Heading level={3} className="text-sm font-bold text-fg-primary">
               {t('search.recentHistory', 'Lịch sử tìm kiếm gần đây')}
             </Heading>
           </header>
@@ -56,10 +56,10 @@ export function SearchHistorySection({ onSelectKeyword }: Readonly<SearchHistory
 
       {/* Trending Searches */}
       {trendingSearches.length > 0 ? (
-        <Card className="p-4 bg-surface border-line-subtle rounded-2xl shadow-card space-y-3">
+        <Card as="section" padding="none" className="social-card space-y-2 border-line-subtle p-3">
           <header className="flex items-center gap-2">
             <Icon icon={TrendingUp} size="sm" tone="warning" />
-            <Heading level={3} className="text-xs font-bold text-text-primary">
+            <Heading level={3} className="text-sm font-bold text-fg-primary">
               {t('search.trendingTitle', 'Xu hướng tìm kiếm thịnh hành')}
             </Heading>
           </header>

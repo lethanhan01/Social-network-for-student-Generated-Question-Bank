@@ -9,7 +9,11 @@
   "saved": "保存しました",
   "cancel": "キャンセル",
   "confirm": "確認",
+  "profileActions": "プロフィールの操作",
   "messages": {
+    "details": "会話の詳細",
+    "closeDetails": "会話の詳細を閉じる",
+    "memberList": "メンバー一覧",
     "title": "メッセージ",
     "description": "仲間とつながり、一緒に学びましょう。",
     "conversations": "会話",
