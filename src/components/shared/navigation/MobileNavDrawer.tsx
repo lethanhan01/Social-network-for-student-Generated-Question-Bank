@@ -1,8 +1,9 @@
 import { useLocation } from 'react-router-dom'
 import { useEffect, useRef } from 'react'
-import { GraduationCap, Settings } from 'lucide-react'
+import { Settings } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { ButtonLink } from '@/components/ui/actions'
+import { BrandLogo } from '@/components/shared/BrandLogo'
 import { Text } from '@/components/ui/typography'
 import { Separator } from '@/components/ui/layout'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/overlay/Sheet'
@@ -40,18 +41,8 @@ export function MobileNavDrawer({ isOpen, onClose }: Readonly<MobileNavDrawerPro
       >
         {/* Drawer Header */}
         <SheetHeader className="pb-3 border-b border-line-subtle">
-          <SheetTitle className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-action-accent flex items-center justify-center text-fg-on-solid font-bold shrink-0">
-              <GraduationCap size={20} />
-            </div>
-            <div>
-              <strong className="text-sm font-bold text-fg-primary leading-tight block">
-                SQB HUST
-              </strong>
-              <strong className="text-xs font-normal text-fg-muted block">
-                Question Bank
-              </strong>
-            </div>
+          <SheetTitle className="flex items-center">
+            <BrandLogo className="h-7" />
           </SheetTitle>
         </SheetHeader>
 

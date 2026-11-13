@@ -34,6 +34,7 @@ describe('LoginPage Component', () => {
     )
 
     expect(screen.getByRole('heading', { name: /SQB HUST/i })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: /SQB HUST/i })).toBeInTheDocument()
     expect(screen.getByLabelText(/Email SIS HUST/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/Mật khẩu/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Đăng nhập hệ thống/i })).toBeInTheDocument()

@@ -35,6 +35,8 @@ describe('Topbar', () => {
     expect(header).not.toHaveClass('bg-transparent')
 
     expect(screen.getByRole('link', { name: /sqb hust/i })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: /sqb hust/i })).toBeInTheDocument()
+    expect(screen.queryByText('Question Bank')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: /menu người dùng/i })).toBeInTheDocument()
     expect(screen.getByRole('searchbox', { name: /tìm kiếm trên sqb hust/i })).toBeInTheDocument()
   })

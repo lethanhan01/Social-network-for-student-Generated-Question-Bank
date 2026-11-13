@@ -21,7 +21,7 @@ describe('MobileNavDrawer', () => {
       </MemoryRouter>
     )
 
-    expect(screen.queryByText('SQB HUST')).not.toBeInTheDocument()
+    expect(screen.queryByRole('img', { name: 'SQB HUST' })).not.toBeInTheDocument()
 
     rerender(
       <MemoryRouter>
@@ -29,7 +29,8 @@ describe('MobileNavDrawer', () => {
       </MemoryRouter>
     )
 
-    expect(screen.getByText('SQB HUST')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'SQB HUST' })).toBeInTheDocument()
+    expect(screen.queryByText('Question Bank')).not.toBeInTheDocument()
     expect(screen.getByRole('dialog')).toBeInTheDocument()
 
     const closeBtn = screen.getByRole('button', { name: /đóng/i })
