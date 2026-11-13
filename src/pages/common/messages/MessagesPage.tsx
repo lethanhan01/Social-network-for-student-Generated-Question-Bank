@@ -2,9 +2,9 @@ import { StartDirectConversation } from '@/components/portal/StartDirectConversa
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { LockKeyhole, Plus, MessageCircle } from 'lucide-react'
+import { Plus, MessageCircle } from 'lucide-react'
 import { Page, PageHeader } from '@/components/ui/layout'
-import { Button, ButtonLink } from '@/components/ui/actions'
+import { Button } from '@/components/ui/actions'
 import { EmptyState } from '@/components/ui/feedback/EmptyState'
 import { ConversationList } from '@/components/portal/ConversationList'
 import { MessageThread } from '@/components/portal/MessageThread'
@@ -14,14 +14,14 @@ import { ReportModal } from '@/components/social/ReportPostModal'
 import { useInboxQuery } from '@/hooks/queries/usePortalQuery'
 import { useChatRealtime } from '@/hooks/useChatRealtime'
 
-export function Inbox({ hidden = false }: { hidden?: boolean }) {
+export function Inbox() {
   const { t } = useTranslation('portal')
   const [params, setParams] = useSearchParams()
   const selected = Number(params.get('conversation')) || 0
   const [isGroupOpen, setIsGroupOpen] = useState(false)
   const [isNewOpen, setIsNewOpen] = useState(false)
   const [reportId, setReportId] = useState<number | null>(null)
-  const query = useInboxQuery(hidden)
+  const query = useInboxQuery()
   const connected = useChatRealtime()
   const items = [
     ...new Map(query.data?.pages.flatMap((p) => p.items ?? []).map((item) => [item.conversation_id, item])).values(),
@@ -37,9 +37,9 @@ export function Inbox({ hidden = false }: { hidden?: boolean }) {
   }
   return (
     <>
-      <section className="portal-inbox" aria-label={t(hidden ? 'vault.title' : 'messages.title')}>
+      <section className="portal-inbox" aria-label={t('messages.title')}>
         <ConversationList
-          onNew={!hidden ? () => setIsNewOpen(true) : undefined}
+          onNew={() => setIsNewOpen(true)}
           items={items}
           selected={conversation ? selected : 0}
           onSelect={handleSelect}
@@ -54,7 +54,6 @@ export function Inbox({ hidden = false }: { hidden?: boolean }) {
           <MessageThread
             key={conversation.conversation_id}
             conversation={conversation}
-            hidden={hidden}
             connected={connected}
             onBack={() => handleSelect(0)}
             onSettings={() => setIsGroupOpen(true)}
@@ -67,23 +66,19 @@ export function Inbox({ hidden = false }: { hidden?: boolean }) {
               title={t('messages.welcome')}
               description={t('messages.welcomeDescription')}
               action={
-                !hidden ? (
-                  <Button onClick={() => setIsNewOpen(true)}>
-                    <Plus size={18} />
-                    {t('messages.new')}
-                  </Button>
-                ) : undefined
+                <Button onClick={() => setIsNewOpen(true)}>
+                  <Plus size={18} />
+                  {t('messages.new')}
+                </Button>
               }
             />
           </section>
         )}
       </section>
-      {!hidden ? (
-        <Button variant="outline" className="mt-4 min-h-11 md:hidden" onClick={() => setIsNewOpen(true)}>
-          <Plus size={18} />
-          {t('messages.new')}
-        </Button>
-      ) : null}
+      <Button variant="outline" className="mt-4 min-h-11 md:hidden" onClick={() => setIsNewOpen(true)}>
+        <Plus size={18} />
+        {t('messages.new')}
+      </Button>
       {isGroupOpen && conversation ? (
         <GroupSettingsModal
           conversation={conversation}
@@ -112,12 +107,6 @@ export default function MessagesPage() {
   return (
     <Page className="h-full overflow-y-auto p-4 sm:p-6">
       <PageHeader eyebrow={t('eyebrow')} title={t('messages.title')} description={t('messages.description')} />
-      <nav className="mb-4 flex justify-end">
-        <ButtonLink to="/messages/hidden-vault" variant="outline">
-          <LockKeyhole size={18} />
-          {t('vault.title')}
-        </ButtonLink>
-      </nav>
       <StartDirectConversation />
       <Inbox />
     </Page>

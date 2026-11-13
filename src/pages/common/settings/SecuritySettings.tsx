@@ -1,10 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { LockKeyhole } from 'lucide-react'
 import { Form, FormField, Input } from '@/components/ui/forms'
-import { Button } from '@/components/ui/actions/Button'
 import { SubmitButton } from '@/components/ui/actions/SubmitButton'
-import { PinModal } from '@/components/portal/PinModal'
 import { passwordSchema } from '@/components/portal/portal.schemas'
 import { usePasswordMutation } from '@/hooks/queries/usePortalQuery'
 import { getApiError } from '@/lib/api-error'
@@ -16,7 +13,6 @@ export function SecuritySettings() {
   const [password, setPassword] = useState('')
   const [confirmation, setConfirmation] = useState('')
   const [error, setError] = useState('')
-  const [pinMode, setPinMode] = useState<'setup' | 'change' | null>(null)
   const mutation = usePasswordMutation()
   async function handleSubmit() {
     if (!oldPassword || !passwordSchema.safeParse(password).success) {
@@ -84,31 +80,6 @@ export function SecuritySettings() {
         </FormField>
         <SubmitButton loading={mutation.isPending}>{t('security.change')}</SubmitButton>
       </Form>
-      <section className="border-t border-line-subtle pt-6 space-y-3">
-        <h3 className="flex gap-2 font-bold">
-          <LockKeyhole size={20} />
-          {t('vault.title')}
-        </h3>
-        <p className="text-sm text-fg-secondary">{t('pin.description')}</p>
-        <footer className="flex flex-wrap gap-3">
-          <Button variant="outline" onClick={() => setPinMode('setup')}>
-            {t('pin.setup')}
-          </Button>
-          <Button variant="outline" onClick={() => setPinMode('change')}>
-            {t('pin.change')}
-          </Button>
-        </footer>
-      </section>
-      {pinMode ? (
-        <PinModal
-          mode={pinMode}
-          onClose={() => setPinMode(null)}
-          onSuccess={() => {
-            setPinMode(null)
-            toast.success(t('saved'))
-          }}
-        />
-      ) : null}
     </section>
   )
 }

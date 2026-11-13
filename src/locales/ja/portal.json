@@ -39,8 +39,6 @@
     "history": "メッセージ履歴",
     "older": "以前のメッセージを読み込む",
     "sayHello": "最初のメッセージを送ってみましょう。",
-    "hide": "会話を非表示にする",
-    "unhide": "会話を再表示する",
     "compose": "メッセージ内容",
     "placeholder": "メッセージを入力…",
     "send": "送信",
@@ -52,24 +50,6 @@
     "findPeople": "名前またはメールで検索",
     "findHint": "相手の名前またはメールを入力してください。",
     "noPeople": "ユーザーが見つかりません。"
-  },
-  "vault": {
-    "title": "非表示の会話",
-    "description": "プライバシーを守る会話スペース。",
-    "locked": "保管庫はロックされています",
-    "explanation": "6桁のPINで解除します。サーバーによる認証後にのみ会話を読み込み、ページを離れるとロックします。",
-    "lock": "ロック"
-  },
-  "pin": {
-    "unlock": "ロック解除",
-    "setup": "PINを設定",
-    "change": "PINを変更",
-    "description": "6桁のPINを使用し、他人と共有しないでください。",
-    "old": "現在のPIN",
-    "code": "6桁のPIN",
-    "confirm": "PINを再入力",
-    "invalid": "PINは6桁の数字で入力してください。",
-    "mismatch": "PINが一致しません。"
   },
   "group": {
     "title": "グループ管理",

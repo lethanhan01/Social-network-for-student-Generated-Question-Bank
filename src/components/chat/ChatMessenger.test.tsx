@@ -166,13 +166,14 @@ describe('Messenger Chat Components', () => {
   })
 
   describe('ChatSidebar', () => {
-    it('renders sidebar title, action buttons, and search input', () => {
+    it('renders sidebar title, action buttons, and search input without hidden vault link', () => {
       renderWithQueryClient(
         <MemoryRouter><ChatSidebar onSelectConversation={vi.fn()} onOpenNewChat={vi.fn()} /></MemoryRouter>
       )
 
       expect(screen.getByRole('heading', { level: 1, name: /đoạn chat/i })).toBeInTheDocument()
       expect(screen.getByRole('searchbox', { name: /tìm kiếm trên messenger/i })).toBeInTheDocument()
+      expect(screen.queryByRole('link', { name: /kho hội thoại ẩn/i })).not.toBeInTheDocument()
     })
   })
 

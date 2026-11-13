@@ -1,13 +1,13 @@
 # TÀI LIỆU TOÀN DIỆN: KIẾN TRÚC MÀN HÌNH & SƠ ĐỒ LUỒNG ĐIỀU HƯỚNG (SCREEN FLOW DIAGRAMS)
 
-Tài liệu này được biên soạn chuẩn xác 100% dựa trên tài liệu đặc tả 33 Use Case ([`requirements.md`](requirements.md)) và tài liệu quy chuẩn phát triển ([`FRONTEND_CONVENTIONS.md`](FRONTEND_CONVENTIONS.md), [`AGENTS.md`](AGENTS.md)). Nội dung bao gồm danh mục chuẩn hóa 26 màn hình chính (Screens), 07 hộp thoại chức năng (Modals/Drawers) và các sơ đồ luồng Mermaid chi tiết phục vụ thiết kế giao diện (UI/UX) và lập trình Frontend.
+Tài liệu này được biên soạn chuẩn xác 100% dựa trên tài liệu đặc tả 32 Use Case ([`requirements.md`](requirements.md)) và tài liệu quy chuẩn phát triển ([`FRONTEND_CONVENTIONS.md`](FRONTEND_CONVENTIONS.md), [`AGENTS.md`](AGENTS.md)). Nội dung bao gồm danh mục chuẩn hóa 25 màn hình chính (Screens), 06 hộp thoại chức năng (Modals/Drawers) và các sơ đồ luồng Mermaid chi tiết phục vụ thiết kế giao diện (UI/UX) và lập trình Frontend.
 
 ---
 
 ## PHẦN I: TỔNG QUAN HỆ THỐNG & PHÂN HỆ TÁC NHÂN (ACTORS)
 
 * **Guest (Khách vãng lai / Chưa đăng nhập):** Đăng nhập vào hệ thống ([`UC01`](requirements.md#uc01-dang-nhap-he-thong)), kích hoạt tài khoản được cấp thông qua xác thực mã OTP ([`UC02`](requirements.md#uc02-quan-tri-vien-tao-tai-khoan--kich-hoat-qua-otp)).
-* **Student (Sinh viên):** Tham gia mạng xã hội học tập, bảng tin & dòng hoạt động ([`UC05`](requirements.md#uc05-dang-bai-viet-moi), [`UC15`](requirements.md#uc15-xem-dong-hoat-dong-activity-feed)), đăng bài viết kèm đa phương tiện tải lên Cloudflare R2 ([`UC05`](requirements.md#uc05-dang-bai-viet-moi), [`UC32`](requirements.md#uc32-tai-len-tep-va-hinh-anh-cloudflare-r2-media)), bình luận tương tác phân cấp ([`UC07`](requirements.md#uc07-binh-luan-tren-bai-viet)), thả cảm xúc đa hình ([`UC08`](requirements.md#uc08-tha--bo-cam-xuc-reactions)), kết bạn với người dùng đồng cấp Sinh viên - Sinh viên ([`UC09`](requirements.md#uc09-quan-ly-moi-quan-he-ban-be-friendships)), chặn người dùng ([`UC10`](requirements.md#uc10-chan-nguoi-dung-blocks)), trò chuyện cá nhân & nhóm ([`UC11`](requirements.md#uc11-tro-chuyen-truc-tiep--nhom-chat)), quản trị nhóm chat ([`UC12`](requirements.md#uc12-quan-tri-nhom-chat)), bảo vệ tin nhắn riêng tư bằng kho hội thoại ẩn mã PIN ([`UC13`](requirements.md#uc13-quan-ly-kho-hoi-thoai-an-bang-ma-pin)), nhận & quản lý thông báo ([`UC14`](requirements.md#uc14-quan-ly-thong-bao)), tra cứu danh mục môn học ([`UC17`](requirements.md#uc17-quan-tri-danh-muc-mon-hoc-subjects)), đề xuất câu hỏi trắc nghiệm và quản lý phiên gửi ([`UC19`](requirements.md#uc19-quan-ly-phien-de-xuat-cau-hoi-trac-nghiem-sessions)), luyện tập trắc nghiệm theo phiên học tập ([`UC21`](requirements.md#uc21-luyen-tap-va-nop-cau-tra-loi)), đánh giá & báo lỗi câu hỏi tham gia Game 5 ([`UC22`](requirements.md#uc22-danh-gia-chat-luong-cau-hoi), [`UC26`](requirements.md#uc26-tham-gia-minigame-du-doan-hoc-thuat)), điểm danh nhận xu SQB Coins và theo dõi BXH ([`UC25`](requirements.md#uc25-diem-danh-chuyen-can-va-bang-xep-hang)), tham gia các minigame dự đoán học thuật Game 1, 2, 4, 6 ([`UC26`](requirements.md#uc26-tham-gia-minigame-du-doan-hoc-thuat)), mua sắm & trang bị vật phẩm cá nhân hóa ([`UC28`](requirements.md#uc28-cua-hang-va-trang-bi-vat-pham-ca-nhan-hoa)), tìm kiếm toàn cục đa thực thể ([`UC30`](requirements.md#uc30-tim-kiem-toan-van-full-text-search)), gửi báo cáo vi phạm nội dung/người dùng ([`UC31`](requirements.md#uc31-gui-bao-cao-vi-pham-reports)), quản lý thiết bị và phiên đăng nhập ([`UC33`](requirements.md#uc33-quan-ly-thiet-bi-dang-nhap-va-phien-lam-viec-devices)).
+* **Student (Sinh viên):** Tham gia mạng xã hội học tập, bảng tin & dòng hoạt động ([`UC05`](requirements.md#uc05-dang-bai-viet-moi), [`UC15`](requirements.md#uc15-xem-dong-hoat-dong-activity-feed)), đăng bài viết kèm đa phương tiện tải lên Cloudflare R2 ([`UC05`](requirements.md#uc05-dang-bai-viet-moi), [`UC32`](requirements.md#uc32-tai-len-tep-va-hinh-anh-cloudflare-r2-media)), bình luận tương tác phân cấp ([`UC07`](requirements.md#uc07-binh-luan-tren-bai-viet)), thả cảm xúc đa hình ([`UC08`](requirements.md#uc08-tha--bo-cam-xuc-reactions)), kết bạn với người dùng đồng cấp Sinh viên - Sinh viên ([`UC09`](requirements.md#uc09-quan-ly-moi-quan-he-ban-be-friendships)), chặn người dùng ([`UC10`](requirements.md#uc10-chan-nguoi-dung-blocks)), trò chuyện cá nhân & nhóm ([`UC11`](requirements.md#uc11-tro-chuyen-truc-tiep--nhom-chat)), quản trị nhóm chat ([`UC12`](requirements.md#uc12-quan-tri-nhom-chat)), nhận & quản lý thông báo ([`UC14`](requirements.md#uc14-quan-ly-thong-bao)), tra cứu danh mục môn học ([`UC17`](requirements.md#uc17-quan-tri-danh-muc-mon-hoc-subjects)), đề xuất câu hỏi trắc nghiệm và quản lý phiên gửi ([`UC19`](requirements.md#uc19-quan-ly-phien-de-xuat-cau-hoi-trac-nghiem-sessions)), luyện tập trắc nghiệm theo phiên học tập ([`UC21`](requirements.md#uc21-luyen-tap-va-nop-cau-tra-loi)), đánh giá & báo lỗi câu hỏi tham gia Game 5 ([`UC22`](requirements.md#uc22-danh-gia-chat-luong-cau-hoi), [`UC26`](requirements.md#uc26-tham-gia-minigame-du-doan-hoc-thuat)), điểm danh nhận xu SQB Coins và theo dõi BXH ([`UC25`](requirements.md#uc25-diem-danh-chuyen-can-va-bang-xep-hang)), tham gia các minigame dự đoán học thuật Game 1, 2, 4, 6 ([`UC26`](requirements.md#uc26-tham-gia-minigame-du-doan-hoc-thuat)), mua sắm & trang bị vật phẩm cá nhân hóa ([`UC28`](requirements.md#uc28-cua-hang-va-trang-bi-vat-pham-ca-nhan-hoa)), tìm kiếm toàn cục đa thực thể ([`UC30`](requirements.md#uc30-tim-kiem-toan-van-full-text-search)), gửi báo cáo vi phạm nội dung/người dùng ([`UC31`](requirements.md#uc31-gui-bao-cao-vi-pham-reports)), quản lý thiết bị và phiên đăng nhập ([`UC33`](requirements.md#uc33-quan-ly-thiet-bi-dang-nhap-va-phien-lam-viec-devices)).
 * **Lecturer (Giảng viên):** Toàn quyền như Sinh viên (trong phạm vi kết bạn đồng cấp Giảng viên - Giảng viên) + Quản lý các lớp học phần phụ trách và danh sách sinh viên ([`UC18`](requirements.md#uc18-quan-ly-lop-hoc-phan-course-classes)), thêm ghi chú chuyên môn học thuật trên bài viết ([`UC06`](requirements.md#uc06-giang-vien-cap-nhat-ghi-chu-chuyen-mon)), thẩm định & phê duyệt các phiên đề xuất câu hỏi từ sinh viên ([`UC20`](requirements.md#uc20-tham-dinh-va-duyet-cau-hoi-question-review)), thẩm định báo lỗi câu hỏi từ sinh viên trong minigame học thuật Game 5 ([`UC20`](requirements.md#uc20-tham-dinh-va-duyet-cau-hoi-question-review), [`UC26`](requirements.md#uc26-tham-gia-minigame-du-doan-hoc-thuat)), sử dụng Trợ lý AI tinh chỉnh câu hỏi và phát hiện ảo giác (hallucination) ([`UC29`](requirements.md#uc29-tro-ly-ai-va-tinh-chinh-cau-hoi-hoc-thuat)), cấu hình sinh đề thi tự động theo ma trận độ khó ([`UC23`](requirements.md#uc23-quan-ly-va-tao-de-thi-tu-dong)), xuất đề thi và ngân hàng câu hỏi ra file PDF/Excel ([`UC24`](requirements.md#uc24-xuat-de-thi-va-ngan-hang-cau-hoi)).
 * **Admin (Quản trị viên):** Cấp tài khoản người dùng đơn lẻ và kích hoạt OTP ([`UC02`](requirements.md#uc02-quan-tri-vien-tao-tai-khoan--kich-hoat-qua-otp)), nhập danh sách tài khoản hàng loạt qua Excel/CSV (Bulk Import) ([`UC03`](requirements.md#uc03-nhap-tai-khoan-hang-loat-bulk-import)), quản lý hồ sơ và vai trò người dùng ([`UC04`](requirements.md#uc04-quan-ly-ho-so-ca-nhan)), quản trị vòng đời học kỳ toàn trường ([`UC16`](requirements.md#uc16-quan-ly-hoc-ky-semesters)), quản trị danh mục môn học ([`UC17`](requirements.md#uc17-quan-tri-danh-muc-mon-hoc-subjects)), phân công lớp học phần và gán sinh viên hàng loạt qua Excel ([`UC18`](requirements.md#uc18-quan-ly-lop-hoc-phan-course-classes)), thẩm định câu hỏi cấp cao ([`UC20`](requirements.md#uc20-tham-dinh-va-duyet-cau-hoi-question-review)), kích hoạt tính toán lại bảng xếp hạng (Redis Cache Rebuild) và chốt học kỳ ([`UC25`](requirements.md#uc25-diem-danh-chuyen-can-va-bang-xep-hang)), cấu hình danh hiệu và trao tặng huy hiệu thủ công ([`UC27`](requirements.md#uc27-quan-ly-va-cap-phat-huy-hieu-danh-hieu)), tiếp nhận và xử lý các ticket báo cáo vi phạm nội dung/người dùng ([`UC31`](requirements.md#uc31-gui-bao-cao-vi-pham-reports)), tương tác với bảng điều khiển Trợ lý AI Quản trị ([`UC29`](requirements.md#uc29-tro-ly-ai-va-tinh-chinh-cau-hoi-hoc-thuat)).
 
@@ -16,7 +16,7 @@ Tài liệu này được biên soạn chuẩn xác 100% dựa trên tài liệu
 ## PHẦN II: SƠ ĐỒ CÂY DANH MỤC MÀN HÌNH (SITE MAP)
 
 ```text
-HỆ THỐNG GIAO DIỆN CHUẨN HÓA (26 SCREENS + 07 MODALS)
+HỆ THỐNG GIAO DIỆN CHUẨN HÓA (25 SCREENS + 06 MODALS)
 ├── [ZONE 1: AUTHENTICATION] (Công khai / Khách)
 │   ├── SCR-01: Màn hình Đăng nhập (Login Screen - /login)
 │   └── SCR-02: Màn hình Xác thực OTP & Kích hoạt (OTP Verification - /verify-otp)
@@ -29,9 +29,7 @@ HỆ THỐNG GIAO DIỆN CHUẨN HÓA (26 SCREENS + 07 MODALS)
 │   ├── SCR-05: Trang Cá nhân & Bộ sưu tập Huy hiệu (User Profile & Badges - /profile/:userId)
 │   ├── SCR-06: Trung tâm Bạn bè & Khối kết nối (Friends & Relations - /friends)
 │   ├── SCR-07: Hộp thư Trò chuyện (Messenger / Conversations - /messages)
-│   │   ├── MODAL-02: Drawer/Modal Quản trị Nhóm chat (Group Chat Settings)
-│   │   └── MODAL-04: Popup Mã PIN Kho ẩn (Thiết lập / Mở khóa Kho bí mật)
-│   ├── SCR-08: Kho Hội thoại ẩn Bảo mật PIN (Secret Vault Chat - /messages/hidden-vault)
+│   │   └── MODAL-02: Drawer/Modal Quản trị Nhóm chat (Group Chat Settings)
 │   ├── SCR-09: Tìm kiếm Toàn cục Đa thực thể (Global Search - /search)
 │   ├── SCR-10: Cài đặt Cá nhân & Phiên thiết bị (Settings & Devices - /settings)
 │   ├── SCR-11: Trung tâm Thông báo (Notifications Center - /notifications)
@@ -67,7 +65,7 @@ HỆ THỐNG GIAO DIỆN CHUẨN HÓA (26 SCREENS + 07 MODALS)
 
 ## PHẦN III: SƠ ĐỒ ĐIỀU HƯỚNG TỔNG THỂ (GLOBAL SCREEN NAVIGATION)
 
-Khung điều hướng trung tâm (Header & Sidebar Navigation Shell) kết nối toàn diện 26 màn hình và 07 hộp thoại ngữ cảnh:
+Khung điều hướng trung tâm (Header & Sidebar Navigation Shell) kết nối toàn diện 25 màn hình và 06 hộp thoại ngữ cảnh:
 
 ```mermaid
 flowchart TD
@@ -118,8 +116,6 @@ flowchart TD
     SCR06 --> SCR05
     SCR05 -- "Nhắn tin" --> SCR07
     SCR07 -. "Cài đặt nhóm" .-> MODAL02["MODAL-02: Quản trị Nhóm chat"]
-    SCR07 -. "Mở kho bảo mật" .-> MODAL04["MODAL-04: Xác thực/Thiết lập mã PIN"]
-    MODAL04 -- "PIN chính xác" --> SCR08["SCR-08: Kho Hội thoại ẩn"]
     SCR03 & SCR04 & SCR05 -. "Báo cáo vi phạm" .-> MODAL03["MODAL-03: Gửi Báo cáo Vi phạm"]
     MODAL03 ==>|"Chuyển tiếp ticket xử lý"| SCR25
 
@@ -145,12 +141,12 @@ flowchart TD
     classDef store fill:#efebe9,stroke:#4e342e,stroke-width:2px;
 
     class SCR01,SCR02 auth;
-    class SCR03,SCR04,SCR05,SCR06,SCR07,SCR08,SCR09,SCR10,SCR11 user;
+    class SCR03,SCR04,SCR05,SCR06,SCR07,SCR09,SCR10,SCR11 user;
     class SCR12,SCR13,SCR14,SCR15 academic;
     class SCR16,SCR17,SCR18 game;
     class SCR19,SCR20,SCR21 lecturer;
     class SCR22,SCR23,SCR24,SCR25,SCR26 admin;
-    class MODAL01,MODAL02,MODAL03,MODAL04,MODAL05,MODAL06,MODAL07 modal;
+    class MODAL01,MODAL02,MODAL03,MODAL05,MODAL06,MODAL07 modal;
     class BANK store;
 ```
 
@@ -195,7 +191,7 @@ flowchart TD
 
 ### Luồng 2: Mạng xã hội, Tương tác & Trò chuyện
 
-Quy trình đăng bài viết đa phương tiện qua Cloudflare R2, tương tác cộng đồng, quan hệ bạn bè đồng cấp, kho ẩn mã PIN và xử lý báo cáo vi phạm:
+Quy trình đăng bài viết đa phương tiện qua Cloudflare R2, tương tác cộng đồng, quan hệ bạn bè đồng cấp, trò chuyện và xử lý báo cáo vi phạm:
 
 ```mermaid
 flowchart TD
@@ -219,16 +215,10 @@ flowchart TD
     PEER_CHECK -->|"Khác cấp (SV-GV)"| PEER_DIFF["Chỉ hiển thị nút: Nhắn tin / Theo dõi"]
     SCR05 -->|"Tùy chọn bảo vệ"| BLOCK_ACT["Chặn người dùng: Hủy bạn bè & Ẩn tương tác"]
 
-    %% Hộp thư trò chuyện & Kho ẩn
+    %% Hộp thư trò chuyện
     SCR03 -->|"Bấm Icon Tin nhắn trên Header"| SCR07["SCR-07: Hộp thư Trò chuyện"]
     SCR07 -->|"Tạo nhóm mới"| GROUP_CHAT["Mở Khung trò chuyện Nhóm"]
     GROUP_CHAT -->|"Bấm Cài đặt nhóm"| MODAL02["MODAL-02: Phân vai trò Tù trưởng / Già làng / Dân làng"]
-
-    SCR07 -->|"Bấm mở Kho hội thoại ẩn"| PIN_STATE{"Đã thiết lập mã PIN?"}
-    PIN_STATE -->|"Chưa có PIN"| PIN_SETUP["MODAL-04: Thiết lập mã PIN 6 số"] --> PIN_VERIFY["Nhập mã PIN xác thực"]
-    PIN_STATE -->|"Đã có PIN"| PIN_VERIFY
-    PIN_VERIFY -->|"Mã PIN khớp"| SCR08["SCR-08: Kho Hội thoại ẩn Bảo mật PIN"]
-    SCR08 -->|"Bấm Bỏ ẩn cuộc hội thoại"| SCR07
 
     %% Trung tâm thông báo
     SCR03 -->|"Bấm Icon Chuông Thông báo"| SCR11["SCR-11: Trung tâm Thông báo"]
@@ -376,8 +366,6 @@ Bảng đối chiếu toàn diện giữa 26 Màn hình chính, 07 Hộp thoại
 | **SCR-06** | Trung tâm Bạn bè & Khối kết nối | `/friends` | All Users (Peer-only) | [`UC09`](requirements.md#uc09-quan-ly-moi-quan-he-ban-be-friendships), [`UC10`](requirements.md#uc10-chan-nguoi-dung-blocks) | `Đang chờ (PENDING)` |
 | **SCR-07** | Hộp thư Trò chuyện & Hội thoại | `/messages` | All Users | [`UC11`](requirements.md#uc11-tro-chuyen-truc-tiep--nhom-chat) | `Đang chờ (PENDING)` |
 | **MODAL-02** | Hộp thoại Quản trị nhóm chat | *(Drawer / Modal)* | Group Admin / Leaders | [`UC12`](requirements.md#uc12-quan-tri-nhom-chat) | `Đang chờ (PENDING)` |
-| **MODAL-04** | Hộp thoại Mã PIN Kho ẩn (Tạo mới / Mở khóa) | *(Contextual Modal)* | All Users | [`UC13`](requirements.md#uc13-quan-ly-kho-hoi-thoai-an-bang-ma-pin) | `Đang chờ (PENDING)` |
-| **SCR-08** | Kho Hội thoại ẩn Bảo mật mã PIN | `/messages/hidden-vault` | All Users | [`UC13`](requirements.md#uc13-quan-ly-kho-hoi-thoai-an-bang-ma-pin) | `Đang chờ (PENDING)` |
 | **SCR-09** | Tìm kiếm Toàn cục Đa thực thể | `/search` | All Users | [`UC30`](requirements.md#uc30-tim-kiem-toan-van-full-text-search) | `Đang chờ (PENDING)` |
 | **SCR-10** | Cài đặt Cá nhân & Phiên thiết bị | `/settings` | All Users | [`UC10`](requirements.md#uc10-chan-nguoi-dung-blocks), [`UC14`](requirements.md#uc14-quan-ly-thong-bao), [`UC33`](requirements.md#uc33-quan-ly-thiet-bi-dang-nhap-va-phien-lam-viec-devices) | `Đang chờ (PENDING)` |
 | **SCR-11** | Trung tâm Thông báo | `/notifications` | All Users | [`UC14`](requirements.md#uc14-quan-ly-thong-bao) | `Đang chờ (PENDING)` |

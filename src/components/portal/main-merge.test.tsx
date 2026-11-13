@@ -1,12 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
+import { MemoryRouter, useLocation } from 'react-router-dom'
 import { renderWithQueryClient } from '@/test/query-test-utils'
 import { StartDirectConversation } from './StartDirectConversation'
 import { ChatPortalActions } from './ChatPortalActions'
-import { ChatSidebar } from '@/components/chat/ChatSidebar'
-import DashboardLayout from '@/layouts/DashboardLayout'
 import { chatService } from '@/services/chat.service'
 import { useAuthStore } from '@/stores/authStore'
 import i18n from '@/lib/i18n'
@@ -49,35 +47,8 @@ describe('Main merge integration', () => {
     )
     await user.click(await screen.findByRole('button', { name: 'Thành viên (1)' }))
     expect(screen.getByText('Mai Anh')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Ẩn hội thoại vào kho PIN' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /ẩn hội thoại/i })).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Quản trị nhóm chat' }))
     expect(screen.getByRole('dialog')).toHaveAccessibleName('Quản trị nhóm chat')
-  })
-  it('TC-MERGE-03: keeps a visible link to the PIN vault in the new chat sidebar', () => {
-    renderWithQueryClient(
-      <MemoryRouter>
-        <ChatSidebar onSelectConversation={vi.fn()} onOpenNewChat={vi.fn()} />
-      </MemoryRouter>
-    )
-    expect(screen.getByRole('link', { name: 'Kho hội thoại ẩn' })).toHaveAttribute('href', '/messages/hidden-vault')
-  })
-  it('TC-MERGE-04: does not apply the full-screen chat overflow lock to the PIN vault', () => {
-    useAuthStore.setState({
-      user: { user_id: 1, roles: ['STUDENT'] },
-      token: 'test-token',
-      isAuthenticated: true,
-      hasHydrated: true,
-    })
-    renderWithQueryClient(
-      <MemoryRouter initialEntries={['/messages/hidden-vault']}>
-        <Routes>
-          <Route element={<DashboardLayout />}>
-            <Route path="/messages/hidden-vault" element={<h1>Vault</h1>} />
-          </Route>
-        </Routes>
-      </MemoryRouter>
-    )
-    expect(screen.getByRole('main')).not.toHaveClass('overflow-hidden')
-    expect(screen.getByRole('navigation', { name: /điều hướng di động/i })).toBeInTheDocument()
   })
 })

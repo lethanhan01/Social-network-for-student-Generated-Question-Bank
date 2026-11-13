@@ -123,7 +123,6 @@ test('Profile actions and conversation information fit on desktop and mobile', a
     await expect(details).toBeVisible()
     await details.getByRole('button', { name: 'Thành viên (2)' }).click()
     await expect(details.getByText('Trần Tuấn Anh')).toBeVisible()
-    await expect(details.getByRole('button', { name: 'Ẩn hội thoại vào kho PIN' })).toBeVisible()
     await expect(page.getByRole('main').getByText('Hẹn gặp ở lớp!')).toBeVisible({ visible: width >= 1280 })
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
     await page.screenshot({ path: test.info().outputPath(`chat-${width}.png`) })
@@ -133,11 +132,5 @@ test('Profile actions and conversation information fit on desktop and mobile', a
     await details.getByRole('button', { name: 'Đóng thông tin hội thoại' }).click()
     await expect(details).toBeHidden()
     await expect(title).toBeFocused()
-    await page.getByRole('button', { name: 'Thông tin hội thoại', exact: true }).click()
-    const hideRequest = page.waitForRequest((request) =>
-      request.method() === 'PATCH' && new URL(request.url()).pathname.endsWith('/conversations/24/hide'))
-    await details.getByRole('button', { name: 'Ẩn hội thoại vào kho PIN' }).click()
-    await hideRequest
-    await expect(page).toHaveURL(/\/messages$/)
   }
 })

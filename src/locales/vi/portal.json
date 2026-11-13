@@ -39,8 +39,6 @@
     "history": "Lịch sử tin nhắn",
     "older": "Tải tin nhắn cũ hơn",
     "sayHello": "Gửi lời chào để bắt đầu cuộc trò chuyện.",
-    "hide": "Ẩn hội thoại vào kho PIN",
-    "unhide": "Đưa hội thoại ra khỏi kho",
     "compose": "Nội dung tin nhắn",
     "placeholder": "Viết tin nhắn của bạn…",
     "send": "Gửi tin nhắn",
@@ -52,24 +50,6 @@
     "findPeople": "Tìm theo tên hoặc email",
     "findHint": "Nhập tên hoặc email để chọn người bạn muốn trò chuyện.",
     "noPeople": "Không tìm thấy người dùng phù hợp."
-  },
-  "vault": {
-    "title": "Kho hội thoại ẩn",
-    "description": "Không gian riêng cho những cuộc trò chuyện cần bảo mật.",
-    "locked": "Kho hội thoại đang khóa",
-    "explanation": "Nhập mã PIN 6 chữ số để truy cập. Hội thoại chỉ được tải sau khi máy chủ xác thực PIN; khóa lại khi bạn rời trang.",
-    "lock": "Khóa kho"
-  },
-  "pin": {
-    "unlock": "Mở khóa kho",
-    "setup": "Thiết lập mã PIN",
-    "change": "Đổi mã PIN",
-    "description": "Sử dụng mã PIN gồm đúng 6 chữ số. Không chia sẻ mã này với người khác.",
-    "old": "Mã PIN hiện tại",
-    "code": "Mã PIN 6 chữ số",
-    "confirm": "Nhập lại mã PIN",
-    "invalid": "Mã PIN phải gồm đúng 6 chữ số.",
-    "mismatch": "Mã PIN nhập lại chưa khớp."
   },
   "group": {
     "title": "Quản trị nhóm chat",

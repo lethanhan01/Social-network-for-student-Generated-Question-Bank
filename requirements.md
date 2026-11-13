@@ -80,7 +80,7 @@ graph TD
 | **Phân hệ 3** | UC05, UC06 | ✓ | ✓ | - | ✓ |
 | **Phân hệ 4** | UC07, UC08 | ✓ | ✓ | - | ✓ |
 | **Phân hệ 5** | UC09, UC10 | ✓ | ✓ | - | ✓ |
-| **Phân hệ 6** | UC11, UC12, UC13 | ✓ | ✓ | ✓ | ✓ |
+| **Phân hệ 6** | UC11, UC12 | ✓ | ✓ | ✓ | ✓ |
 | **Phân hệ 7** | UC14, UC15 | ✓ | ✓ | ✓ | ✓ |
 | **Phân hệ 8** | UC16, UC17, UC18 | ✓ | ✓ | ✓ | ✓ |
 | **Phân hệ 9** | UC19, UC20 | ✓ | ✓ | ✓ | - |
@@ -113,7 +113,6 @@ graph TD
 - [Phân hệ 6: Trò chuyện & Tin nhắn (Conversations & Messages)](#phan-he-6-tro-chuyen--tin-nhan-conversations--messages)
   - [UC11: Trò chuyện trực tiếp & Nhóm chat](#uc11-tro-chuyen-truc-tiep--nhom-chat)
   - [UC12: Quản trị nhóm chat](#uc12-quan-tri-nhom-chat)
-  - [UC13: Quản lý kho hội thoại ẩn bằng mã PIN](#uc13-quan-ly-kho-hoi-thoai-an-bang-ma-pin)
 - [Phân hệ 7: Thông báo & Dòng hoạt động (Notifications & Activity Feed)](#phan-he-7-thong-bao--dong-hoat-dong-notifications--activity-feed)
   - [UC14: Quản lý thông báo](#uc14-quan-ly-thong-bao)
   - [UC15: Xem dòng hoạt động (Activity Feed)](#uc15-xem-dong-hoat-dong-activity-feed)
@@ -461,29 +460,6 @@ Cho phép người dùng tạo đoạn chat 1-1 hoặc nhóm chat mới, xem dan
 3. Thêm thành viên mới (`POST /conversations/{id}/members`) hoặc gỡ bỏ thành viên (`DELETE /conversations/{id}/members/{userId}`).
 4. Thay đổi quyền hạn (phân vai trò: **Tù trưởng / Già làng / Dân làng**) cho từng thành viên (`PUT /conversations/{id}/members/{userId}/role`).
 5. Thành viên bất kỳ có thể chọn **"Rời nhóm"** (`POST /conversations/{id}/leave`).
-
----
-
-### UC13: Quản lý kho hội thoại ẩn bằng mã PIN
-
-| Thuộc tính | Chi tiết |
-| :--- | :--- |
-| **Mã Use Case** | `UC-CHAT-03` |
-| **Tên Use Case** | Quản lý kho trò chuyện ẩn |
-| **Tác nhân (Actor)** | Người dùng đã đăng nhập |
-| **Điều kiện tiên quyết** | Người dùng đã đăng nhập và có các cuộc hội thoại cần bảo mật riêng tư. |
-| **Điều kiện sau** | Hội thoại được chuyển vào kho bí mật có mã PIN hoặc được bỏ ẩn về danh sách chung. |
-| **API liên quan** | `POST /users/me/hidden-chat-pin`, `PATCH /conversations/{id}/hide`, `PATCH /conversations/{id}/unhide`, `POST /conversations/hidden/unlock`, `GET /conversations/hidden` |
-
-**Mô tả:**  
-Thiết lập/đổi mã PIN bí mật, ẩn cuộc hội thoại vào kho bảo mật, mở khóa xem kho và bỏ ẩn cuộc hội thoại.
-
-**Luồng sự kiện chính (Main Flow):**
-1. Người dùng thiết lập mã PIN bảo mật cá nhân (`POST /users/me/hidden-chat-pin`).
-2. Người dùng chọn một cuộc hội thoại và bấm **"Ẩn"** (`PATCH /conversations/{id}/hide`), cuộc hội thoại biến mất khỏi danh sách chung.
-3. Khi cần xem lại, người dùng nhập mã PIN để mở khóa kho ẩn (`POST /conversations/hidden/unlock`).
-4. Hệ thống xác thực PIN thành công và tải danh sách các đoạn chat ẩn (`GET /conversations/hidden`).
-5. Người dùng có thể chọn bỏ ẩn để đưa về danh sách chính (`PATCH /conversations/{id}/unhide`).
 
 ---
 

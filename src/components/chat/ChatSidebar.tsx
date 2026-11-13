@@ -1,4 +1,3 @@
-import { ButtonLink } from '@/components/ui/actions/Button'
 import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SquarePen, MoreHorizontal, BellOff, CheckCheck } from 'lucide-react'
@@ -39,7 +38,6 @@ function renderStatusIndicator(hasUnread: boolean, isMuted?: boolean) {
 
 export function ChatSidebar({ activeId, onSelectConversation, onOpenNewChat }: Readonly<ChatSidebarProps>) {
   const { t } = useTranslation('chat')
-  const { t: tp } = useTranslation('portal')
   const [search, setSearch] = useState('')
   const [tab, setTab] = useState<'ALL' | 'UNREAD' | 'GROUP'>('ALL')
 
@@ -68,7 +66,6 @@ export function ChatSidebar({ activeId, onSelectConversation, onOpenNewChat }: R
 
   return (
     <aside aria-label={t('messengerTitle')} className="w-full md:w-64 xl:w-72 flex flex-col h-full bg-surface-card border-r border-line-subtle shrink-0">
-      <nav className="shrink-0 px-3 pt-3"><ButtonLink to="/messages/hidden-vault" variant="outline" className="min-h-11 w-full">{tp('vault.title')}</ButtonLink></nav>
       <header className="p-3 pb-2 flex items-center justify-between gap-2 shrink-0">
         <Heading level={1} className="text-xl font-bold text-fg-primary tracking-tight">
           {t('messengerTitle')}

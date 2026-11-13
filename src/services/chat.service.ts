@@ -12,7 +12,6 @@ import type {
   LeaveGroupResponseDto,
   LeaveGroupRequestDto,
   UpdateMemberRoleRequestDto,
-  UnlockHiddenChatDto,
   MessageListResponseDto,
   DeleteMessageResponseDto,
 } from '@/types'
@@ -76,26 +75,6 @@ export const chatService = {
   async leaveGroup(id: number, payload?: LeaveGroupRequestDto): Promise<LeaveGroupResponseDto> {
     return requestData<LeaveGroupResponseDto>(
       api.post<GlobalResponse<LeaveGroupResponseDto>>(`/conversations/${id}/leave`, payload)
-    )
-  },
-
-  async hideConversation(id: number): Promise<void> {
-    await api.patch<GlobalResponse<void>>(`/conversations/${id}/hide`)
-  },
-
-  async unhideConversation(id: number): Promise<void> {
-    await api.patch<GlobalResponse<void>>(`/conversations/${id}/unhide`)
-  },
-
-  async unlockHiddenConversations(payload: UnlockHiddenChatDto): Promise<void> {
-    await api.post<GlobalResponse<void>>('/conversations/hidden/unlock', payload)
-  },
-
-  async getHiddenConversations(options?: { signal?: AbortSignal }): Promise<ConversationListResponseDto> {
-    return requestData<ConversationListResponseDto>(
-      api.get<GlobalResponse<ConversationListResponseDto>>('/conversations/hidden', {
-        signal: options?.signal,
-      })
     )
   },
 
