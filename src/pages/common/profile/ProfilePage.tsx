@@ -72,12 +72,12 @@ export default function ProfilePage() {
   const posts = postsQuery.data?.pages.flatMap((page) => page.items ?? []) ?? []
 
   return (
-    <section className="max-w-4xl mx-auto space-y-6">
+    <section className="max-w-4xl mx-auto space-y-3">
       {/* Cover and Header Profile Card */}
-      <Card className="p-0 overflow-hidden bg-surface border-line-subtle shadow-card rounded-2xl">
+      <Card as="section" padding="none" className="social-card overflow-hidden">
         {/* Cover photo banner */}
         {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Cover photo container] */}
-        <div className="h-36 sm:h-48 bg-gradient-to-r from-action-accent/30 via-action-accent/10 to-surface-elevated relative">
+        <div className="h-28 sm:h-40 bg-gradient-to-r from-action-accent/30 via-action-accent/10 to-surface-elevated relative">
           {profile.cover_url ? (
             <Image src={profile.cover_url} alt="Cover" className="w-full h-full object-cover" />
           ) : null}
@@ -85,21 +85,21 @@ export default function ProfilePage() {
 
         {/* Profile Info Row */}
         {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Profile header info container] */}
-        <div className="px-6 pb-6 pt-0 relative flex flex-col sm:flex-row sm:items-end justify-between gap-4 -mt-14 sm:-mt-16">
+        <div className="px-3 pb-3 sm:px-4 relative flex flex-col lg:flex-row lg:items-end justify-between gap-3 -mt-9 sm:-mt-12">
           {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Avatar and Title stack] */}
-          <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 text-center sm:text-left">
+          <div className="flex min-w-0 items-end gap-3">
             <Avatar
               src={profile.avatar_url || undefined}
               name={profile.full_name || 'HUST'}
               fallback={(profile.full_name || 'H').charAt(0).toUpperCase()}
               size="lg"
-              className="w-24 h-24 sm:w-28 sm:h-28 ring-4 ring-surface"
+              className="w-20 h-20 sm:w-24 sm:h-24 shrink-0 ring-4 ring-surface-card bg-surface-card"
             />
             {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Name and badges container] */}
-            <div className="space-y-1">
+            <div className="min-w-0 space-y-1 pt-10 sm:pt-12">
               {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Name flex row] */}
-              <div className="flex items-center gap-2 justify-center sm:justify-start flex-wrap">
-                <Heading level={1} className="text-xl sm:text-2xl font-black text-text-primary">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Heading level={1} className="text-xl sm:text-2xl font-bold min-w-0 break-words">
                   {profile.full_name}
                 </Heading>
                 <Badge tone={profile.role === 'LECTURER' ? 'accent' : 'neutral'} size="sm">
@@ -118,7 +118,7 @@ export default function ProfilePage() {
 
           {/* Action Buttons */}
           {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Profile actions button row] */}
-          <div className="flex items-center justify-center sm:justify-end gap-2 flex-wrap">
+          <div className="flex items-center lg:justify-end lg:shrink-0 min-w-0">
             {isMe ? (
               <Button
                 variant="primary"
@@ -140,71 +140,74 @@ export default function ProfilePage() {
         </div>
 
         {/* Bio and Faculty details */}
-        {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Bio and details row container] */}
-        <div className="px-6 pb-6 pt-2 border-t border-line-subtle space-y-3">
-          {profile.bio ? (
-            <Text size="sm" className="text-text-primary leading-relaxed whitespace-pre-wrap">
-              {profile.bio}
-            </Text>
-          ) : null}
-          {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Faculty metadata flex chips] */}
-          <div className="flex items-center gap-4 flex-wrap text-xs text-text-muted">
-            {profile.school_faculty ? (
-              <strong className="font-normal inline-flex items-center gap-1.5">
-                <GraduationCap size={15} />
-                {profile.school_faculty}
-              </strong>
+        {(profile.bio || profile.school_faculty || profile.class_name || profile.created_at) ? (
+          <section className="px-3 py-3 sm:px-4 border-t border-line-subtle space-y-2">
+            {profile.bio ? (
+              <Text size="sm" className="text-text-primary leading-relaxed whitespace-pre-wrap">
+                {profile.bio}
+              </Text>
             ) : null}
-            {profile.class_name ? (
-              <strong className="font-normal inline-flex items-center gap-1.5">
-                <BookOpen size={15} />
-                {profile.class_name}
-              </strong>
-            ) : null}
-            {profile.created_at ? (
-              <strong className="font-normal inline-flex items-center gap-1.5">
-                <Calendar size={15} />
-                {t('profile.joined', 'Gia nhập')}: {formatDate(profile.created_at)}
-              </strong>
-            ) : null}
-          </div>
-        </div>
+            {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Faculty metadata flex chips] */}
+            <div className="flex items-center gap-4 flex-wrap text-xs text-text-muted">
+              {profile.school_faculty ? (
+                <strong className="font-normal inline-flex items-center gap-1.5">
+                  <GraduationCap size={15} />
+                  {profile.school_faculty}
+                </strong>
+              ) : null}
+              {profile.class_name ? (
+                <strong className="font-normal inline-flex items-center gap-1.5">
+                  <BookOpen size={15} />
+                  {profile.class_name}
+                </strong>
+              ) : null}
+              {profile.created_at ? (
+                <strong className="font-normal inline-flex items-center gap-1.5">
+                  <Calendar size={15} />
+                  {t('profile.joined', 'Gia nhập')}: {formatDate(profile.created_at)}
+                </strong>
+              ) : null}
+            </div>
+          </section>
+        ) : null}
       </Card>
 
-      {/* Badges Section */}
-      <ProfileBadgesCard userId={isMe ? undefined : profile.user_id} />
+      <section className="grid items-start gap-3 md:grid-cols-3">
+        {/* Badges Section */}
+        <ProfileBadgesCard userId={isMe ? undefined : profile.user_id} />
 
-      {/* User's Posts Feed */}
-      <section aria-label={t('social.profilePosts')} className="space-y-4">
-        <Heading level={2} className="text-lg font-bold text-text-primary">
-          {t('profile.userPosts', 'Bài viết đã chia sẻ')} ({posts.length})
-        </Heading>
-        {postsQuery.isPending || postsQuery.isError ? (
-          <QueryFeedback
-            pending={postsQuery.isPending}
-            error={postsQuery.error}
-            onRetry={postsQuery.refetch}
-          />
-        ) : posts.length > 0 ? (
-          /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [User posts list stack] */
-          <div className="space-y-4">
-            {posts.map((p) => (
-              <PostCard
-                key={p.post_id}
-                post={p}
-                currentUserAvatar={currentUser?.avatar_url || undefined}
-                currentUserName={currentUser?.fullName || 'Bạn'}
-              />
-            ))}
-          </div>
-        ) : (
-          <Card className="p-6 sm:p-8 text-center bg-surface border-line-subtle rounded-2xl shadow-card">
-            <Text size="sm" tone="muted">
-              {t('profile.noPosts', 'Chưa có bài viết nào được đăng tải.')}
-            </Text>
-          </Card>
-        )}
-        <LoadMore query={postsQuery} />
+        {/* User's Posts Feed */}
+        <section aria-label={t('social.profilePosts')} className="space-y-3 md:col-span-2">
+          <Heading level={2} className="text-lg font-bold text-text-primary">
+            {t('profile.userPosts', 'Bài viết đã chia sẻ')} ({posts.length})
+          </Heading>
+          {postsQuery.isPending || postsQuery.isError ? (
+            <QueryFeedback
+              pending={postsQuery.isPending}
+              error={postsQuery.error}
+              onRetry={postsQuery.refetch}
+            />
+          ) : posts.length > 0 ? (
+            /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [User posts list stack] */
+            <div className="space-y-3">
+              {posts.map((p) => (
+                <PostCard
+                  key={p.post_id}
+                  post={p}
+                  currentUserAvatar={currentUser?.avatar_url || undefined}
+                  currentUserName={currentUser?.fullName || 'Bạn'}
+                />
+              ))}
+            </div>
+          ) : (
+            <Card padding="none" className="social-card p-4 text-center">
+              <Text size="sm" tone="muted">
+                {t('profile.noPosts', 'Chưa có bài viết nào được đăng tải.')}
+              </Text>
+            </Card>
+          )}
+          <LoadMore query={postsQuery} />
+        </section>
       </section>
 
       {/* Modals */}

@@ -15,7 +15,7 @@ export function SearchResultItemCard({ item }: Readonly<SearchResultItemCardProp
   if (item.user) {
     const u = item.user
     return (
-      <Card className="p-4 bg-surface border-line-subtle rounded-2xl shadow-card flex items-center justify-between gap-3">
+      <Card as="article" padding="none" className="social-card border-line-subtle p-3 flex items-center justify-between gap-3">
         {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [User info horizontal container] */}
         <div className="flex items-center gap-3 min-w-0">
           <Avatar
@@ -56,7 +56,7 @@ export function SearchResultItemCard({ item }: Readonly<SearchResultItemCardProp
   if (item.post) {
     const p = item.post
     return (
-      <Card className="p-4 bg-surface border-line-subtle rounded-2xl shadow-card space-y-2">
+      <Card as="article" padding="none" className="social-card border-line-subtle p-3 space-y-2">
         <header className="flex items-center justify-between gap-2">
           {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Post author badge row] */}
           <div className="flex items-center gap-2 min-w-0">
@@ -89,7 +89,7 @@ export function SearchResultItemCard({ item }: Readonly<SearchResultItemCardProp
   if (item.question) {
     const q = item.question
     return (
-      <Card className="p-4 bg-surface border-line-subtle rounded-2xl shadow-card space-y-2">
+      <Card as="article" padding="none" className="social-card border-line-subtle p-3 space-y-2">
         <header className="flex items-center justify-between gap-2">
           {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Question header row] */}
           <div className="flex items-center gap-2">

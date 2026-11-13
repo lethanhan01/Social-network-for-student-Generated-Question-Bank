@@ -16,7 +16,7 @@ export function CreatePostBox({ user, onOpenCreateModal }: Readonly<CreatePostBo
   const initials = displayName.trim().charAt(0).toUpperCase()
 
   return (
-    <Card className="p-4 bg-surface border-line-subtle shadow-card rounded-2xl space-y-3">
+    <Card as="section" padding="none" className="social-card p-3 space-y-2">
       {/* Top Input Trigger */}
       {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Flex layout container for post trigger bar] */}
       <div className="flex items-center gap-3">
@@ -31,7 +31,7 @@ export function CreatePostBox({ user, onOpenCreateModal }: Readonly<CreatePostBo
           variant="secondary"
           size="md"
           onClick={onOpenCreateModal}
-          className="flex-1 min-w-0 justify-start text-text-muted hover:text-text-primary bg-surface-hover rounded-full px-4 h-auto min-h-11 py-3 text-left text-sm font-normal border border-line-subtle whitespace-normal"
+          className="flex-1 min-w-0 justify-start text-text-muted hover:text-text-primary bg-surface-hover rounded-full px-4 h-auto min-h-11 py-2 text-left text-sm font-normal border border-line-subtle whitespace-normal"
         >
           {t('social.composerPrompt')}
         </Button>
@@ -46,7 +46,7 @@ export function CreatePostBox({ user, onOpenCreateModal }: Readonly<CreatePostBo
           variant="ghost"
           size="sm"
           onClick={onOpenCreateModal}
-          className="justify-center gap-2 text-xs min-h-11"
+          className="justify-center gap-1.5 px-1.5 text-sm min-h-11 whitespace-normal"
           leftIcon={<HelpCircle size={18} className="text-tone-warning" />}
         >
           <strong className="font-normal">{t('social.discussion')}</strong>
@@ -55,7 +55,7 @@ export function CreatePostBox({ user, onOpenCreateModal }: Readonly<CreatePostBo
           variant="ghost"
           size="sm"
           onClick={onOpenCreateModal}
-          className="justify-center gap-2 text-xs min-h-11"
+          className="justify-center gap-1.5 px-1.5 text-sm min-h-11 whitespace-normal"
           leftIcon={<ImageIcon size={18} className="text-action-accent" />}
         >
           <strong className="font-normal">{t('social.attachment')}</strong>
@@ -64,7 +64,7 @@ export function CreatePostBox({ user, onOpenCreateModal }: Readonly<CreatePostBo
           variant="ghost"
           size="sm"
           onClick={onOpenCreateModal}
-          className="justify-center gap-2 text-xs min-h-11"
+          className="justify-center gap-1.5 px-1.5 text-sm min-h-11 whitespace-normal"
           leftIcon={<Sparkles size={18} className="text-tone-info" />}
         >
           <strong className="font-normal">{t('social.share')}</strong>

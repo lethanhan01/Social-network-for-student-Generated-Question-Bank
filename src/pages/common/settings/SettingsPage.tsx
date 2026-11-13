@@ -26,7 +26,7 @@ function AppearanceSettings() {
   const setTheme = useThemeStore((s) => s.setTheme)
   const { currentLanguage, changeLanguage } = useLanguageSwitch()
   return (
-    <section className="space-y-6">
+    <section className="space-y-3">
       <h2 className="text-xl font-bold">{t('settings.appearance')}</h2>
       <p className="text-sm text-fg-secondary">{t('settings.appearanceDescription')}</p>
       <FormField htmlFor="portal-settingspage-0" label={t('settings.theme')}>
@@ -63,7 +63,7 @@ export default function SettingsPage() {
   return (
     <Page>
       <PageHeader eyebrow={t('eyebrow')} title={t('settings.title')} description={t('settings.description')} />
-      <section className="grid gap-6 lg:grid-cols-4">
+      <section className="grid gap-3 lg:grid-cols-4">
         <nav className="flex flex-wrap gap-2 lg:flex-col lg:items-stretch" aria-label={t('settings.title')}>
           {tabs.map(({ key, icon: Icon }) => (
             <Button
@@ -81,7 +81,7 @@ export default function SettingsPage() {
             </Button>
           ))}
         </nav>
-        <Card as="section" className="lg:col-span-3 p-5 sm:p-8">
+        <Card as="section" className="social-card lg:col-span-3 p-4">
           {active === 'appearance' ? (
             <AppearanceSettings />
           ) : active === 'security' ? (

@@ -14,7 +14,7 @@ export function ProfileBadgesCard({ userId }: Readonly<ProfileBadgesCardProps>) 
   const { data: badges = [], isLoading } = useUserBadgesQuery(userId)
 
   return (
-    <Card className="p-4 sm:p-5 bg-surface border-line-subtle shadow-card rounded-2xl space-y-4">
+    <Card className="social-card p-3 space-y-2">
       <header className="flex items-center justify-between">
         {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Header title flex layout] */}
         <div className="flex items-center gap-2">
@@ -34,7 +34,7 @@ export function ProfileBadgesCard({ userId }: Readonly<ProfileBadgesCardProps>) 
         </Text>
       ) : badges.length > 0 ? (
         /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Badges grid layout] */
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+        <div className="grid grid-cols-2 gap-2">
           {badges.map((badge) => (
             /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Single badge card container] */
             <div
@@ -57,12 +57,12 @@ export function ProfileBadgesCard({ userId }: Readonly<ProfileBadgesCardProps>) 
                 {badge.name}
               </strong>
               {badge.description ? (
-                <Text size="xs" tone="muted" className="text-[11px] line-clamp-2">
+                <Text size="xs" tone="muted" className="text-xs line-clamp-2">
                   {badge.description}
                 </Text>
               ) : null}
               {badge.earned_at ? (
-                <time className="text-[10px] text-text-muted block" dateTime={badge.earned_at}>
+                <time className="text-xs text-text-muted block" dateTime={badge.earned_at}>
                   {formatDate(badge.earned_at)}
                 </time>
               ) : null}
@@ -71,7 +71,7 @@ export function ProfileBadgesCard({ userId }: Readonly<ProfileBadgesCardProps>) 
         </div>
       ) : (
         /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Empty badges state container] */
-        <div className="text-center py-4 space-y-1">
+        <div className="text-center py-2 space-y-1">
           <Icon icon={ShieldAlert} size="lg" fg="muted" className="mx-auto" />
           <Text size="xs" tone="muted">
             {t('profile.emptyBadges', 'Chưa đạt được huy hiệu học tập nào.')}

@@ -22,7 +22,7 @@ export function ConnectionCard({
   const person = entry.requester ?? entry.receiver ?? entry
   if (!person.user_id) return null
   return (
-    <Card as="article" className="flex flex-col gap-3 p-4 bg-surface-card border-line-subtle shadow-card rounded-2xl">
+    <Card as="article" padding="none" className="social-card flex flex-col gap-2 border-line-subtle p-3">
       <header className="flex items-center gap-3">
         <Avatar
           src={person.avatar_url || undefined}
@@ -48,7 +48,7 @@ export function ConnectionCard({
           </p>
         </hgroup>
       </header>
-      <footer className="mt-auto flex flex-wrap items-center gap-2 pt-3 border-t border-line-subtle">
+      <footer className="mt-auto flex flex-wrap items-center gap-2 pt-2 border-t border-line-subtle">
         {tab === 'RECEIVED' ? (
           <>
             <Button disabled={busy} size="sm" className="flex-1 min-h-11 text-xs" leftIcon={<Check size={14} />} onClick={() => onAction('accept', person.user_id!)}>
@@ -119,7 +119,7 @@ export function ConnectionGrid({ entries, tab, busy, onAction }: Readonly<{
   onAction: (action: ConnectionAction, id: number) => void
 }>) {
   return (
-    <section className={`grid gap-4 sm:grid-cols-2 ${tab === 'FRIENDS' ? 'lg:grid-cols-3' : ''}`}>
+    <section className={`grid gap-3 sm:grid-cols-2 ${tab === 'FRIENDS' ? 'lg:grid-cols-3' : ''}`}>
       {entries.map((entry) => (
         <ConnectionCard
           key={entry.user_id ?? entry.requester?.user_id ?? entry.receiver?.user_id}

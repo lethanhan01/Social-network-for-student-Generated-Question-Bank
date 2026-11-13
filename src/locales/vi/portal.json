@@ -9,7 +9,11 @@
   "saved": "Đã lưu thay đổi",
   "cancel": "Hủy",
   "confirm": "Xác nhận",
+  "profileActions": "Tùy chọn hồ sơ",
   "messages": {
+    "details": "Thông tin hội thoại",
+    "closeDetails": "Đóng thông tin hội thoại",
+    "memberList": "Danh sách thành viên",
     "title": "Tin nhắn",
     "description": "Kết nối, trao đổi và cùng nhau học tập.",
     "conversations": "Cuộc trò chuyện",

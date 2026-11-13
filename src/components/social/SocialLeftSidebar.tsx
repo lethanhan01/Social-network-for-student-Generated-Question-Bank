@@ -31,7 +31,7 @@ export function SocialLeftSidebar({
   const studentCode = user?.student_lecturer_code || '—'
 
   return (
-    <Card className="p-4 bg-surface-card border-line-subtle shadow-card rounded-2xl space-y-4">
+    <Card as="section" padding="none" className="space-y-3 border-transparent bg-transparent p-2 shadow-none">
       {/* User Profile Summary */}
       <header className="flex items-center gap-3">
         <Avatar

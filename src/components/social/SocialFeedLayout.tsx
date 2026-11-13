@@ -20,7 +20,7 @@ export function SocialFeedLayout({
       </aside>
 
       {/* Center Column: Create Box, Filter Tabs, Feed Streams */}
-      <section className="min-w-0 w-full space-y-6">
+      <section className="min-w-0 w-full">
         {centerFeed}
       </section>
 

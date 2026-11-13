@@ -80,7 +80,7 @@ export default function PostDetailPage() {
   }
 
   return (
-    <section className="max-w-3xl mx-auto py-6 px-4 space-y-6">
+    <section className="max-w-2xl mx-auto space-y-3">
       {/* Navigation Header */}
       <nav aria-label="Điều hướng quay lại" className="flex items-center justify-between">
         <BackButton

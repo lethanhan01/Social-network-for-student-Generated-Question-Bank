@@ -31,9 +31,9 @@ export default function HiddenVaultPage() {
     })
   }
   return (
-    <Page>
+    <Page className="max-w-5xl space-y-3">
       <PageHeader eyebrow={t('eyebrow')} title={t('vault.title')} description={t('vault.description')} />
-      <nav className="mb-4 flex justify-between gap-3">
+      <nav className="flex justify-between gap-2">
         <ButtonLink to="/messages" variant="outline">
           {t('messages.title')}
         </ButtonLink>
@@ -47,11 +47,11 @@ export default function HiddenVaultPage() {
       {unlocked ? (
         <Inbox hidden />
       ) : (
-        <Card as="section" className="mx-auto max-w-xl p-5 sm:p-12 text-center space-y-6">
-          <ShieldCheck size={56} className="mx-auto text-action-accent" aria-hidden="true" />
-          <h2 className="text-2xl font-bold">{t('vault.locked')}</h2>
+        <Card as="section" className="social-card mx-auto max-w-xl p-4 sm:p-6 text-center space-y-3">
+          <ShieldCheck size={40} className="mx-auto text-action-accent" aria-hidden="true" />
+          <h2 className="text-lg font-bold">{t('vault.locked')}</h2>
           <p className="text-sm leading-relaxed text-fg-secondary">{t('vault.explanation')}</p>
-          <footer className="flex flex-wrap justify-center gap-3">
+          <footer className="flex flex-wrap justify-center gap-2">
             <Button onClick={() => setMode('unlock')}>
               <LockKeyhole size={18} />
               {t('pin.unlock')}

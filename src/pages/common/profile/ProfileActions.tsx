@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Ellipsis, Flag, UserX } from 'lucide-react'
 import { Button, ButtonLink } from '@/components/ui/actions/Button'
-import { ConfirmDialog } from '@/components/ui/overlay/ConfirmDialog'
+import {
+  ConfirmDialog, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from '@/components/ui/overlay'
 import {
   useSendFriendRequestMutation,
   useUnfriendMutation,
@@ -20,6 +23,7 @@ export function ProfileActions({
   onReport,
 }: Readonly<{ profile: ProfileResponse; myRole?: string; onReport: () => void }>) {
   const { t } = useTranslation()
+  const { t: tp } = useTranslation('portal')
   const [confirm, setConfirm] = useState<'unfriend' | 'block' | 'unblock'>()
   const stats = useRelationshipStatsQuery(profile.user_id ?? 0)
   const send = useSendFriendRequestMutation()
@@ -53,18 +57,20 @@ export function ProfileActions({
     }
   }
   return (
-    <section className="flex flex-wrap justify-center gap-2 sm:justify-end">
+    <section className="flex w-full min-w-0 flex-wrap items-center gap-1.5 lg:justify-end">
       {blocked ? (
         <Button disabled={busy} variant="outline" onClick={() => setConfirm('unblock')}>
           {t('profile.unblock_user')}
         </Button>
       ) : (
         <>
-          <ButtonLink to={`/messages?userId=${profile.user_id}`} variant="secondary">
+          <ButtonLink to={`/messages?userId=${profile.user_id}`} variant="secondary" size="sm" className="min-h-11">
             {t('profile.message_integration')}
           </ButtonLink>
           {sameRole ? (
             <Button
+              size="sm"
+              className="min-h-11"
               disabled={busy || pending}
               variant={isFriend ? 'outline' : 'primary'}
               onClick={() => (isFriend ? setConfirm('unfriend') : void perform('send'))}
@@ -76,12 +82,9 @@ export function ProfileActions({
                   : t('profile.send_friend_request')}
             </Button>
           ) : null}
-          {pending ? (
-            <ButtonLink to="/friends?tab=RECEIVED" variant="ghost">
-              {t('friends.tab_received')}
-            </ButtonLink>
-          ) : null}
           <Button
+            size="sm"
+            className="min-h-11"
             disabled={busy}
             variant="outline"
             onClick={() => {
@@ -90,14 +93,30 @@ export function ProfileActions({
           >
             {t(following ? 'social.unfollow' : 'social.follow')}
           </Button>
-          <Button disabled={busy} variant="ghost" onClick={() => setConfirm('block')}>
-            {t('zone2.blockUser')}
-          </Button>
         </>
       )}
-      <Button variant="ghost" onClick={onReport}>
-        {t('report.submit')}
-      </Button>
+      <DropdownMenu modal={false}>
+        <DropdownMenuTrigger asChild>
+          <Button variant="secondary" size="sm" className="min-h-11 min-w-11 px-2" aria-label={tp('profileActions')}>
+            <Ellipsis size={20} />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          {pending && !blocked ? (
+            <DropdownMenuItem asChild className="min-h-11 justify-start">
+              <ButtonLink to="/friends?tab=RECEIVED" variant="ghost" size="sm">{t('friends.tab_received')}</ButtonLink>
+            </DropdownMenuItem>
+          ) : null}
+          {!blocked ? (
+            <DropdownMenuItem disabled={busy} destructive className="min-h-11" onSelect={() => setConfirm('block')}>
+              <UserX size={16} /> {t('zone2.blockUser')}
+            </DropdownMenuItem>
+          ) : null}
+          <DropdownMenuItem className="min-h-11" onSelect={onReport}>
+            <Flag size={16} /> {t('report.submit')}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
       <ConfirmDialog
         open={Boolean(confirm)}
         title={t('social.confirmAction')}

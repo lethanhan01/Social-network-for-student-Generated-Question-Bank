@@ -40,14 +40,17 @@ describe('Main merge integration', () => {
     expect(create).toHaveBeenCalledWith({ target_user_id: 9 })
   })
   it('TC-MERGE-02: exposes group administration from the new main chat view', async () => {
-    vi.spyOn(chatService, 'getGroupMembers').mockResolvedValue([])
+    vi.spyOn(chatService, 'getGroupMembers').mockResolvedValue([{ user_id: 9, full_name: 'Mai Anh' }])
     const user = userEvent.setup()
     renderWithQueryClient(
       <MemoryRouter>
-        <ChatPortalActions conversationId={24} />
+        <ChatPortalActions conversationId={24} conversation={{ conversation_id: 24, type: 'GROUP', display_name: 'Study group' }} onClose={vi.fn()} />
       </MemoryRouter>
     )
-    await user.click(await screen.findByRole('button', { name: 'Quản trị nhóm chat' }))
+    await user.click(await screen.findByRole('button', { name: 'Thành viên (1)' }))
+    expect(screen.getByText('Mai Anh')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Ẩn hội thoại vào kho PIN' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Quản trị nhóm chat' }))
     expect(screen.getByRole('dialog')).toHaveAccessibleName('Quản trị nhóm chat')
   })
   it('TC-MERGE-03: keeps a visible link to the PIN vault in the new chat sidebar', () => {

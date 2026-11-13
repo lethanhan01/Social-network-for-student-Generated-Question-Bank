@@ -75,8 +75,8 @@ export default function SearchPage() {
       })
   }
   return (
-    <section className="space-y-5">
-      <header className="space-y-2">
+    <section className="mx-auto max-w-3xl space-y-3">
+      <header className="space-y-1">
         <Heading level={1} className="text-2xl font-bold">
           {t('search.title')}
         </Heading>

@@ -77,7 +77,7 @@ export function PostCard({
   }
 
   return (
-    <Card className="p-4 sm:p-5 bg-surface border-line-subtle shadow-card rounded-2xl space-y-3.5">
+    <Card as="section" padding="none" className="social-card p-3 sm:px-4 space-y-2">
       {/* Header */}
       <PostCardHeader
         post={post}
@@ -91,7 +91,7 @@ export function PostCard({
       />
 
       {/* Post Body Content */}
-      <article className="text-sm text-text-primary leading-relaxed whitespace-pre-wrap">
+      <article className="social-post-copy text-fg-primary whitespace-pre-wrap break-words">
         {isLongText && !isExpanded ? `${content.slice(0, 200)}...` : content}
         {isLongText ? (
           <Button

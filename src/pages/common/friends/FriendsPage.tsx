@@ -66,19 +66,19 @@ export default function FriendsPage() {
     else void perform(action, id)
   }
   return (
-    <Page className="max-w-5xl space-y-6">
-      <header className="space-y-2 pb-4 border-b border-line-subtle">
-        <Heading level={1} className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+    <Page className="max-w-5xl space-y-3">
+      <header className="space-y-1 pb-3 border-b border-line-subtle">
+        <Heading level={1} className="text-2xl font-bold tracking-tight">
           {t('social.connectionsTitle')}
         </Heading>
         <p className="text-sm text-fg-muted">{t('social.connectionsSubtitle')}</p>
       </header>
-      <Tabs value={tab} onValueChange={(value) => setParams({ tab: value })} variant="pills" className="space-y-6">
+      <Tabs value={tab} onValueChange={(value) => setParams({ tab: value })} variant="pills" className="space-y-3">
         <TabsList aria-label={t('social.connectionsTitle')} className="max-w-full overflow-x-auto">
           {TABS.map((value) => {
             const Icon = TAB_ICONS[value]
             return (
-              <TabsTrigger key={value} value={value} leftIcon={<Icon size={16} />} className="min-h-11 text-xs shrink-0">
+              <TabsTrigger key={value} value={value} leftIcon={<Icon size={16} />} className="min-h-11 text-sm shrink-0">
                 {t(`social.connections.${value}`)}{tab === value && query.isSuccess ? ` (${entries.length})` : ''}
               </TabsTrigger>
             )
@@ -89,7 +89,7 @@ export default function FriendsPage() {
             <QueryFeedback pending={query.isPending} error={query.error} onRetry={query.refetch} />
           ) : null}
           {query.isSuccess && entries.length === 0 ? (
-            <section className="rounded-2xl border border-line-subtle bg-surface-card p-8 text-center text-fg-muted">
+            <section className="social-card border border-line-subtle bg-surface-card p-4 text-center text-sm text-fg-muted">
               <p>{t('social.emptyConnections')}</p>
             </section>
           ) : null}
