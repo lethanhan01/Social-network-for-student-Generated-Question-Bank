@@ -286,12 +286,7 @@
     "NO_UNLOCKED_TIMEZONE": 1
   },
   "src/pages/dev/DesignSystemShowcasePage.tsx": {
-    "NO_ARBITRARY_CLASSES_OR_TOKENS": 1,
-    "NO_DECORATIVE_BORDER_OVERLOAD": 1,
-    "NO_INLINE_STYLE": 1,
-    "NO_NONSEMANTIC_TAGS": 13,
-    "NO_PRIMITIVE_IN_COMPONENT": 1,
-    "NO_RAW_INTERACTIVE_ELEMENTS": 1
+    "NO_NONSEMANTIC_TAGS": 13
   },
   "src/utils/cn.ts": {
     "NO_BARREL_IMPORT_UTILS": 1

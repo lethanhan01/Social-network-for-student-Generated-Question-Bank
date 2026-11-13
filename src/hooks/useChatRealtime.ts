@@ -14,7 +14,6 @@ export function useChatRealtime() {
       void client.invalidateQueries({ queryKey: queryKeys.conversations.list() })
       void client.invalidateQueries({ queryKey: queryKeys.conversations.infiniteList() })
       void client.invalidateQueries({ queryKey: queryKeys.conversations.inbox() })
-      void client.invalidateQueries({ queryKey: queryKeys.conversations.hidden() })
       void client.invalidateQueries({ queryKey: queryKeys.conversations.messageThread(message.conversation_id) })
     })
     const unsubscribeStatus = webSocketService.onConnection(setConnected)

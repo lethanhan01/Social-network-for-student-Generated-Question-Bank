@@ -50,7 +50,7 @@ describe('Portal workflows', () => {
     })
     const read = vi.spyOn(notificationService, 'markAsRead').mockResolvedValue()
     renderWithQueryClient(
-      <MemoryRouter initialEntries={['/notifications']}>
+      <MemoryRouter initialEntries={['/notifications']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <NotificationsPage />
         <Location />
       </MemoryRouter>

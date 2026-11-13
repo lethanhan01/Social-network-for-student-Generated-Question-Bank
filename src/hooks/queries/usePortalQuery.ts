@@ -3,32 +3,26 @@ import { queryKeys } from '@/lib/query-keys'
 import { chatService } from '@/services/chat.service'
 import { notificationService } from '@/services/notification.service'
 import { deviceService } from '@/services/device.service'
-import { userService } from '@/services/user.service'
 import { authService } from '@/services/auth.service'
-import type { UpdatePushSettingsRequestDto, SetHiddenChatPinDto, ChangePasswordRequest } from '@/types'
+import type { UpdatePushSettingsRequestDto, ChangePasswordRequest } from '@/types'
 
-export function useInboxQuery(hidden: boolean) {
+export function useInboxQuery() {
   return useInfiniteQuery({
-    queryKey: hidden ? queryKeys.conversations.hidden() : queryKeys.conversations.inbox(),
+    queryKey: queryKeys.conversations.inbox(),
     initialPageParam: undefined as string | undefined,
-    queryFn: ({ signal, pageParam }) =>
-      hidden
-        ? chatService.getHiddenConversations({ signal })
-        : chatService.getConversations({ cursor: pageParam, limit: 30 }, { signal }),
+    queryFn: ({ signal, pageParam }) => chatService.getConversations({ cursor: pageParam, limit: 30 }, { signal }),
     getNextPageParam: (page) =>
-      !hidden && page.pagination?.has_next && page.pagination.after != null ? String(page.pagination.after) : undefined,
-    gcTime: hidden ? 0 : 300000,
+      page.pagination?.has_next && page.pagination.after != null ? String(page.pagination.after) : undefined,
   })
 }
-export function useMessagesQuery(id: number, hidden: boolean) {
+export function useMessagesQuery(id: number) {
   return useInfiniteQuery({
-    queryKey: queryKeys.conversations.messages(id, { hidden }),
+    queryKey: queryKeys.conversations.messages(id),
     initialPageParam: undefined as string | undefined,
     queryFn: ({ signal, pageParam }) => chatService.getMessages(id, { cursor: pageParam, limit: 40 }, { signal }),
     getNextPageParam: (page) =>
       page.pagination?.has_next && page.pagination.after != null ? String(page.pagination.after) : undefined,
     enabled: id > 0,
-    gcTime: hidden ? 0 : 300000,
   })
 }
 export function useGroupMembersQuery(id: number) {
@@ -48,14 +42,6 @@ export function usePortalMutation<T, R>(
     onSuccess: () => {
       void client.invalidateQueries({ queryKey: queryKeys[domain].all })
     },
-  })
-}
-export function usePinMutation(mode: 'unlock' | 'setup' | 'change') {
-  return useMutation({
-    mutationFn: (payload: SetHiddenChatPinDto) =>
-      mode === 'unlock'
-        ? chatService.unlockHiddenConversations({ pin: payload.pin })
-        : userService.setHiddenChatPin(payload),
   })
 }
 export function useNotificationsQuery() {

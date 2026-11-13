@@ -4,12 +4,19 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { renderWithQueryClient } from '@/test/query-test-utils'
 import { sessionService } from '@/services/session.service'
+import { useAuthStore } from '@/stores/authStore'
 import i18n from '@/lib/i18n'
 import ProposalsPage from './ProposalsPage'
 
 describe('Open proposal composer', () => {
   beforeEach(async () => {
     vi.restoreAllMocks()
+    useAuthStore.setState({
+      user: { user_id: 1, roles: ['STUDENT'] },
+      token: 'test-token',
+      isAuthenticated: true,
+      hasHydrated: true,
+    })
     await i18n.changeLanguage('vi')
     vi.spyOn(sessionService, 'getMySubmissions').mockResolvedValue({ contents: [] })
     vi.spyOn(sessionService, 'getMyEnrolledSubjects').mockResolvedValue([{ subject_id: 7, code: 'IT', name: 'Course' }])
@@ -21,7 +28,7 @@ describe('Open proposal composer', () => {
   it('opens the form even when randomUUID is unavailable in the browser', async () => {
     vi.stubGlobal('crypto', { getRandomValues: crypto.getRandomValues.bind(crypto) })
     const user = userEvent.setup()
-    renderWithQueryClient(<MemoryRouter><ProposalsPage /></MemoryRouter>)
+    renderWithQueryClient(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><ProposalsPage /></MemoryRouter>)
     await user.click(screen.getByRole('button', { name: 'Tạo đề xuất' }))
     expect(await screen.findByRole('dialog', { name: 'Tạo đề xuất câu hỏi' })).toBeInTheDocument()
     expect(await screen.findByRole('combobox', { name: 'Lớp học phần' })).toBeInTheDocument()

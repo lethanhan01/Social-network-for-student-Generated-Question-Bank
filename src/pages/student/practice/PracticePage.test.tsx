@@ -19,7 +19,7 @@ const service = vi.mocked(practiceService)
 
 function renderPage() {
   return renderWithQueryClient(
-    <MemoryRouter initialEntries={['/practice/5']}>
+    <MemoryRouter initialEntries={['/practice/5']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
         <Route path="/practice/:sessionId" element={<PracticePage />} />
       </Routes>

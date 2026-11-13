@@ -1,34 +1,30 @@
 import { MessageBubble } from './MessageBubble'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, Send, Settings, EyeOff, Eye, MessageCircle } from 'lucide-react'
+import { ArrowLeft, Send, Settings, MessageCircle } from 'lucide-react'
 import { Button } from '@/components/ui/actions/Button'
 import { SubmitButton } from '@/components/ui/actions/SubmitButton'
 import { Form, FormField, Textarea } from '@/components/ui/forms'
 import { Avatar } from '@/components/ui/data-display/Avatar'
 import { EmptyState } from '@/components/ui/feedback/EmptyState'
-import { useMessagesQuery, usePortalMutation } from '@/hooks/queries/usePortalQuery'
-import { chatService } from '@/services/chat.service'
+import { useMessagesQuery } from '@/hooks/queries/usePortalQuery'
 import { webSocketService } from '@/services/websocket.service'
 import { useAuthStore } from '@/stores/authStore'
-import { getApiError } from '@/lib/api-error'
-import { toast } from '@/lib/toast'
 import { QueryFeedback } from './QueryFeedback'
 import { messageSchema } from './portal.schemas'
 import type { ConversationDto } from '@/types'
 
 interface Props {
   conversation: ConversationDto
-  hidden: boolean
   connected: boolean
   onBack: () => void
   onSettings: () => void
   onReport: (userId: number) => void
 }
-export function MessageThread({ conversation, hidden, connected, onBack, onSettings, onReport }: Props) {
+export function MessageThread({ conversation, connected, onBack, onSettings, onReport }: Props) {
   const { t } = useTranslation('portal')
   const id = conversation.conversation_id ?? 0
-  const query = useMessagesQuery(id, hidden)
+  const query = useMessagesQuery(id)
   const userId = useAuthStore((s) => Number(s.user?.user_id ?? s.user?.userId))
   const [draft, setDraft] = useState('')
   const [error, setError] = useState('')
@@ -37,9 +33,6 @@ export function MessageThread({ conversation, hidden, connected, onBack, onSetti
     ...new Map(query.data?.pages.flatMap((p) => p.messages ?? []).map((m) => [m.message_id, m])).values(),
   ].sort((a, b) => (a.message_id ?? 0) - (b.message_id ?? 0))
   const lastId = messages.at(-1)?.message_id
-  const visibility = usePortalMutation(() =>
-    hidden ? chatService.unhideConversation(id) : chatService.hideConversation(id)
-  )
   useEffect(() => {
     end.current?.scrollIntoView({ block: 'end' })
     if (lastId && connected) webSocketService.markAsRead({ conversation_id: id, message_id: lastId })
@@ -60,15 +53,6 @@ export function MessageThread({ conversation, hidden, connected, onBack, onSetti
     }
     setDraft('')
   }
-  async function handleVisibility() {
-    try {
-      await visibility.mutateAsync(undefined)
-      onBack()
-      toast.success(t('saved'))
-    } catch (cause) {
-      toast.error(getApiError(cause, t('error')))
-    }
-  }
   return (
     <section className="portal-thread" aria-label={conversation.display_name || t('messages.title')}>
       <header className="flex items-center gap-3 border-b border-line-subtle p-4">
@@ -88,16 +72,6 @@ export function MessageThread({ conversation, hidden, connected, onBack, onSetti
             {t(connected ? 'messages.connected' : 'messages.offline')}
           </p>
         </section>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-11 w-11 min-h-11 min-w-11 p-0"
-          aria-label={t(hidden ? 'messages.unhide' : 'messages.hide')}
-          loading={visibility.isPending}
-          onClick={() => void handleVisibility()}
-        >
-          {hidden ? <Eye size={19} /> : <EyeOff size={19} />}
-        </Button>
         {conversation.type === 'GROUP' ? (
           <Button
             variant="ghost"

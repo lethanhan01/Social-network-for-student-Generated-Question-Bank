@@ -7,7 +7,6 @@ import type {
   PushSettingsResponseDto,
   UpdatePushSettingsRequestDto,
 } from '@/types/notification.types'
-import type { SetHiddenChatPinDto } from '@/types/chat.types'
 
 export const userService = {
   async getMyProfile(options?: { signal?: AbortSignal }): Promise<ProfileResponse> {
@@ -34,10 +33,6 @@ export const userService = {
         signal: options?.signal,
       })
     )
-  },
-
-  async setHiddenChatPin(payload: SetHiddenChatPinDto): Promise<void> {
-    await api.post<GlobalResponse<void>>('/users/me/hidden-chat-pin', payload)
   },
 
   async getPushSettings(options?: { signal?: AbortSignal }): Promise<PushSettingsResponseDto> {

@@ -87,7 +87,6 @@ export const queryKeys = {
       ['conversations', 'messages', id, params] as const,
     infiniteList: () => ['conversations', 'infiniteList'] as const,
     infiniteMessages: (id: number) => ['conversations', 'infiniteMessages', id] as const,
-    hidden: () => ['conversations', 'hidden'] as const,
   },
   courses: {
     all: ['courses'] as const,

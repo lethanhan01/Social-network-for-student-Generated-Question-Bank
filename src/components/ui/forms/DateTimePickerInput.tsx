@@ -81,7 +81,7 @@ export function DateTimePickerInput({
   error,
 }: Readonly<DateTimePickerInputProps>) {
   const { t, i18n } = useTranslation('common')
-  const effectivePlaceholder = placeholder ?? t('datePicker.placeholder', 'DD/MM/YYYY HH:mm')
+  const effectivePlaceholder = placeholder ?? t('datePicker.placeholder')
   const calendarLocale = i18n.language === 'ja' ? ja : vi
   const [open, setOpen] = useState(false)
 
@@ -169,7 +169,7 @@ export function DateTimePickerInput({
             <div className="mb-2 flex items-center gap-1.5">
               <Clock3 size={13} className="text-fg-muted" />
               <span className="text-xs font-medium text-fg-secondary">
-                {t('datePicker.time', 'Thời gian')}
+                {t('datePicker.time')}
               </span>
               {selectedHour !== undefined && (
                 <span className="ml-auto font-mono text-sm font-semibold text-action-accent">
@@ -184,7 +184,7 @@ export function DateTimePickerInput({
                 min={0}
                 max={23}
                 step={1}
-                aria-label={t('common:time.hour', 'Giờ (HH)')}
+                aria-label={t('time.hour')}
                 value={selectedHour ?? ''}
                 onChange={(e) => handleHourSelect(Number(e.target.value))}
                 className="w-16 text-center font-mono min-h-[44px]"
@@ -196,7 +196,7 @@ export function DateTimePickerInput({
                 min={0}
                 max={59}
                 step={minuteStep}
-                aria-label={t('common:time.minute', 'Phút (MM)')}
+                aria-label={t('time.minute')}
                 value={selectedMinute ?? ''}
                 onChange={(e) => handleMinuteSelect(Number(e.target.value))}
                 className="w-16 text-center font-mono min-h-[44px]"

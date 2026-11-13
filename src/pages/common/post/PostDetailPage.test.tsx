@@ -50,7 +50,7 @@ describe('PostDetailPage Component', () => {
     })
 
     renderWithQueryClient(
-      <MemoryRouter initialEntries={['/posts/42']}>
+      <MemoryRouter initialEntries={['/posts/42']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           <Route path="/posts/:id" element={<PostDetailPage />} />
         </Routes>
@@ -65,7 +65,7 @@ describe('PostDetailPage Component', () => {
     vi.mocked(postService.getPostById).mockRejectedValue(new Error('Post not found'))
 
     renderWithQueryClient(
-      <MemoryRouter initialEntries={['/posts/999']}>
+      <MemoryRouter initialEntries={['/posts/999']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           <Route path="/posts/:id" element={<PostDetailPage />} />
         </Routes>
@@ -73,6 +73,6 @@ describe('PostDetailPage Component', () => {
     )
 
     expect(await screen.findByText(/Bài viết không tồn tại hoặc đã bị gỡ/i)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Trở về bảng tin/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Về bảng tin/i })).toBeInTheDocument()
   })
 })

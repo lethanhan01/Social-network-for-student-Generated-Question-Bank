@@ -108,7 +108,7 @@ export function PostCardHeader({
             variant="ghost"
             size="sm"
             className="w-11 h-11 p-0 rounded-full text-text-muted hover:text-text-primary min-h-11 min-w-11 flex items-center justify-center"
-            aria-label={t('post.options', 'Tùy chọn bài viết')}
+            aria-label={t('post.options')}
           >
             <MoreHorizontal size={18} />
           </Button>
@@ -138,7 +138,7 @@ export function PostCardHeader({
               >
                 <ExternalLink size={15} className="mr-2" />
                 <strong className="font-normal">
-                  {t('post.viewDetail', 'Xem chi tiết bài viết')}
+                  {t('post.viewDetail')}
                 </strong>
               </ButtonLink>
             </DropdownMenuItem>
@@ -147,20 +147,20 @@ export function PostCardHeader({
             <DropdownMenuItem onClick={onOpenLecturerNote}>
               <GraduationCap size={15} className="mr-2 text-action-accent" />
               <strong className="font-normal">
-                {t('post.lecturerNote.menu', 'Ghi chú chuyên môn')}
+                {t('post.lecturerNote.menu')}
               </strong>
             </DropdownMenuItem>
           ) : null}
           <DropdownMenuItem onClick={onCopyLink}>
             <Copy size={15} className="mr-2" />
-            <strong className="font-normal">{t('post.copyLink', 'Sao chép liên kết')}</strong>
+            <strong className="font-normal">{t('post.copyLink')}</strong>
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={onOpenReport}
             className="text-tone-danger hover:bg-tone-danger/10"
           >
             <AlertCircle size={15} className="mr-2" />
-            <strong className="font-normal">{t('report.submit', 'Báo cáo vi phạm')}</strong>
+            <strong className="font-normal">{t('report.submit')}</strong>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

@@ -1,7 +1,8 @@
 import { useLocation } from 'react-router-dom'
-import { GraduationCap, Menu, X, MessageCircle } from 'lucide-react'
+import { Menu, X, MessageCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button, ButtonLink } from '@/components/ui/actions'
+import { BrandLogo } from '@/components/shared/BrandLogo'
 import { ThemeToggle } from '@/components/ui/navigation'
 import { LanguageSwitcher } from '@/components/ui/typography'
 import { TopbarNav } from './TopbarNav'
@@ -18,8 +19,8 @@ export function Topbar({
   const { t } = useTranslation('common')
   const { pathname } = useLocation()
   const toggleLabel = isMobileMenuOpen
-    ? t('nav.closeMenu', 'Đóng menu điều hướng')
-    : t('nav.openMenu', 'Mở menu điều hướng')
+    ? t('nav.closeMenu')
+    : t('nav.openMenu')
 
   return (
     <header
@@ -47,22 +48,9 @@ export function Topbar({
         <ButtonLink
           to="/feed"
           variant="ghost"
-          aria-label="SQB HUST"
-          className="flex items-center gap-2.5 min-w-0 rounded-xl p-0 h-auto shrink-0"
+          className="flex items-center min-h-11 rounded-xl px-1 py-0 h-auto shrink-0"
         >
-          {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Brand logo mark] */}
-          <div className="w-10 h-10 rounded-full bg-action-accent flex items-center justify-center text-fg-on-solid font-bold shrink-0">
-            <GraduationCap size={22} />
-          </div>
-          {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Brand text wrapper] */}
-          <div className="hidden sm:block md:hidden xl:block truncate text-left">
-            <strong className="font-extrabold text-base tracking-tight text-fg-primary block truncate">
-              SQB HUST
-            </strong>
-            <strong className="text-[11px] font-normal text-fg-muted truncate block">
-              Question Bank
-            </strong>
-          </div>
+          <BrandLogo className="h-8" />
         </ButtonLink>
 
         <TopbarSearch />
@@ -78,7 +66,7 @@ export function Topbar({
           to="/messages"
           variant="ghost"
           size="sm"
-          aria-label={t('nav.messages', 'Đoạn chat')}
+          aria-label={t('nav.messages')}
           aria-current={pathname.startsWith('/messages') ? 'page' : undefined}
           className={cn('min-h-11 min-w-11 p-0 rounded-full hover:bg-surface-card-hover flex items-center justify-center shrink-0', pathname.startsWith('/messages') ? 'text-action-accent border-b-2 border-action-accent' : 'text-fg-muted hover:text-fg-primary')}
         >

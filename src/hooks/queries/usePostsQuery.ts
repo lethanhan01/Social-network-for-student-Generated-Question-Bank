@@ -4,6 +4,7 @@ import { feedService } from '@/services/feed.service'
 import { reactionService } from '@/services/reaction.service'
 import { queryKeys } from '@/lib/query-keys'
 import { getNextCursor } from '@/lib/pagination'
+import { useAuthStore } from '@/stores/authStore'
 import type {
   CreatePostRequest,
   UpdatePostRequest,
@@ -43,31 +44,36 @@ export function useInfiniteUserPostsQuery(userId: number, limit = 10) {
   })
 }
 
-export function useInfinitePostsFeedQuery(limit = 10) {
+export function useInfinitePostsFeedQuery(limit = 10, enabled = true) {
+  const isAuthReady = useAuthStore((s) => s.isAuthenticated && Boolean(s.token))
   return useInfiniteQuery({
     queryKey: queryKeys.posts.infiniteFeed(limit),
     queryFn: ({ pageParam, signal }) =>
       postService.getMyPosts({ cursor: pageParam as string | undefined, limit }, { signal }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => getNextCursor(lastPage.pagination),
+    enabled: isAuthReady && enabled,
   })
 }
 
-export function useInfiniteActivityFeedQuery(limit = 10) {
+export function useInfiniteActivityFeedQuery(limit = 10, enabled = true) {
+  const isAuthReady = useAuthStore((s) => s.isAuthenticated && Boolean(s.token))
   return useInfiniteQuery({
     queryKey: queryKeys.feed.infiniteActivity(limit),
     queryFn: ({ pageParam, signal }) =>
       feedService.getActivityFeeds({ cursor: pageParam as string | undefined, limit }, { signal }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => getNextCursor(lastPage.pagination),
+    enabled: isAuthReady && enabled,
   })
 }
 
 export function useNewFeedCountQuery(since?: string) {
+  const isAuthReady = useAuthStore((s) => s.isAuthenticated && Boolean(s.token))
   return useQuery({
     queryKey: queryKeys.feed.newCount(since),
     queryFn: ({ signal }) => feedService.getNewFeedCount({ since }, { signal }),
-    enabled: Boolean(since),
+    enabled: isAuthReady && Boolean(since),
     refetchInterval: 30000,
   })
 }

@@ -71,11 +71,5 @@
   },
   "src/components/ui/navigation/ThemeToggle.tsx": {
     "NO_MAGIC_DIMENSIONS": 1
-  },
-  "src/pages/dev/DesignSystemShowcasePage.tsx": {
-    "NO_ARBITRARY_CLASSES_OR_TOKENS": 1,
-    "NO_DECORATIVE_BORDER_OVERLOAD": 1,
-    "NO_INLINE_STYLE": 1,
-    "NO_PRIMITIVE_IN_COMPONENT": 1
   }
 }

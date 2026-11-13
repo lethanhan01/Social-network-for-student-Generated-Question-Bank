@@ -20,7 +20,7 @@ vi.mock('@/services/websocket.service', () => ({ websocketService: {
 
 function renderRoute(route: string) {
   return renderWithQueryClient(
-    <MemoryRouter initialEntries={[route]}>
+    <MemoryRouter initialEntries={[route]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
         <Route path="/messages" element={<ChatPage />} />
         <Route path="/messages/:conversationId" element={<ChatPage />} />

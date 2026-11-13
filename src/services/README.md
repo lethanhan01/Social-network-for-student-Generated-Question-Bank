@@ -157,13 +157,13 @@ export async function requestData<T>(
 | 1 | [`api.ts`](api.ts) | Cấu hình lõi Axios Client, Interceptors, Mutex Refresh. | Toàn bộ các endpoints |
 | 2 | [`auth.service.ts`](auth.service.ts) | Đăng nhập credentials, đăng xuất, cấp mới token, đổi mật khẩu. | `/auth/login`, `/auth/logout`, `/auth/refresh`, `/auth/change-password` |
 | 3 | [`device.service.ts`](device.service.ts) | Quản lý thiết bị đăng nhập, thu hồi phiên làm việc, đồng bộ FID Firebase. | `/devices`, `/devices/{id}/logout`, `/devices/fid` |
-| 4 | [`user.service.ts`](user.service.ts) | Hồ sơ cá nhân của tôi, xem trang cá nhân khác, mã PIN ẩn, cấu hình push. | `/users/me`, `/users/{id}`, `/settings/push` |
+| 4 | [`user.service.ts`](user.service.ts) | Hồ sơ cá nhân của tôi, xem trang cá nhân khác, cấu hình push. | `/users/me`, `/users/{id}`, `/settings/push` |
 | 5 | [`relationship.service.ts`](relationship.service.ts) | Mạng lưới bạn bè, gửi/nhận lời mời kết bạn, theo dõi (Follow), chặn (Block). | `/friendships/*`, `/follows/*`, `/blocks/*` |
 | 6 | [`post.service.ts`](post.service.ts) | Đăng bài viết, xem chi tiết, sửa/xóa bài, video bài giảng, ghi chú giảng viên. | `/posts`, `/posts/{id}`, `/video-posts`, `/posts/{id}/lecturer-notes` |
 | 7 | [`comment.service.ts`](comment.service.ts) | Bình luận bài viết, phản hồi bình luận đa cấp, chỉnh sửa/xóa bình luận. | `/comments`, `/comments/{id}` |
 | 8 | [`reaction.service.ts`](reaction.service.ts) | Thả hoặc gỡ tương tác cảm xúc đa hình LIKE, LOVE, WOW. | `/react` |
 | 9 | [`feed.service.ts`](feed.service.ts) | Dòng hoạt động học tập cá nhân hóa và mạng lưới bạn bè, đếm sự kiện mới. | `/activity-feeds`, `/activity-feeds/new-count` |
-| 10 | [`chat.service.ts`](chat.service.ts) | Hội thoại 1-1, nhóm chat, quản trị vai trò thành viên, thu hồi tin nhắn, kho ẩn. | `/conversations/*`, `/messages/*` |
+| 10 | [`chat.service.ts`](chat.service.ts) | Hội thoại 1-1, nhóm chat, quản trị vai trò thành viên, thu hồi tin nhắn. | `/conversations/*`, `/messages/*` |
 | 11 | [`course.service.ts`](course.service.ts) | Danh mục môn học, quản lý lớp học phần, gán sinh viên vào lớp. | `/subjects`, `/lecturer/course-classes/*` |
 | 12 | [`session.service.ts`](session.service.ts) | Sinh viên tạo phiên đề xuất câu hỏi, quản lý bài nộp, môn học đã ghi danh. | `/sessions/propose`, `/sessions/my-submissions/*` |
 | 13 | [`review.service.ts`](review.service.ts) | Giảng viên thẩm định, phê duyệt/từ chối câu hỏi, sửa câu hỏi và chốt phiên. | `/sessions/pending`, `/sessions/approve`, `/sessions/reject`, `/questions/{id}` |

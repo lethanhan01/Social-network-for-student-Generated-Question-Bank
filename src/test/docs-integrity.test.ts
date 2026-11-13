@@ -13,6 +13,7 @@ describe('Documentation Integrity & Markdown Path Standards', () => {
     })
     expect(output).toContain('[Link Integrity]')
     expect(output).toContain('100% tệp Markdown tuân thủ quy chuẩn')
+    expect(output).toContain('Warnings: 0')
     expect(output).not.toContain('lỗi toàn vẹn nghiêm trọng')
   })
 })

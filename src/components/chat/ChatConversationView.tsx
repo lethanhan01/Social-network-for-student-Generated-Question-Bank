@@ -12,6 +12,7 @@ import {
   useRecallMessageMutation,
   useSendMessageMutation,
   useAutoMarkAsRead,
+  resolveCurrentUserId,
 } from '@/hooks/queries/useChatQuery'
 import { useInfiniteConversationsQuery } from '@/hooks/queries/useMessengerQuery'
 import { type WsConnectionStatus } from '@/services/websocket.service'
@@ -36,7 +37,7 @@ export function ChatConversationView({
 }: Readonly<ChatConversationViewProps>) {
   const { t } = useTranslation('chat')
   const { t: tp } = useTranslation('portal')
-  const currentUserId = useAuthStore((state) => state.user?.user_id ?? Number(state.user?.userId))
+  const currentUserId = useAuthStore((state) => resolveCurrentUserId(state.user))
   const resolvedTheme = useThemeStore((state) => state.resolvedTheme)
   const [text, setText] = useState('')
   const [mediaUrl, setMediaUrl] = useState<string | null>(null)
@@ -120,11 +121,11 @@ export function ChatConversationView({
         mediaUrls: urls,
         replyTo: prevReply,
       })
-    } catch {
+    } catch (err) {
       setText(prevText)
       setMediaUrl(prevMedia)
       setReplyTo(prevReply)
-      toast.error(t('sendErrorDisconnected', 'Không thể gửi tin nhắn. Kết nối máy chủ realtime bị gián đoạn. Vui lòng thử lại.'))
+      toast.error(err instanceof Error && err.message === 'WS_DISCONNECTED' ? t('sendErrorDisconnected') : getApiError(err, t('sendErrorDisconnected')))
     }
   }
 
@@ -132,7 +133,7 @@ export function ChatConversationView({
     e.preventDefault()
     if (!text.trim() && !mediaUrl) return
     if (mediaUrl) {
-      void sendMessageContent(text.trim() || t('sentImage', 'đã gửi một ảnh'), 'IMAGE', [mediaUrl])
+      void sendMessageContent(text.trim() || t('sentImage'), 'IMAGE', [mediaUrl])
     } else {
       void sendMessageContent(text.trim(), 'TEXT')
     }
@@ -142,7 +143,7 @@ export function ChatConversationView({
     if (!recallTarget?.message_id) return
     try {
       await recallMutation.mutateAsync({ messageId: recallTarget.message_id, mode: 'EVERYONE' })
-      toast.success(t('recallSuccess', 'Đã thu hồi tin nhắn'))
+      toast.success(t('recallSuccess'))
     } catch (err) {
       toast.error(getApiError(err))
     } finally {
@@ -156,9 +157,9 @@ export function ChatConversationView({
         <EmptyState
           size="lg"
           icon={<MessageCircle size={48} className="text-action-accent" />}
-          title={t('noConversationSelected', 'Chưa chọn đoạn chat nào')}
-          description={t('noConversationSelectedDesc', 'Hãy chọn một đoạn chat từ danh sách bên trái hoặc bắt đầu cuộc trò chuyện mới để kết nối.')}
-          action={<Button variant="primary" size="sm" leftIcon={<SquarePen size={18} />} onClick={onOpenNewChat}>{t('newMessage', 'Tạo đoạn chat mới')}</Button>}
+          title={t('noConversationSelected')}
+          description={t('noConversationSelectedDesc')}
+          action={<Button variant="primary" size="sm" leftIcon={<SquarePen size={18} />} onClick={onOpenNewChat}>{t('newMessage')}</Button>}
         />
       </section>
     )
@@ -222,16 +223,16 @@ export function ChatConversationView({
                 <EmojiPicker onEmojiClick={handleEmojiClick} theme={resolvedTheme === 'dark' ? EmojiTheme.DARK : EmojiTheme.LIGHT} lazyLoadEmojis />
               </PopoverContent>
             </Popover>
-            <Input value={text} onChange={(e) => handleTextChange(e.target.value)} placeholder={t('typeMessage', 'Nhập tin nhắn...')} aria-label={t('typeMessage', 'Nhập tin nhắn...')} className="flex-1 min-w-0 rounded-full bg-surface-sunken" />
+            <Input value={text} onChange={(e) => handleTextChange(e.target.value)} placeholder={t('typeMessage')} aria-label={t('typeMessage')} className="flex-1 min-w-0 rounded-full bg-surface-sunken" />
             {!text.trim() && !mediaUrl ? (
-              <Button variant="ghost" size="sm" onClick={() => { void sendMessageContent('👍', 'TEXT') }} aria-label={t('likeThumb', 'Thích')} className="w-11 h-11 p-0 rounded-full text-action-accent hover:bg-action-accent/10"><ThumbsUp size={19} /></Button>
+              <Button variant="ghost" size="sm" onClick={() => { void sendMessageContent('👍', 'TEXT') }} aria-label={t('likeThumb')} className="w-11 h-11 p-0 rounded-full text-action-accent hover:bg-action-accent/10"><ThumbsUp size={19} /></Button>
             ) : (
-              <Button variant="primary" size="sm" type="submit" disabled={isUploading} aria-label={t('send', 'Gửi')} className="w-11 h-11 p-0 rounded-full"><Send size={16} /></Button>
+              <Button variant="primary" size="sm" type="submit" disabled={isUploading} aria-label={t('send')} className="w-11 h-11 p-0 rounded-full"><Send size={16} /></Button>
             )}
           </Form>
         </footer>
 
-        <ConfirmDialog open={Boolean(recallTarget)} onClose={() => setRecallTarget(null)} onConfirm={handleConfirmRecall} title={t('recallConfirmTitle', 'Thu hồi tin nhắn?')} description={t('recallConfirmDesc', 'Bạn có chắc chắn muốn thu hồi tin nhắn này với mọi người không?')} confirmLabel={t('confirmDelete', 'Thu hồi')} variant="danger" icon={<AlertCircle size={24} />} />
+        <ConfirmDialog open={Boolean(recallTarget)} onClose={() => setRecallTarget(null)} onConfirm={handleConfirmRecall} title={t('recallConfirmTitle')} description={t('recallConfirmDesc')} confirmLabel={t('confirmDelete')} variant="danger" icon={<AlertCircle size={24} />} />
       </section>
       {isDetailsOpen ? (
         <aside

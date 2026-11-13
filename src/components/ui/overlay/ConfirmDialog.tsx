@@ -33,8 +33,8 @@ export function ConfirmDialog({
   const isDanger = variant === 'danger'
   const isWarning = variant === 'warning'
 
-  const effectiveConfirmLabel = confirmLabel ?? (isDanger ? t('button.delete', 'Xác nhận') : t('button.confirm', 'Xác nhận'))
-  const effectiveCancelLabel = cancelLabel ?? t('button.cancel', 'Hủy')
+  const effectiveConfirmLabel = confirmLabel ?? (isDanger ? t('button.delete') : t('button.confirm'))
+  const effectiveCancelLabel = cancelLabel ?? t('button.cancel')
 
   const defaultIcon = isDanger ? (
     <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-status-danger-bg text-status-danger-fg">

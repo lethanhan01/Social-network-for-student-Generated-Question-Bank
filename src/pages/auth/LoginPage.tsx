@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Navigate } from 'react-router-dom'
-import { GraduationCap, Lock, Mail } from 'lucide-react'
+import { Lock, Mail } from 'lucide-react'
+import { BrandLogo } from '@/components/shared/BrandLogo'
 import { Card } from '@/components/ui/data-display'
 import { Form, FormField, Input } from '@/components/ui/forms'
 import { SubmitButton } from '@/components/ui/actions'
@@ -72,15 +73,11 @@ export default function LoginPage() {
 
   return (
     <Card className="p-4 sm:p-6 lg:p-8 bg-surface border-line-subtle shadow-card rounded-2xl">
-      <header className="text-center mb-8">
-        {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [App logo icon badge container] */}
-        <div className="mx-auto w-14 h-14 rounded-2xl bg-action-accent flex items-center justify-center text-text-inverse mb-4 shadow-sm">
-          <Icon icon={GraduationCap} size="xl" />
-        </div>
-        <Heading level={2} className="text-2xl font-extrabold tracking-tight text-text-primary">
-          SQB HUST
+      <header className="text-center mb-8 space-y-3">
+        <Heading level={1} className="flex justify-center">
+          <BrandLogo className="h-14" />
         </Heading>
-        <Text size="sm" tone="muted" className="mt-1">
+        <Text size="sm" tone="muted">
           Hệ Thống Mạng Xã Hội Học Tập & Ngân Hàng Đề Thi
         </Text>
       </header>

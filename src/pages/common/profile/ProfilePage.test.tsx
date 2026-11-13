@@ -39,7 +39,7 @@ describe('ProfilePage Component', () => {
   it('updates the current account name after saving the profile', async () => {
     const user = userEvent.setup()
     vi.mocked(userService.updateMyProfile).mockResolvedValue({ user_id: 100, role: 'STUDENT', full_name: 'Updated account name' })
-    renderWithQueryClient(<MemoryRouter initialEntries={['/profile/me']}><Routes><Route path="/profile/:userId" element={<ProfilePage />} /></Routes></MemoryRouter>)
+    renderWithQueryClient(<MemoryRouter initialEntries={['/profile/me']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><Routes><Route path="/profile/:userId" element={<ProfilePage />} /></Routes></MemoryRouter>)
     await user.click(await screen.findByRole('button', { name: 'Chỉnh sửa hồ sơ' }))
     const name = screen.getByRole('textbox', { name: 'Họ và tên' })
     await user.clear(name)
@@ -64,6 +64,7 @@ describe('ProfilePage Component', () => {
         role: 'STUDENT',
         roles: ['STUDENT'],
       },
+      token: 'test-token',
       isAuthenticated: true,
       hasHydrated: true,
     })
@@ -97,7 +98,7 @@ describe('ProfilePage Component', () => {
     })
 
     renderWithQueryClient(
-      <MemoryRouter initialEntries={['/profile/me']}>
+      <MemoryRouter initialEntries={['/profile/me']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           <Route path="/profile/:userId" element={<ProfilePage />} />
         </Routes>
@@ -122,7 +123,7 @@ describe('ProfilePage Component', () => {
     })
 
     renderWithQueryClient(
-      <MemoryRouter initialEntries={['/profile/200']}>
+      <MemoryRouter initialEntries={['/profile/200']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           <Route path="/profile/:userId" element={<ProfilePage />} />
         </Routes>
@@ -142,7 +143,7 @@ describe('ProfilePage Component', () => {
       full_name: 'Hoàng Thị Lan',
     })
     renderWithQueryClient(
-      <MemoryRouter initialEntries={['/profile/200']}>
+      <MemoryRouter initialEntries={['/profile/200']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           <Route path="/profile/:userId" element={<ProfilePage />} />
         </Routes>
@@ -156,7 +157,7 @@ describe('ProfilePage Component', () => {
   it('recognizes my numeric route when the auth user uses the userId alias', async () => {
     useAuthStore.setState({ user: { userId: '100', roles: ['STUDENT'] } })
     renderWithQueryClient(
-      <MemoryRouter initialEntries={['/profile/100']}>
+      <MemoryRouter initialEntries={['/profile/100']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           <Route path="/profile/:userId" element={<ProfilePage />} />
         </Routes>

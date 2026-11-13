@@ -12,7 +12,7 @@ describe('Practice answer flow', () => {
   it('keeps the answer retryable when the server fails instead of inventing a result', async () => {
     const answer = vi.spyOn(practiceService, 'answerQuestion').mockRejectedValue(new Error('Offline'))
     const user = userEvent.setup()
-    renderWithQueryClient(<MemoryRouter><PracticeQuestion sessionId={9} onNext={vi.fn()}
+    renderWithQueryClient(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><PracticeQuestion sessionId={9} onNext={vi.fn()}
       question={{ question_id: 12, content: 'Question', updated_at: '2026-01-01', options: [{ key: 'A', text: 'First' }] }} /></MemoryRouter>)
     await user.click(screen.getByRole('button', { name: 'A. First' }))
     await user.click(screen.getByRole('button', { name: 'Kiểm tra đáp án' }))
@@ -24,7 +24,7 @@ describe('Practice answer flow', () => {
   it('shows the server explanation and enables rating only after a successful answer', async () => {
     vi.spyOn(practiceService, 'answerQuestion').mockResolvedValue({ is_correct: true, correct_answer: 'B', explanation: 'Server explanation' })
     const user = userEvent.setup()
-    renderWithQueryClient(<MemoryRouter><PracticeQuestion sessionId={9} onNext={vi.fn()}
+    renderWithQueryClient(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><PracticeQuestion sessionId={9} onNext={vi.fn()}
       question={{ question_id: 12, content: 'Question', options: [{ key: 'B', text: 'Second' }] }} /></MemoryRouter>)
     expect(screen.queryByRole('button', { name: 'Đánh giá / Báo lỗi' })).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'B. Second' }))

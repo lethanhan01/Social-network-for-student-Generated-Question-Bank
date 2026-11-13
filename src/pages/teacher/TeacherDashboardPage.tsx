@@ -95,7 +95,7 @@ export default function TeacherDashboardPage() {
                 size="sm"
                 className="w-full justify-center min-h-11 text-xs font-semibold text-action-accent hover:text-action-accent"
               >
-                {t('common.details', 'Xem chi tiết')}
+                {t('common.details')}
               </ButtonLink>
             </nav>
           </Card>

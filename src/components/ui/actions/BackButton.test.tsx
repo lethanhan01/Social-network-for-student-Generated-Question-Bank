@@ -7,7 +7,7 @@ describe('BackButton Component', () => {
   it('renders default back button label and calls onClick', () => {
     const handleClick = vi.fn()
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <BackButton onClick={handleClick} />
       </MemoryRouter>
     )
@@ -21,7 +21,7 @@ describe('BackButton Component', () => {
 
   it('renders router link when "to" prop is provided', () => {
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <BackButton to="/dashboard" label="Về trang chủ" />
       </MemoryRouter>
     )
@@ -33,7 +33,7 @@ describe('BackButton Component', () => {
 
   it('renders icon only mode', () => {
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <BackButton iconOnly label="Quay lại" />
       </MemoryRouter>
     )

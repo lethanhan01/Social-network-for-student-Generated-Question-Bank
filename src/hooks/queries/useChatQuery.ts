@@ -1,10 +1,11 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import {
   useQuery,
   useMutation,
   useQueryClient,
   useInfiniteQuery,
   type InfiniteData,
+  type QueryClient,
 } from '@tanstack/react-query'
 import { chatService } from '@/services/chat.service'
 import { websocketService, type WsConnectionStatus } from '@/services/websocket.service'
@@ -14,6 +15,7 @@ import type {
   CreateDirectConversationDto,
   CreateGroupConversationDto,
   MessageListResponseDto,
+  ConversationDto,
   ConversationListResponseDto,
   MessageDto,
 } from '@/types'
@@ -95,6 +97,225 @@ export interface SendMessagePayload {
   replyTo?: MessageDto | null
 }
 
+let optimisticSeq = 0
+
+function toFiniteNumber(value: unknown): number | undefined {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : undefined
+  if (typeof value === 'string' && value.trim() !== '') {
+    const parsed = Number(value)
+    return Number.isFinite(parsed) ? parsed : undefined
+  }
+  return undefined
+}
+
+export function resolveCurrentUserId(
+  user: { user_id?: unknown; userId?: unknown } | null | undefined
+): number | undefined {
+  return toFiniteNumber(user?.user_id ?? user?.userId)
+}
+
+function nextOptimisticId(): number {
+  optimisticSeq = (optimisticSeq + 1) % 1000
+  return -(Date.now() * 1000 + optimisticSeq)
+}
+
+function waitForWsConnected(timeoutMs = 2000): Promise<void> {
+  if (websocketService.getStatus() === 'CONNECTED') return Promise.resolve()
+  return new Promise((resolve, reject) => {
+    const state: {
+      settled: boolean
+      timer?: ReturnType<typeof setTimeout>
+      unsub?: () => void
+    } = { settled: false }
+
+    const finish = (ok: boolean) => {
+      if (state.settled) return
+      state.settled = true
+      if (state.timer) clearTimeout(state.timer)
+      state.unsub?.()
+      if (ok) resolve()
+      else reject(new Error('WS_DISCONNECTED'))
+    }
+
+    state.timer = setTimeout(() => finish(false), timeoutMs)
+    state.unsub = websocketService.onStatusChange((status) => {
+      if (status === 'CONNECTED') finish(true)
+      else if (status === 'DISCONNECTED') finish(false)
+    })
+    if (state.settled) state.unsub()
+  })
+}
+
+function hasPendingOptimisticMessage(
+  queryClient: QueryClient,
+  conversationId: number,
+  optimisticId: number
+): boolean {
+  const snapshots = queryClient.getQueriesData<InfiniteData<MessageListResponseDto>>({
+    queryKey: queryKeys.conversations.infiniteMessages(conversationId),
+  })
+  return snapshots.some(([, data]) =>
+    data?.pages?.some((page) => page.messages?.some((m) => m.message_id === optimisticId))
+  )
+}
+
+function mergeReplyPreview(
+  existing: MessageDto['reply_to_message'],
+  replyToMessageId?: number | null
+): MessageDto['reply_to_message'] {
+  if (!replyToMessageId) return existing
+  return existing ? { ...existing, message_id: replyToMessageId } : { message_id: replyToMessageId }
+}
+
+function reconcileIncomingMessage(
+  old: InfiniteData<MessageListResponseDto> | undefined,
+  params: {
+    convId: number
+    activeConvId?: number
+    newMsg: MessageDto
+    incomingSenderId?: number
+    currentUserId?: number
+  }
+): InfiniteData<MessageListResponseDto> | undefined {
+  const { convId, activeConvId, newMsg, incomingSenderId, currentUserId } = params
+  if (!old?.pages?.length) {
+    if (convId !== activeConvId) return old
+    return {
+      pageParams: [undefined],
+      pages: [{ conversation_id: convId, messages: [newMsg], pagination: { has_next: false } }],
+    }
+  }
+  const msgId = newMsg.message_id
+  const exists = old.pages.some((page) => page.messages?.some((m) => m.message_id === msgId))
+  if (exists) return old
+
+  const firstMessages = old.pages[0]?.messages || []
+  let matchIdx = -1
+  for (let idx = firstMessages.length - 1; idx >= 0; idx -= 1) {
+    const candidate = firstMessages[idx]
+    if ((candidate.message_id ?? 0) >= 0) continue
+    const sameContent = (candidate.content ?? '') === (newMsg.content ?? '')
+    const sameType = (candidate.message_type ?? 'TEXT') === (newMsg.message_type ?? 'TEXT')
+    const senderCompatible =
+      incomingSenderId === undefined ||
+      incomingSenderId === currentUserId ||
+      (candidate.sender_id != null && Number(candidate.sender_id) === incomingSenderId)
+    if (sameContent && sameType && senderCompatible) {
+      matchIdx = idx
+      break
+    }
+  }
+
+  if (matchIdx >= 0) {
+    const matched = firstMessages[matchIdx]
+    const replaced: MessageDto = {
+      ...matched,
+      message_id: msgId,
+      sender_id: incomingSenderId ?? matched.sender_id ?? currentUserId,
+      sender_name: newMsg.sender_name || matched.sender_name,
+      avatar_url: newMsg.avatar_url ?? matched.avatar_url,
+      content: newMsg.content,
+      message_type: newMsg.message_type,
+      media_urls: newMsg.media_urls ?? matched.media_urls,
+      reply_to_message: mergeReplyPreview(matched.reply_to_message, newMsg.reply_to_message?.message_id),
+      created_at: newMsg.created_at || matched.created_at,
+    }
+    const nextFirst = [...firstMessages]
+    nextFirst[matchIdx] = replaced
+    return {
+      ...old,
+      pages: old.pages.map((p, i) => (i === 0 ? { ...p, messages: nextFirst } : p)),
+    }
+  }
+
+  return {
+    ...old,
+    pages: old.pages.map((p, i) => (i === 0 ? { ...p, messages: [newMsg, ...(p.messages || [])] } : p)),
+  }
+}
+
+function removeOptimisticMessage(
+  queryClient: QueryClient,
+  conversationId: number,
+  optimisticId: number
+): void {
+  queryClient.setQueriesData<InfiniteData<MessageListResponseDto>>(
+    { queryKey: queryKeys.conversations.infiniteMessages(conversationId) },
+    (old) => {
+      if (!old?.pages?.length) return old
+      return {
+        ...old,
+        pages: old.pages.map((p) => ({
+          ...p,
+          messages: (p.messages || []).filter((m) => m.message_id !== optimisticId),
+        })),
+      }
+    }
+  )
+}
+
+function updateConversationPreviews(
+  queryClient: QueryClient,
+  conversationId: number,
+  lastMessage: {
+    message_id: number
+    content?: string
+    message_type?: 'TEXT' | 'IMAGE' | 'VIDEO' | 'GIF'
+    created_at?: string
+  },
+  incrementUnread: boolean
+): boolean {
+  let foundInInfinite = false
+  queryClient.setQueriesData<InfiniteData<ConversationListResponseDto>>(
+    { queryKey: queryKeys.conversations.infiniteList() },
+    (old) => {
+      if (!old?.pages?.length) return old
+      let matchedConv: ConversationDto | undefined
+      const strippedPages = old.pages.map((page) => {
+        const items = page.items ?? []
+        const idx = items.findIndex((c) => c.conversation_id === conversationId)
+        if (idx < 0) return page
+        matchedConv = items[idx]
+        const nextItems = [...items]
+        nextItems.splice(idx, 1)
+        return { ...page, items: nextItems }
+      })
+      if (!matchedConv) return old
+      foundInInfinite = true
+      const updated = {
+        ...matchedConv,
+        last_message: lastMessage,
+        unread_count: incrementUnread ? (matchedConv.unread_count || 0) + 1 : matchedConv.unread_count,
+      }
+      const pages = strippedPages.map((page, idx) =>
+        idx === 0 ? { ...page, items: [updated, ...(page.items ?? [])] } : page
+      )
+      return { ...old, pages }
+    }
+  )
+
+  queryClient.setQueriesData<ConversationListResponseDto>(
+    { queryKey: queryKeys.conversations.list() },
+    (old) => {
+      if (!old?.items) return old
+      const items = [...old.items]
+      const idx = items.findIndex((c) => c.conversation_id === conversationId)
+      if (idx < 0) return old
+      const current = items[idx]
+      const updated = {
+        ...current,
+        last_message: lastMessage,
+        unread_count: incrementUnread ? (current.unread_count || 0) + 1 : current.unread_count,
+      }
+      items.splice(idx, 1)
+      items.unshift(updated)
+      return { ...old, items }
+    }
+  )
+
+  return foundInInfinite
+}
+
 export function useSendMessageMutation() {
   const queryClient = useQueryClient()
 
@@ -106,16 +327,19 @@ export function useSendMessageMutation() {
       mediaUrls,
       replyTo,
     }: SendMessagePayload) => {
-      if (websocketService.getStatus() !== 'CONNECTED') {
+      const status = websocketService.getStatus()
+      if (status === 'DISCONNECTED') {
         websocketService.connect()
         throw new Error('WS_DISCONNECTED')
       }
+
       const user = useAuthStore.getState().user
-      const optimisticId = -Date.now()
+      const optimisticId = nextOptimisticId()
+      const currentUserId = resolveCurrentUserId(user)
 
       const optimisticMsg: MessageDto = {
         message_id: optimisticId,
-        sender_id: user?.user_id ?? 0,
+        sender_id: currentUserId ?? 0,
         sender_name: user?.fullName || user?.username || 'Tôi',
         avatar_url: user?.avatar_url || user?.avatarUrl || undefined,
         content,
@@ -155,61 +379,61 @@ export function useSendMessageMutation() {
         }
       )
 
-      // 2. Update conversation list preview
-      queryClient.setQueriesData<ConversationListResponseDto>(
-        { queryKey: queryKeys.conversations.list() },
-        (old) => {
-          if (!old?.items) return old
-          const items = [...old.items]
-          const idx = items.findIndex((c) => c.conversation_id === conversationId)
-          if (idx >= 0) {
-            const current = items[idx]
-            const updated = {
-              ...current,
-              last_message: {
-                message_id: optimisticId,
-                content: optimisticMsg.content,
-                message_type: optimisticMsg.message_type,
-                created_at: optimisticMsg.created_at,
-              },
-            }
-            items.splice(idx, 1)
-            items.unshift(updated)
-          }
-          return { ...old, items }
-        }
+      // 2. Update conversation list preview (infiniteList + legacy list)
+      updateConversationPreviews(
+        queryClient,
+        conversationId,
+        {
+          message_id: optimisticId,
+          content: optimisticMsg.content,
+          message_type: optimisticMsg.message_type,
+          created_at: optimisticMsg.created_at,
+        },
+        false
       )
 
-      // 3. Send over STOMP WebSocket
-      const sent = websocketService.sendMessage({
-        conversation_id: conversationId,
-        content,
-        message_type: messageType === 'IMAGE' ? 'IMAGE' : 'TEXT',
-        media_urls: mediaUrls,
-        reply_to_message_id: replyTo?.message_id ?? null,
-      })
-
-      if (!sent) {
-        websocketService.connect()
-        throw new Error('WS_DISCONNECTED')
+      // 3. Wait briefly if CONNECTING, then send over STOMP WebSocket
+      try {
+        if (status === 'CONNECTING') {
+          await waitForWsConnected(2000)
+        }
+        const sent = websocketService.sendMessage({
+          conversation_id: conversationId,
+          content,
+          message_type: messageType === 'IMAGE' ? 'IMAGE' : 'TEXT',
+          media_urls: mediaUrls,
+          reply_to_message_id: replyTo?.message_id ?? null,
+        })
+        if (!sent) {
+          websocketService.connect()
+          throw new Error('WS_DISCONNECTED')
+        }
+      } catch (err) {
+        removeOptimisticMessage(queryClient, conversationId, optimisticId)
+        throw err
       }
 
       return optimisticMsg
     },
-    onError: (_error, variables) => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.conversations.infiniteMessages(variables.conversationId) })
+    onError: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.conversations.infiniteList() })
     },
-    onSuccess: (_data, variables) => {
-      // 4. Reconcile with server ID after 500ms
+    onSuccess: (optimisticMsg, variables) => {
+      // 4. Conditional reconcile only if WS echo did not replace the optimistic message
       setTimeout(() => {
+        if (
+          optimisticMsg.message_id == null ||
+          !hasPendingOptimisticMessage(queryClient, variables.conversationId, optimisticMsg.message_id)
+        ) {
+          return
+        }
         void queryClient.invalidateQueries({
           queryKey: queryKeys.conversations.infiniteMessages(variables.conversationId),
         })
         void queryClient.invalidateQueries({
           queryKey: queryKeys.conversations.infiniteList(),
         })
-      }, 500)
+      }, 1500)
     },
   })
 }
@@ -220,97 +444,80 @@ export function useChatRealtimeSync(activeConversationId?: number) {
     websocketService.getStatus()
   )
   const [typingUsers, setTypingUsers] = useState<Record<number, string>>({})
+  const activeConvRef = useRef(activeConversationId)
+  activeConvRef.current = activeConversationId
 
   // Connect websocket on mount
   useEffect(() => {
     websocketService.connect()
     const unsubStatus = websocketService.onStatusChange(setConnectionStatus)
 
-    const unsubMsg = websocketService.onMessage((msg) => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.conversations.infiniteList() })
-      // 1. Append message to active conversation cache if open
+    const unsubMsg = websocketService.onMessage((rawMsg) => {
+      const convId = toFiniteNumber(rawMsg.conversation_id)
+      const msgId = toFiniteNumber(rawMsg.message_id)
+      if (convId === undefined || msgId === undefined) return
+
+      const incomingSenderId = toFiniteNumber(rawMsg.sender_id)
+      const currentUserId = resolveCurrentUserId(useAuthStore.getState().user)
+      const msgType = (rawMsg.message_type ?? 'TEXT') as MessageDto['message_type']
+
+      const newMsg: MessageDto = {
+        message_id: msgId,
+        sender_id: incomingSenderId,
+        sender_name: rawMsg.sender_name,
+        avatar_url: rawMsg.sender_avatar ?? undefined,
+        content: rawMsg.content,
+        message_type: msgType,
+        media_urls: rawMsg.media_urls,
+        reply_to_message: rawMsg.reply_to_message_id
+          ? { message_id: rawMsg.reply_to_message_id }
+          : undefined,
+        created_at: rawMsg.created_at,
+      }
+
+      // 1. Reconcile optimistic message or append new message to conversation cache
       queryClient.setQueriesData<InfiniteData<MessageListResponseDto>>(
-        { queryKey: queryKeys.conversations.infiniteMessages(msg.conversation_id) },
-        (old) => {
-          if (!old?.pages?.length) return old
-          const exists = old.pages.some((page) =>
-            page.messages?.some((m) => m.message_id === msg.message_id)
-          )
-          if (exists) return old
-
-          const newMsg: MessageDto = {
-            message_id: msg.message_id,
-            sender_id: msg.sender_id,
-            sender_name: msg.sender_name,
-            avatar_url: msg.sender_avatar ?? undefined,
-            content: msg.content,
-            message_type: msg.message_type as 'TEXT' | 'IMAGE' | 'VIDEO' | 'GIF',
-            media_urls: msg.media_urls,
-            reply_to_message: msg.reply_to_message_id
-              ? { message_id: msg.reply_to_message_id }
-              : undefined,
-            created_at: msg.created_at,
-          }
-
-          const newPages = old.pages.map((p, i) =>
-            i === 0 ? { ...p, messages: [newMsg, ...(p.messages || [])] } : p
-          )
-          return {
-            ...old,
-            pages: newPages,
-          }
-        }
+        { queryKey: queryKeys.conversations.infiniteMessages(convId) },
+        (old) =>
+          reconcileIncomingMessage(old, {
+            convId,
+            activeConvId: activeConvRef.current,
+            newMsg,
+            incomingSenderId,
+            currentUserId,
+          })
       )
 
-      if (activeConversationId === msg.conversation_id) {
-        const queryState = queryClient.getQueryState(queryKeys.conversations.infiniteMessages(msg.conversation_id))
+      if (activeConvRef.current === convId) {
+        const queryState = queryClient.getQueryState(queryKeys.conversations.infiniteMessages(convId))
         if (queryState?.status === 'error') {
-          void queryClient.invalidateQueries({ queryKey: queryKeys.conversations.infiniteMessages(msg.conversation_id) })
+          void queryClient.invalidateQueries({ queryKey: queryKeys.conversations.infiniteMessages(convId) })
         }
       }
 
-      // 2. Update conversation list preview
-      queryClient.setQueriesData<ConversationListResponseDto>(
-        { queryKey: queryKeys.conversations.list() },
-        (old) => {
-          if (!old || !old.items) return old
-          const items = [...old.items]
-          const targetIndex = items.findIndex((c) => c.conversation_id === msg.conversation_id)
-
-          if (targetIndex >= 0) {
-            const current = items[targetIndex]
-            const updated = {
-              ...current,
-              last_message: {
-                message_id: msg.message_id,
-                content: msg.content,
-                message_type: msg.message_type as 'TEXT' | 'IMAGE' | 'VIDEO' | 'GIF',
-                created_at: msg.created_at,
-              },
-              unread_count:
-                activeConversationId === msg.conversation_id
-                  ? current.unread_count
-                  : (current.unread_count || 0) + 1,
-            }
-            items.splice(targetIndex, 1)
-            items.unshift(updated)
-          } else {
-            void queryClient.invalidateQueries({ queryKey: queryKeys.conversations.list() })
-          }
-
-          return {
-            ...old,
-            items,
-          }
-        }
+      // 2. Update conversation list preview (infiniteList + legacy list)
+      const isMine = currentUserId !== undefined && incomingSenderId === currentUserId
+      const foundInInfinite = updateConversationPreviews(
+        queryClient,
+        convId,
+        {
+          message_id: msgId,
+          content: rawMsg.content,
+          message_type: msgType,
+          created_at: rawMsg.created_at,
+        },
+        convId !== activeConvRef.current && !isMine
       )
+      if (!foundInInfinite) {
+        void queryClient.invalidateQueries({ queryKey: queryKeys.conversations.infiniteList() })
+      }
     })
 
     return () => {
       unsubStatus()
       unsubMsg()
     }
-  }, [queryClient, activeConversationId])
+  }, [queryClient])
 
   // Subscribe to typing indicators for active conversation
   useEffect(() => {

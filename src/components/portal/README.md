@@ -5,16 +5,14 @@
 | Màn hình / popup | Điểm vào |
 | --- | --- |
 | SCR-07: Hộp thư | `/messages` |
-| SCR-08: Kho hội thoại ẩn | `/messages/hidden-vault` |
 | SCR-10: Cài đặt cá nhân và thiết bị | `/settings` |
 | SCR-11: Trung tâm thông báo | `/notifications` |
 | MODAL-02: Quản trị nhóm | Nút cài đặt trong hội thoại nhóm |
 | MODAL-03: Báo cáo | Popup dùng chung của bài viết, bình luận, hồ sơ và người gửi tin nhắn |
-| MODAL-04: PIN | Kho hội thoại ẩn và Cài đặt > Bảo mật |
 
 ## Tích hợp với main
 
-Sau khi đồng bộ main, giao diện chat mới của nhóm tiếp tục phục vụ các route /messages và /messages/:conversationId, giữ gửi ảnh, emoji, trả lời và trạng thái đang gõ. ChatPortalActions bổ sung quản trị nhóm và ẩn hội thoại; sidebar có lối vào kho PIN. Các liên kết /messages?userId=... và /messages?conversation=... vẫn được hỗ trợ. Namespace academic và portal cùng được đăng ký; các route học thuật của main được giữ nguyên. Kho PIN dùng bố cục trang thông thường để tránh bị cắt nội dung bởi khung chat toàn màn hình.
+Sau khi đồng bộ main, giao diện chat mới của nhóm tiếp tục phục vụ các route /messages và /messages/:conversationId, giữ gửi ảnh, emoji, trả lời và trạng thái đang gõ. ChatPortalActions bổ sung quản trị nhóm chat. Các liên kết /messages?userId=... và /messages?conversation=... vẫn được hỗ trợ. Namespace academic và portal cùng được đăng ký; các route học thuật của main được giữ nguyên.
 
 ## Tổ chức mã nguồn
 
@@ -27,10 +25,6 @@ Sau khi đồng bộ main, giao diện chat mới của nhóm tiếp tục phụ
 
 Các bộ lọc thông báo, tab cài đặt và hội thoại được chọn nằm trong URL. Dữ liệu máy chủ nằm trong TanStack Query. Các form chỉ giữ bản nháp cục bộ.
 
-## Kho hội thoại ẩn
-
-Không tải danh sách kho trước khi máy chủ xác thực PIN thành công. PIN không được lưu vào storage, URL hay query keys. Khi rời trang hoặc khóa kho, dữ liệu tin nhắn đã tải được loại khỏi cache. Cổng PIN phía client bổ sung trải nghiệm; backend vẫn phải kiểm tra quyền truy cập ở mọi request.
-
 ## Xác minh
 
 - `npm run verify:docs`
@@ -40,4 +34,4 @@ Không tải danh sách kho trước khi máy chủ xác thực PIN thành công
 - `npm test`
 - `npm run build`
 
-Các test trong thư mục này bao phủ PIN sai/không khớp, cổng kho ẩn, báo cáo thất bại rồi thử lại, phân quyền quản trị nhóm, đọc thông báo và xác nhận đăng xuất thiết bị. Bản kiểm tra trình duyệt dùng API giả lập, không thay đổi dữ liệu backend thật. Cần kiểm thử tích hợp riêng với phiên đăng nhập hợp lệ để xác nhận STOMP, lưu PIN và chính sách quyền của server.
+Các test trong thư mục này bao phủ báo cáo thất bại rồi thử lại, phân quyền quản trị nhóm, đọc thông báo và xác nhận đăng xuất thiết bị. Bản kiểm tra trình duyệt dùng API giả lập, không thay đổi dữ liệu backend thật. Cần kiểm thử tích hợp riêng với phiên đăng nhập hợp lệ để xác nhận STOMP và chính sách quyền của server.

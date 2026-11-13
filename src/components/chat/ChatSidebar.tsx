@@ -1,4 +1,3 @@
-import { ButtonLink } from '@/components/ui/actions/Button'
 import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SquarePen, MoreHorizontal, BellOff, CheckCheck } from 'lucide-react'
@@ -39,7 +38,6 @@ function renderStatusIndicator(hasUnread: boolean, isMuted?: boolean) {
 
 export function ChatSidebar({ activeId, onSelectConversation, onOpenNewChat }: Readonly<ChatSidebarProps>) {
   const { t } = useTranslation('chat')
-  const { t: tp } = useTranslation('portal')
   const [search, setSearch] = useState('')
   const [tab, setTab] = useState<'ALL' | 'UNREAD' | 'GROUP'>('ALL')
 
@@ -59,36 +57,35 @@ export function ChatSidebar({ activeId, onSelectConversation, onOpenNewChat }: R
   }, [query.data, tab, search])
 
   function renderSnippet(c: ConversationDto) {
-    if (!c.last_message) return t('noMessagesShort', 'Chưa có tin nhắn')
+    if (!c.last_message) return t('noMessagesShort')
     if (c.last_message.message_type === 'IMAGE') {
-      return t('sentImage', 'đã gửi một ảnh')
+      return t('sentImage')
     }
     return c.last_message.content || ''
   }
 
   return (
-    <aside aria-label={t('messengerTitle', 'Đoạn chat')} className="w-full md:w-64 xl:w-72 flex flex-col h-full bg-surface-card border-r border-line-subtle shrink-0">
-      <nav className="shrink-0 px-3 pt-3"><ButtonLink to="/messages/hidden-vault" variant="outline" className="min-h-11 w-full">{tp('vault.title')}</ButtonLink></nav>
+    <aside aria-label={t('messengerTitle')} className="w-full md:w-64 xl:w-72 flex flex-col h-full bg-surface-card border-r border-line-subtle shrink-0">
       <header className="p-3 pb-2 flex items-center justify-between gap-2 shrink-0">
         <Heading level={1} className="text-xl font-bold text-fg-primary tracking-tight">
-          {t('messengerTitle', 'Đoạn chat')}
+          {t('messengerTitle')}
         </Heading>
         {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Header actions flex buttons row] */}
         <div className="flex items-center gap-1">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" aria-label={t('options', 'Tùy chọn')} className="w-9 h-9 p-0 rounded-full text-fg-muted hover:text-fg-primary">
+              <Button variant="ghost" size="sm" aria-label={t('options')} className="w-9 h-9 p-0 rounded-full text-fg-muted hover:text-fg-primary">
                 <MoreHorizontal size={18} />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 p-1 bg-surface-elevated border border-line-subtle rounded-xl z-50">
               <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-surface-card-hover cursor-pointer">
                 <CheckCheck size={16} />
-                <span>{t('markAllAsRead', 'Đánh dấu tất cả là đã đọc')}</span>
+                <span>{t('markAllAsRead')}</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button variant="ghost" size="sm" onClick={onOpenNewChat} aria-label={t('newMessage', 'Tạo đoạn chat mới')} className="w-9 h-9 p-0 rounded-full text-fg-muted hover:text-fg-primary">
+          <Button variant="ghost" size="sm" onClick={onOpenNewChat} aria-label={t('newMessage')} className="w-9 h-9 p-0 rounded-full text-fg-muted hover:text-fg-primary">
             <SquarePen size={18} />
           </Button>
         </div>
@@ -96,7 +93,7 @@ export function ChatSidebar({ activeId, onSelectConversation, onOpenNewChat }: R
 
       {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Search bar wrapper padding] */}
       <div className="px-3 py-1.5 shrink-0">
-        <SearchInput value={search} onChange={setSearch} placeholder={t('searchMessenger', 'Tìm kiếm trên Messenger')} aria-label={t('searchMessenger', 'Tìm kiếm trên Messenger')} className="rounded-full bg-surface-sunken" />
+        <SearchInput value={search} onChange={setSearch} placeholder={t('searchMessenger')} aria-label={t('searchMessenger')} className="rounded-full bg-surface-sunken" />
       </div>
 
       {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Tabs pill wrapper] */}
@@ -105,9 +102,9 @@ export function ChatSidebar({ activeId, onSelectConversation, onOpenNewChat }: R
           value={tab}
           onValueChange={(val) => setTab(val as 'ALL' | 'UNREAD' | 'GROUP')}
           options={[
-            { value: 'ALL', label: t('filterAll', 'Tất cả') },
-            { value: 'UNREAD', label: t('filterUnread', 'Chưa đọc') },
-            { value: 'GROUP', label: t('filterGroups', 'Nhóm') },
+            { value: 'ALL', label: t('filterAll') },
+            { value: 'UNREAD', label: t('filterUnread') },
+            { value: 'GROUP', label: t('filterGroups') },
           ]}
         />
       </div>
@@ -159,7 +156,7 @@ export function ChatSidebar({ activeId, onSelectConversation, onOpenNewChat }: R
             )
           })
         ) : (
-          query.isSuccess ? <p className="p-8 text-center text-sm text-fg-muted">{t('noConversations', 'Chưa có cuộc trò chuyện nào')}</p> : null
+          query.isSuccess ? <p className="p-8 text-center text-sm text-fg-muted">{t('noConversations')}</p> : null
         )}
         <LoadMore query={query} />
       </nav>

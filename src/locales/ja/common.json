@@ -9,8 +9,12 @@
     "mutualFriends": "共通の友達 {{count}}人",
     "pendingConnection": "承認待ち",
     "connectionStatus": {
-      "FRIENDS": "HUSTの友達", "RECEIVED": "友達申請", "SENT": "申請済み",
-      "BLOCKED": "ブロック中", "FOLLOWING": "フォロー中", "FOLLOWERS": "フォロワー"
+      "FRIENDS": "HUSTの友達",
+      "RECEIVED": "友達申請",
+      "SENT": "申請済み",
+      "BLOCKED": "ブロック中",
+      "FOLLOWING": "フォロー中",
+      "FOLLOWERS": "フォロワー"
     },
     "commentDeleted": "このコメントは削除されました。",
     "searchSubtitle": "ユーザー、投稿、問題、問題集、科目を検索できます。",
@@ -38,7 +42,12 @@
     "feedFilters": "フィードの絞り込み",
     "subjectFilter": "科目で絞り込む",
     "allSubjects": "すべての科目",
-    "feedTabs": { "ALL": "すべてのフィード", "MINE": "自分の投稿", "MY_SUBJECTS": "履修科目", "LECTURERS": "教員のコメント" },
+    "feedTabs": {
+      "ALL": "すべてのフィード",
+      "MINE": "自分の投稿",
+      "MY_SUBJECTS": "履修科目",
+      "LECTURERS": "教員のコメント"
+    },
     "emptyFeed": "まだアクティビティはありません。友達とつながるか、最初の投稿を共有しましょう。",
     "activity": {
       "CREATED_POST": "投稿を共有しました",
@@ -55,7 +64,11 @@
     "contentRequired": "内容を入力するかファイルを添付してください。",
     "attachment": "画像・資料",
     "remove": "削除",
-    "visibility": { "PUBLIC": "公開", "FRIENDS": "友達", "ONLY_ME": "自分のみ" },
+    "visibility": {
+      "PUBLIC": "公開",
+      "FRIENDS": "友達",
+      "ONLY_ME": "自分のみ"
+    },
     "connections": {
       "FRIENDS": "友達",
       "RECEIVED": "受信した申請",
@@ -145,7 +158,7 @@
     "retry": "再試行"
   },
   "nav": {
-    "dashboard": "ダッシュボード",
+    "dashboard": "学習概要",
     "profile": "プロフィール",
     "logout": "ログアウト",
     "closeMenu": "メニューを閉じる",
@@ -168,7 +181,18 @@
     "search": "グローバル検索",
     "settings": "システム設定",
     "shortcuts": "ショートカット",
-    "mySubjects": "登録コース"
+    "mySubjects": "登録コース",
+    "practice": "模擬試験・演習",
+    "proposals": "問題提案",
+    "teacherDashboard": "教育概要",
+    "teacherReports": "違反報告",
+    "classes": "担当クラス",
+    "reviews": "問題レビュー",
+    "academic": "教務管理",
+    "messages": "メッセージ",
+    "mainNav": "メインナビゲーション",
+    "mobileNav": "モバイルナビゲーション",
+    "primaryModules": "メイン機能"
   },
   "status": {
     "active": "アクティブ",
@@ -242,7 +266,13 @@
     "trending_searches": "トレンドキーワード",
     "delete_history": "削除",
     "empty_results": "該当する検索結果が見つかりませんでした",
-    "results_count": "{{count}}件の検索結果"
+    "results_count": "{{count}}件の検索結果",
+    "recentHistory": "最近の検索履歴",
+    "trendingTitle": "人気の検索キーワード",
+    "viewProfile": "プロフィールを見る",
+    "typePost": "投稿",
+    "typeQuestion": "復習問題",
+    "viewQuestion": "問題を見る"
   },
   "filter": {
     "title": "フィルター"
@@ -250,7 +280,9 @@
   "pagination": {
     "prev": "前へ",
     "next": "次へ",
-    "pageOf": "{{page}} / {{totalPages}} ページ"
+    "pageOf": "{{page}} / {{totalPages}} ページ",
+    "showing": "{{total}}件中 {{from}} - {{to}}件を表示",
+    "totalItems": "合計: {{total}}件"
   },
   "dateRange": {
     "from": "開始日",
@@ -407,6 +439,7 @@
     "appearanceDesc": "ライト、ダーク、またはシステム設定に合わせた自動切り替えを選択できます。"
   },
   "feed": {
+    "allPosts": "すべての投稿",
     "newPostsAvailable": "新しいアクティビティが{{count}}件あります。更新するにはクリックしてください。",
     "createPost": {
       "title": "新しい投稿を作成",
@@ -467,7 +500,32 @@
       "public": "全体公開",
       "friends": "友達のみ",
       "only_me": "自分のみ"
-    }
+    },
+    "lecturerNote": {
+      "required": "専門メモの内容を入力してください。",
+      "success": "教員の専門メモを保存しました。",
+      "error": "専門メモを保存できませんでした。もう一度お試しください。",
+      "title": "教員からの専門メモ",
+      "guideline": "専門メモは投稿上に目立たせて表示され、学生に正確な学術情報や補足を提供します。",
+      "contentLabel": "専門コメントの内容",
+      "placeholder": "投稿に対するコメント、解説ガイド、学術的な注意点を入力...",
+      "save": "メモを保存",
+      "menu": "専門メモ"
+    },
+    "linkCopied": "投稿のリンクをコピーしました！",
+    "likeCountUnit": "件のリアクション",
+    "commentCountUnit": "件のコメント",
+    "comment": "コメント",
+    "share": "共有",
+    "options": "投稿オプション",
+    "viewDetail": "投稿の詳細を見る",
+    "copyLink": "リンクをコピー",
+    "loadingDetail": "投稿の詳細を読み込み中...",
+    "errorForbiddenTitle": "投稿へのアクセス権がありません",
+    "errorNotFoundTitle": "投稿が存在しないか削除されました",
+    "errorForbiddenDesc": "この投稿は非公開に設定されているか、特定の学生グループのみに公開されています。",
+    "errorNotFoundDesc": "投稿のリンクが間違っているか、作成者がSQB HUSTから投稿を削除した可能性があります。",
+    "postIdLabel": "投稿ID"
   },
   "comment": {
     "title": "コメント",
@@ -487,7 +545,8 @@
     "like": "いいね",
     "love": "お気に入り",
     "wow": "すごい",
-    "likes_count": "いいね {{count}}件"
+    "likes_count": "いいね {{count}}件",
+    "reacted": "いいね済み"
   },
   "profile": {
     "title": "プロフィール",
@@ -526,7 +585,23 @@
     "unblock_user": "ブロック解除",
     "block_confirm": "このユーザーはあなたのプロフィールや投稿を閲覧できなくなります。",
     "message_integration": "メッセージ",
-    "peer_rule_notice": "友達申請は学生同士、または教員同士のみ可能です。"
+    "peer_rule_notice": "友達申請は学生同士、または教員同士のみ可能です。",
+    "updateSuccess": "プロフィールを更新しました！",
+    "editTitle": "プロフィールを編集",
+    "fullNameLabel": "氏名",
+    "genderLabel": "性別",
+    "genderMale": "男性",
+    "genderFemale": "女性",
+    "bioLabel": "自己紹介",
+    "badgesTitle": "獲得バッジ",
+    "badgeUnit": "個のバッジ",
+    "emptyBadges": "まだ学習バッジを獲得していません。",
+    "loading": "プロフィールを読み込み中...",
+    "notFound": "ユーザープロフィールが見つかりません。",
+    "edit": "プロフィールを編集",
+    "joined": "参加日",
+    "userPosts": "共有した投稿",
+    "noPosts": "まだ投稿がありません。"
   },
   "friends": {
     "title": "友達とつながり",
@@ -541,7 +616,15 @@
     "request_accepted": "友達申請を承認しました",
     "request_declined": "申請を辞退しました",
     "request_sent": "友達申請を送信しました",
-    "unblocked_success": "ブロックを解除しました"
+    "unblocked_success": "ブロックを解除しました",
+    "friendCountUnit": "人の友達",
+    "mutualCount": "人の共通の友達",
+    "connected": "HUSTの友達",
+    "viewAll": "すべての友達を見る",
+    "empty": "まだつながっている友達がいません。",
+    "findFriends": "検索してつながる",
+    "roleLecturer": "教員",
+    "roleStudent": "学生"
   },
   "report": {
     "modal_title": "コンテンツの問題を報告",
@@ -561,5 +644,25 @@
     "placeholder": "学習アドバイス、知識の修正、または学術的なコメントを入力してください...",
     "submit": "ノートを保存",
     "success": "教員ノートを更新しました！"
+  },
+  "common": {
+    "search": "検索",
+    "searchPlaceholder": "SQB HUSTで検索",
+    "cancel": "キャンセル",
+    "collapse": "折りたたむ",
+    "expand": "もっと見る",
+    "back": "フィードに戻る",
+    "backToFeed": "フィードに戻る",
+    "saveChanges": "変更を保存",
+    "loading": "読み込み中..."
+  },
+  "time": {
+    "hour": "時 (HH)",
+    "minute": "分 (MM)"
+  },
+  "errors": {
+    "pageNotFound": "ページが見つかりません",
+    "pageNotFoundDesc": "アクセスしたURLは存在しないか、新しいアドレスに移動しました。",
+    "backHome": "ホームに戻る"
   }
 }

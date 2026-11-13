@@ -2,7 +2,7 @@ import { useLocation } from 'react-router-dom'
 import { ButtonLink } from '@/components/ui/actions/Button'
 import { useTranslation } from 'react-i18next'
 import { Tooltip } from '@/components/ui/overlay'
-import { getPrimaryNavItems } from '@/config/navigation.config'
+import { getPrimaryNavItems, resolveUserRoles } from '@/config/navigation.config'
 import { useAuthStore } from '@/stores/authStore'
 import { cn } from '@/utils/cn'
 
@@ -14,15 +14,21 @@ export function TopbarNav({ className }: Readonly<TopbarNavProps>) {
   const { t } = useTranslation('common')
   const { pathname } = useLocation()
   const user = useAuthStore((state) => state.user)
-  const navItems = getPrimaryNavItems(user?.roles)
+  const effectiveRoles = resolveUserRoles(user?.roles, user?.role)
+
+  if (!user || !effectiveRoles) {
+    return null
+  }
+
+  const navItems = getPrimaryNavItems(effectiveRoles)
 
   return (
     <nav
-      aria-label="Thanh điều hướng chính"
+      aria-label={t('nav.mainNav')}
       className={cn('flex items-center justify-center h-full gap-1 sm:gap-2', className)}
     >
       {navItems.map((item) => {
-        const label = t(item.labelKey, item.defaultLabel)
+        const label = t(item.labelKey)
         const isActive =
           pathname === item.to ||
           (item.to !== '/feed' && pathname.startsWith(`${item.to}/`))

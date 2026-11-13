@@ -81,7 +81,7 @@ export function EditProfileModal({ isOpen, profile, onClose }: Readonly<EditProf
         date_of_birth: dateOfBirth || undefined,
         timezone,
       })
-      toast.success(t('profile.updateSuccess', 'Cập nhật thông tin hồ sơ thành công!'))
+      toast.success(t('profile.updateSuccess'))
       onClose()
     } catch (cause) {
       setError(getApiError(cause, t('zone2.actionError')))
@@ -96,7 +96,7 @@ export function EditProfileModal({ isOpen, profile, onClose }: Readonly<EditProf
       onClose={() => {
         if (!loading) onClose()
       }}
-      title={t('profile.editTitle', 'Chỉnh sửa hồ sơ cá nhân')}
+      title={t('profile.editTitle')}
       size="lg"
     >
       <Form onSubmit={handleSubmit} noValidate onInput={() => setError('')} className="space-y-4">
@@ -158,7 +158,7 @@ export function EditProfileModal({ isOpen, profile, onClose }: Readonly<EditProf
           {coverFile?.name ?? t('social.coverUpload')}
         </Button>
 
-        <FormField label={t('profile.fullNameLabel', 'Họ và tên')} required>
+        <FormField label={t('profile.fullNameLabel')} required>
           <Input
             aria-label="Họ và tên"
             value={fullName}
@@ -168,7 +168,7 @@ export function EditProfileModal({ isOpen, profile, onClose }: Readonly<EditProf
           />
         </FormField>
 
-        <FormField label={t('profile.genderLabel', 'Giới tính')}>
+        <FormField label={t('profile.genderLabel')}>
           <Select
             aria-label="Giới tính"
             value={gender}
@@ -179,13 +179,13 @@ export function EditProfileModal({ isOpen, profile, onClose }: Readonly<EditProf
               <SelectValue placeholder="Chọn giới tính" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="MALE">{t('profile.genderMale', 'Nam')}</SelectItem>
-              <SelectItem value="FEMALE">{t('profile.genderFemale', 'Nữ')}</SelectItem>
+              <SelectItem value="MALE">{t('profile.genderMale')}</SelectItem>
+              <SelectItem value="FEMALE">{t('profile.genderFemale')}</SelectItem>
             </SelectContent>
           </Select>
         </FormField>
 
-        <FormField label={t('profile.bioLabel', 'Tiểu sử / Giới thiệu')}>
+        <FormField label={t('profile.bioLabel')}>
           <Textarea
             aria-label="Tiểu sử bản thân"
             value={bio}
@@ -226,10 +226,10 @@ export function EditProfileModal({ isOpen, profile, onClose }: Readonly<EditProf
             disabled={loading}
             className="min-h-11"
           >
-            {t('common.cancel', 'Hủy')}
+            {t('common.cancel')}
           </Button>
           <SubmitButton loading={loading} variant="primary" className="min-h-11 px-6">
-            {t('common.saveChanges', 'Lưu thay đổi')}
+            {t('common.saveChanges')}
           </SubmitButton>
         </footer>
       </Form>

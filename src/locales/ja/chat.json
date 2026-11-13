@@ -108,7 +108,6 @@
   "markAllAsRead": "すべて既読にする",
   "markAsUnread": "未読にする",
   "muteConversation": "通知をミュート",
-  "hideConversation": "チャットを非表示",
   "typeMessage": "メッセージを入力...",
   "you": "あなた",
   "sentFile": "ファイルを送信しました",
@@ -134,5 +133,10 @@
   "noFriendsFound": "友達が見つかりません",
   "sendErrorDisconnected": "メッセージを送信できませんでした。リアルタイムサーバーとの接続が切断されました。もう一度お試しください。",
   "unreadMessagesDivider": "未読メッセージ",
-  "scrollToBottom": "最新メッセージへスクロール"
+  "scrollToBottom": "最新メッセージへスクロール",
+  "recallSuccess": "メッセージを取り消しました",
+  "reply": "返信",
+  "options": "オプション",
+  "createGroupSuccess": "グループを作成しました",
+  "creating": "グループを作成中..."
 }

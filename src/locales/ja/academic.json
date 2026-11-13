@@ -80,7 +80,11 @@
       "edit": "編集",
       "delete": "取り消し",
       "editAria": "セッション{{title}}を編集",
-      "deleteAria": "セッション{{title}}を取り消し"
+      "deleteAria": "セッション{{title}}を取り消し",
+      "statusApproved": "承認済み",
+      "statusRejected": "却下",
+      "statusReviewing": "審査中",
+      "statusPending": "承認待ち"
     },
     "form": {
       "createTitle": "新しい提案セッションを作成",
@@ -257,6 +261,7 @@
   "common": {
     "cancel": "キャンセル",
     "loading": "読み込み中...",
-    "back": "戻る"
+    "back": "戻る",
+    "details": "詳細を見る"
   }
 }

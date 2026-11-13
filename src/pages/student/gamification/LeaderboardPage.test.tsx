@@ -17,7 +17,7 @@ const mockedService = vi.mocked(gamificationService)
 
 function renderPage(initialEntry = '/gamification/leaderboard') {
   return renderWithQueryClient(
-    <MemoryRouter initialEntries={[initialEntry]}>
+    <MemoryRouter initialEntries={[initialEntry]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <LeaderboardPage />
     </MemoryRouter>
   )

@@ -16,7 +16,6 @@
     "NO_NONSEMANTIC_TAGS": 9
   },
   "src/pages/dev/DesignSystemShowcasePage.tsx": {
-    "NO_NONSEMANTIC_TAGS": 13,
-    "NO_RAW_INTERACTIVE_ELEMENTS": 1
+    "NO_NONSEMANTIC_TAGS": 13
   }
 }

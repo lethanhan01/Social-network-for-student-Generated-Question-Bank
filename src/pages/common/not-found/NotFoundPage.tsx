@@ -29,13 +29,10 @@ export default function NotFoundPage() {
             404
           </Heading>
           <Heading level={2} className="text-lg font-semibold text-fg-primary">
-            {t('errors.pageNotFound', 'Không tìm thấy trang yêu cầu')}
+            {t('errors.pageNotFound')}
           </Heading>
           <Text size="sm" tone="muted">
-            {t(
-              'errors.pageNotFoundDesc',
-              'Đường dẫn bạn vừa truy cập không tồn tại hoặc đã được di chuyển sang địa chỉ mới.'
-            )}
+            {t('errors.pageNotFoundDesc')}
           </Text>
         </header>
 
@@ -47,7 +44,7 @@ export default function NotFoundPage() {
             className="min-h-11 px-6 rounded-xl font-medium"
             leftIcon={<Home size={18} />}
           >
-            {t('errors.backHome', 'Quay về trang chủ')}
+            {t('errors.backHome')}
           </ButtonLink>
         </nav>
       </Card>

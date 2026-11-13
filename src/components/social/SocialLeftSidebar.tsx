@@ -1,15 +1,13 @@
-import {
-  BookOpen,
-  LayoutDashboard,
-  CalendarCheck,
-  Search,
-  Sparkles,
-} from 'lucide-react'
+import { BookOpen } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Card, Avatar, Badge } from '@/components/ui/data-display'
-import { Button, ButtonLink } from '@/components/ui/actions'
-import { Heading, Text } from '@/components/ui/typography'
-import { Separator } from '@/components/ui/layout'
+import { Button } from '@/components/ui/actions/Button'
+import { Heading } from '@/components/ui/typography/Heading'
+import { Text } from '@/components/ui/typography/Text'
+import { Separator } from '@/components/ui/layout/Separator'
+import { FeatureShortcutsNav } from '@/components/shared/navigation/FeatureShortcutsNav'
+import { resolveUserRoles } from '@/config/navigation.config'
+import { useAuthStore } from '@/stores/authStore'
 import type { ProfileResponse, SubjectResponse } from '@/types'
 
 interface SocialLeftSidebarProps {
@@ -26,6 +24,11 @@ export function SocialLeftSidebar({
   onSelectSubject,
 }: Readonly<SocialLeftSidebarProps>) {
   const { t } = useTranslation('common')
+  const authUser = useAuthStore((state) => state.user)
+  const effectiveRoles = resolveUserRoles(
+    user?.role ? [user.role] : authUser?.roles,
+    authUser?.role
+  )
   const displayName = user?.full_name || user?.email || t('social.member')
   const initials = displayName.trim().charAt(0).toUpperCase()
   const studentCode = user?.student_lecturer_code || '—'
@@ -66,65 +69,20 @@ export function SocialLeftSidebar({
 
       <Separator />
 
-      {/* Group 1: Navigation Shortcuts */}
-      <nav aria-label={t('nav.shortcuts')} className="space-y-1">
-        <Text size="xs" tone="muted" className="font-semibold uppercase tracking-wider px-2 mb-2 block">
-          {t('nav.shortcuts', 'Lối tắt tính năng')}
-        </Text>
-        <ButtonLink
-          to="/feed"
-          variant={!selectedSubjectId ? 'secondary' : 'ghost'}
-          size="sm"
-          className="w-full justify-start gap-2.5 min-h-11"
-          onClick={() => onSelectSubject?.(undefined)}
-        >
-          <Sparkles size={18} className="text-action-accent shrink-0" />
-          <strong className="font-normal">{t('feed.allPosts', 'Tất cả bảng tin')}</strong>
-        </ButtonLink>
-        <ButtonLink
-          to="/dashboard"
-          variant="ghost"
-          size="sm"
-          className="w-full justify-start gap-2.5 min-h-11"
-        >
-          <LayoutDashboard size={18} className="text-action-accent shrink-0" />
-          <strong className="font-normal">{t('nav.dashboard', 'Tổng quan học tập')}</strong>
-        </ButtonLink>
-        <ButtonLink
-          to="/exams"
-          variant="ghost"
-          size="sm"
-          className="w-full justify-start gap-2.5 min-h-11"
-        >
-          <BookOpen size={18} className="text-action-accent shrink-0" />
-          <strong className="font-normal">{t('nav.exams', 'Ngân hàng đề thi')}</strong>
-        </ButtonLink>
-        <ButtonLink
-          to="/gamification/leaderboard"
-          variant="ghost"
-          size="sm"
-          className="w-full justify-start gap-2.5 min-h-11"
-        >
-          <CalendarCheck size={18} className="text-action-accent shrink-0" />
-          <strong className="font-normal">{t('nav.leaderboard', 'Điểm danh & Vinh danh')}</strong>
-        </ButtonLink>
-        <ButtonLink
-          to="/search"
-          variant="ghost"
-          size="sm"
-          className="w-full justify-start gap-2.5 min-h-11"
-        >
-          <Search size={18} className="text-action-accent shrink-0" />
-          <strong className="font-normal">{t('nav.search', 'Tìm kiếm toàn cục')}</strong>
-        </ButtonLink>
-      </nav>
+      {/* Group 1: Role-aware Navigation Shortcuts */}
+      <FeatureShortcutsNav
+        roles={effectiveRoles}
+        showAllPosts
+        isAllPostsActive={!selectedSubjectId}
+        onSelectAllPosts={() => onSelectSubject?.(undefined)}
+      />
 
       <Separator />
 
       {/* Group 2: Real Subjects List from API */}
-      <section aria-label="Môn học theo dõi" className="space-y-2">
+      <section aria-label={t('nav.mySubjects')} className="space-y-2">
         <Text size="xs" tone="muted" className="font-semibold uppercase tracking-wider px-2 block">
-          {t('nav.mySubjects', 'Môn học theo dõi')} ({subjects.length})
+          {t('nav.mySubjects')} ({subjects.length})
         </Text>
         {subjects.length > 0 ? (
           /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Subject list buttons vertical stack] */

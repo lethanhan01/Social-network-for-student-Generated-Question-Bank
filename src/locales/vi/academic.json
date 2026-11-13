@@ -80,7 +80,11 @@
       "edit": "Chỉnh sửa",
       "delete": "Hủy phiên",
       "editAria": "Chỉnh sửa phiên {{title}}",
-      "deleteAria": "Hủy phiên {{title}}"
+      "deleteAria": "Hủy phiên {{title}}",
+      "statusApproved": "Đã duyệt",
+      "statusRejected": "Bị từ chối",
+      "statusReviewing": "Đang thẩm định",
+      "statusPending": "Chờ duyệt"
     },
     "form": {
       "createTitle": "Tạo phiên đề xuất mới",
@@ -205,7 +209,7 @@
     "saved": "Đã gửi đánh giá.",
     "send": "Gửi đánh giá",
     "value": "{{score}} / 4 điểm",
-    "title": "Đánh giá \u0026 Báo lỗi câu hỏi",
+    "title": "Đánh giá & Báo lỗi câu hỏi",
     "description": "Chấm điểm chất lượng câu hỏi hoặc báo lỗi sai kiến thức để giảng viên thẩm định.",
     "ratingLabel": "Chất lượng câu hỏi",
     "ratingRequired": "Vui lòng chọn mức đánh giá hoặc báo lỗi.",
@@ -253,10 +257,11 @@
     "ratingValue": "{{rating}}/4",
     "errorFlag": "Báo lỗi"
   },
-  "eyebrow": "Học tập \u0026 Ngân hàng câu hỏi",
+  "eyebrow": "Học tập & Ngân hàng câu hỏi",
   "common": {
     "cancel": "Hủy",
     "loading": "Đang tải...",
-    "back": "Quay lại"
+    "back": "Quay lại",
+    "details": "Xem chi tiết"
   }
 }

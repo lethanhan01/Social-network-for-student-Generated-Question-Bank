@@ -3,11 +3,9 @@ import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { renderWithQueryClient } from '@/test/query-test-utils'
-import { PinModal } from './PinModal'
 import { ReportModal } from '@/components/social/ReportPostModal'
-import HiddenVaultPage from '@/pages/common/messages/HiddenVaultPage'
-import { chatService } from '@/services/chat.service'
-import { userService } from '@/services/user.service'
+import { ChatPortalActions } from './ChatPortalActions'
+import { SecuritySettings } from '@/pages/common/settings/SecuritySettings'
 import { utilityService } from '@/services/utility.service'
 import i18n from '@/lib/i18n'
 import { notificationPath } from '@/pages/common/notifications/notification-target'
@@ -19,45 +17,21 @@ describe('Portal security and forms', () => {
     await i18n.changeLanguage('vi')
   })
 
-  it('TC-PIN-01: rejects invalid and mismatched PIN without sending it to the server', async () => {
-    const user = userEvent.setup()
-    const submit = vi.spyOn(userService, 'setHiddenChatPin').mockResolvedValue()
-    renderWithQueryClient(<PinModal mode="setup" onClose={vi.fn()} onSuccess={vi.fn()} />)
-    await user.type(screen.getByLabelText(/Mã PIN 6 chữ số/), '123')
-    await user.click(screen.getByRole('button', { name: 'Thiết lập mã PIN' }))
-    expect(await screen.findByRole('alert')).toHaveTextContent('đúng 6 chữ số')
-    expect(submit).not.toHaveBeenCalled()
-    await user.type(screen.getByLabelText(/Mã PIN 6 chữ số/), '456')
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
-    await user.type(screen.getByLabelText(/Nhập lại mã PIN/), '654321')
-    await user.click(screen.getByRole('button', { name: 'Thiết lập mã PIN' }))
-    expect(await screen.findByRole('alert')).toHaveTextContent('chưa khớp')
-    expect(submit).not.toHaveBeenCalled()
+  it('TC-SECURITY-01: renders password change only without hidden vault PIN settings', () => {
+    renderWithQueryClient(<SecuritySettings />)
+    expect(screen.getByRole('heading', { name: 'Đổi mật khẩu' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /kho hội thoại ẩn/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /mã pin/i })).not.toBeInTheDocument()
   })
 
-  it('TC-VAULT-02: keeps hidden data locked until successful server verification and locks again', async () => {
-    const user = userEvent.setup()
-    const unlock = vi
-      .spyOn(chatService, 'unlockHiddenConversations')
-      .mockRejectedValueOnce(new Error('PIN không đúng'))
-      .mockResolvedValueOnce()
-    const hidden = vi.spyOn(chatService, 'getHiddenConversations').mockResolvedValue({ items: [] })
+  it('TC-DIRECT-02: renders direct conversation details without hidden vault action', () => {
     renderWithQueryClient(
-      <MemoryRouter>
-        <HiddenVaultPage />
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <ChatPortalActions conversationId={12} conversation={{ conversation_id: 12, type: 'DIRECT', display_name: 'Lan' }} onClose={vi.fn()} />
       </MemoryRouter>
     )
-    expect(hidden).not.toHaveBeenCalled()
-    await user.click(screen.getByRole('button', { name: 'Mở khóa kho' }))
-    await user.type(screen.getByLabelText(/Mã PIN 6 chữ số/), '123456')
-    await user.click(screen.getByRole('button', { name: 'Mở khóa kho' }))
-    expect(await screen.findByRole('alert')).toHaveTextContent('PIN không đúng')
-    expect(hidden).not.toHaveBeenCalled()
-    await user.click(screen.getByRole('button', { name: 'Mở khóa kho' }))
-    await waitFor(() => expect(hidden).toHaveBeenCalledTimes(1))
-    expect(unlock).toHaveBeenLastCalledWith({ pin: '123456' })
-    await user.click(screen.getByRole('button', { name: 'Khóa kho' }))
-    expect(await screen.findByRole('heading', { name: 'Kho hội thoại đang khóa' })).toBeInTheDocument()
+    expect(screen.getByText('Lan')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /ẩn hội thoại/i })).not.toBeInTheDocument()
   })
 
   it('TC-REPORT-03: preserves input on API error and submits the correct target on retry', async () => {

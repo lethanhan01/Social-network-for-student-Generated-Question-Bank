@@ -6,6 +6,8 @@ import type { ProtectedRouteProps } from './protected-route.types'
 
 export function ProtectedRoute({ allowedRoles, children }: Readonly<ProtectedRouteProps> = {}) {
   const user = useAuthStore((state) => state.user)
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const token = useAuthStore((state) => state.token)
   const hasHydrated = useAuthStore((state) => state.hasHydrated)
   const hasWarnedRef = useRef(false)
 
@@ -27,7 +29,7 @@ export function ProtectedRoute({ allowedRoles, children }: Readonly<ProtectedRou
     return null
   }
 
-  if (!user) {
+  if (!isAuthenticated || !user || !token) {
     return <Navigate to="/login" replace />
   }
 

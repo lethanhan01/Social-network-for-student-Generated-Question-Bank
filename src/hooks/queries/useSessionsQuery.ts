@@ -1,6 +1,7 @@
-﻿import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { sessionService } from '@/services/session.service'
 import { queryKeys } from '@/lib/query-keys'
+import { useAuthStore } from '@/stores/authStore'
 import type { ProposeSessionRequest, UpdateSubmissionSessionRequest } from '@/types'
 
 export function useMySubmissionsQuery(params?: { cursor?: string; limit?: number; status?: string }) {
@@ -19,9 +20,11 @@ export function useMySubmissionDetailQuery(sessionId: number) {
 }
 
 export function useEnrolledSubjectsQuery() {
+  const isAuthReady = useAuthStore((s) => s.isAuthenticated && Boolean(s.token))
   return useQuery({
     queryKey: queryKeys.sessions.enrolledSubjects(),
     queryFn: ({ signal }) => sessionService.getMyEnrolledSubjects({ signal }),
+    enabled: isAuthReady,
     staleTime: 10 * 60 * 1000,
   })
 }

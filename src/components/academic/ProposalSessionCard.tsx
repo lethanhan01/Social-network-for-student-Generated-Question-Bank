@@ -30,15 +30,15 @@ export function ProposalSessionCard({ session, onEdit, onDelete }: Readonly<Prop
           </Badge>
           {(() => {
             if (sessionStatus === 'APPROVED' || sessionStatus === 'RESOLVED') {
-              return <Badge tone="success" size="xs">{t('proposals.card.statusApproved', 'Đã duyệt')}</Badge>
+              return <Badge tone="success" size="xs">{t('proposals.card.statusApproved')}</Badge>
             }
             if (sessionStatus === 'REJECTED') {
-              return <Badge tone="danger" size="xs">{t('proposals.card.statusRejected', 'Bị từ chối')}</Badge>
+              return <Badge tone="danger" size="xs">{t('proposals.card.statusRejected')}</Badge>
             }
             if (sessionStatus === 'REVIEWING') {
-              return <Badge tone="info" size="xs">{t('proposals.card.statusReviewing', 'Đang thẩm định')}</Badge>
+              return <Badge tone="info" size="xs">{t('proposals.card.statusReviewing')}</Badge>
             }
-            return <Badge tone="warning" size="xs">{t('proposals.card.statusPending', 'Chờ duyệt')}</Badge>
+            return <Badge tone="warning" size="xs">{t('proposals.card.statusPending')}</Badge>
           })()}
         </div>
         <Heading level={3} size="xs" truncate>

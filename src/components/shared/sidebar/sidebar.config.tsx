@@ -7,7 +7,6 @@ import {
   HelpCircle,
   MessageSquare,
   Users,
-  Search,
   Sparkles,
   Settings,
   CalendarCheck,
@@ -24,7 +23,11 @@ export function getSQBNavSections(): NavSection[] {
       label: 'Học tập & Đề thi',
       items: [
         { label: i18n.t('academic:subjects.title'), to: '/subjects', icon: <BookOpen size={20} /> },
-        { label: i18n.t('academic:proposals.title'), to: '/proposals', icon: <PenLine size={20} /> },
+        {
+          label: i18n.t('academic:proposals.title'),
+          to: '/proposals',
+          icon: <PenLine size={20} />,
+        },
         { label: i18n.t('academic:practice.title'), to: '/practice', icon: <Play size={20} /> },
         {
           label: 'Tổng quan',
@@ -60,11 +63,6 @@ export function getSQBNavSections(): NavSection[] {
           label: 'Bạn bè & Kết nối',
           to: '/friends',
           icon: <Users size={20} />,
-        },
-        {
-          label: 'Tìm kiếm toàn cục',
-          to: '/search',
-          icon: <Search size={20} />,
         },
       ],
     },

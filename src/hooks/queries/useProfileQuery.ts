@@ -5,9 +5,11 @@ import type { UpdateProfileRequest } from '@/types'
 import { useAuthStore } from '@/stores/authStore'
 
 export function useMyProfileQuery() {
+  const isAuthReady = useAuthStore((s) => s.isAuthenticated && Boolean(s.token))
   return useQuery({
     queryKey: queryKeys.users.profile('me'),
     queryFn: ({ signal }) => userService.getMyProfile({ signal }),
+    enabled: isAuthReady,
     staleTime: 5 * 60 * 1000,
   })
 }

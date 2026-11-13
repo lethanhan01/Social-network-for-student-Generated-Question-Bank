@@ -37,7 +37,7 @@ Cấu hình mẫu dùng `VITE_API_URL=/api/v1` và `API_PROXY_TARGET` trong môi
 
 Server cung cấp SockJS tại `/api/v1/ws` (gốc trả `Welcome to SockJS!`, `/info` xác nhận hỗ trợ WebSocket). Client STOMP native kết nối transport `/api/v1/ws/websocket`, qua proxy WebSocket của Vite khi phát triển. Có thể đặt `VITE_WS_URL` nếu hạ tầng triển khai dùng URL khác. Kết nối được ngắt khi đăng xuất.
 
-Quản lý nhóm chat, kho PIN, cài đặt tài khoản, thông báo, thẩm định và quản trị thuộc các màn hình/phân hệ riêng trong tài liệu màn hình. Route nhắn tin ở đây hoàn thiện liên kết từ Zone 2 và cung cấp danh sách hội thoại, nội dung, gửi văn bản và thu hồi.
+Quản lý nhóm chat, cài đặt tài khoản, thông báo, thẩm định và quản trị thuộc các màn hình/phân hệ riêng trong tài liệu màn hình. Route nhắn tin ở đây hoàn thiện liên kết từ Zone 2 và cung cấp danh sách hội thoại, nội dung, gửi văn bản và thu hồi.
 
 ## Kiểm thử
 

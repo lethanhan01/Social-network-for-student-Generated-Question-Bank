@@ -11,7 +11,6 @@ const ProfilePage = lazy(() => import('@/pages/common/profile/ProfilePage'))
 const FriendsPage = lazy(() => import('@/pages/common/friends/FriendsPage'))
 const SearchPage = lazy(() => import('@/pages/common/search/SearchPage'))
 const ChatPage = lazy(() => import('@/pages/common/chat/ChatPage'))
-const HiddenVaultPage = lazy(() => import('@/pages/common/messages/HiddenVaultPage'))
 const SettingsPage = lazy(() => import('@/pages/common/settings/SettingsPage'))
 const NotificationsPage = lazy(() => import('@/pages/common/notifications/NotificationsPage'))
 
@@ -35,7 +34,6 @@ export const commonRoutes: RouteObject[] = [
         children: [
           { path: '/messages', element: <ChatPage /> },
           { path: '/messages/:conversationId', element: <ChatPage /> },
-          { path: '/messages/hidden-vault', element: <HiddenVaultPage /> },
           { path: '/settings', element: <SettingsPage /> },
           { path: '/notifications', element: <NotificationsPage /> },
         ],

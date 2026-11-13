@@ -1,12 +1,14 @@
 import { useLocation } from 'react-router-dom'
 import { useEffect, useRef } from 'react'
-import { GraduationCap, Settings } from 'lucide-react'
+import { Settings } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { ButtonLink } from '@/components/ui/actions'
+import { BrandLogo } from '@/components/shared/BrandLogo'
 import { Text } from '@/components/ui/typography'
 import { Separator } from '@/components/ui/layout'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/overlay/Sheet'
-import { getPrimaryNavItems, getSecondaryShortcutItems } from '@/config/navigation.config'
+import { getPrimaryNavItems, resolveUserRoles } from '@/config/navigation.config'
+import { FeatureShortcutsNav } from './FeatureShortcutsNav'
 import { useAuthStore } from '@/stores/authStore'
 import { cn } from '@/utils/cn'
 
@@ -20,8 +22,8 @@ export function MobileNavDrawer({ isOpen, onClose }: Readonly<MobileNavDrawerPro
   const { pathname } = useLocation()
   const prevPathRef = useRef(pathname)
   const user = useAuthStore((state) => state.user)
-  const primaryNavItems = getPrimaryNavItems(user?.roles)
-  const secondaryShortcutItems = getSecondaryShortcutItems(user?.roles)
+  const effectiveRoles = resolveUserRoles(user?.roles, user?.role)
+  const primaryNavItems = getPrimaryNavItems(effectiveRoles)
 
   // Close drawer strictly when route changes
   useEffect(() => {
@@ -39,27 +41,17 @@ export function MobileNavDrawer({ isOpen, onClose }: Readonly<MobileNavDrawerPro
       >
         {/* Drawer Header */}
         <SheetHeader className="pb-3 border-b border-line-subtle">
-          <SheetTitle className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-action-accent flex items-center justify-center text-fg-on-solid font-bold shrink-0">
-              <GraduationCap size={20} />
-            </div>
-            <div>
-              <strong className="text-sm font-bold text-fg-primary leading-tight block">
-                SQB HUST
-              </strong>
-              <strong className="text-xs font-normal text-fg-muted block">
-                Question Bank
-              </strong>
-            </div>
+          <SheetTitle className="flex items-center">
+            <BrandLogo className="h-7" />
           </SheetTitle>
         </SheetHeader>
 
         {/* Navigation Content List */}
         <div className="flex-1 overflow-y-auto no-scrollbar py-3 space-y-4">
           {/* Primary Navigation Modules */}
-          <nav aria-label="Phân hệ chính" className="space-y-1">
+          <nav aria-label={t('nav.primaryModules')} className="space-y-1">
             <Text size="xs" tone="muted" className="font-semibold uppercase tracking-wider px-2 mb-2 block">
-              Phân hệ chính
+              {t('nav.primaryModules')}
             </Text>
             {primaryNavItems.map((item) => {
               const isActive = pathname === item.to || pathname.startsWith(`${item.to}/`)
@@ -76,7 +68,7 @@ export function MobileNavDrawer({ isOpen, onClose }: Readonly<MobileNavDrawerPro
                   )}
                 >
                   <span className="shrink-0 text-action-accent">{item.icon}</span>
-                  <strong className="font-normal truncate">{t(item.labelKey, item.defaultLabel)}</strong>
+                  <strong className="font-normal truncate">{t(item.labelKey)}</strong>
                 </ButtonLink>
               )
             })}
@@ -85,44 +77,21 @@ export function MobileNavDrawer({ isOpen, onClose }: Readonly<MobileNavDrawerPro
           <Separator />
 
           {/* Secondary Shortcuts */}
-          <nav aria-label="Lối tắt tính năng" className="space-y-1">
-            <Text size="xs" tone="muted" className="font-semibold uppercase tracking-wider px-2 mb-2 block">
-              {t('nav.shortcuts', 'Lối tắt tính năng')}
-            </Text>
-            {secondaryShortcutItems.map((item) => {
-              const isActive = pathname === item.to
-              return (
-                <ButtonLink
-                  key={item.id}
-                  to={item.to}
-                  variant={isActive ? 'secondary' : 'ghost'}
-                  size="sm"
-                  onClick={onClose}
-                  className={cn(
-                    'w-full justify-start gap-3 min-h-11 text-xs',
-                    isActive ? 'font-semibold text-action-accent' : 'text-fg-primary'
-                  )}
-                >
-                  <span className="shrink-0 text-action-accent">{item.icon}</span>
-                  <strong className="font-normal truncate">{t(item.labelKey, item.defaultLabel)}</strong>
-                </ButtonLink>
-              )
-            })}
+          <FeatureShortcutsNav roles={effectiveRoles} onNavigate={onClose} />
 
-            <ButtonLink
-              to="/settings"
-              variant={pathname === '/settings' ? 'secondary' : 'ghost'}
-              size="sm"
-              onClick={onClose}
-              className={cn(
-                'w-full justify-start gap-3 min-h-11 text-xs',
-                pathname === '/settings' ? 'font-semibold text-action-accent' : 'text-fg-primary'
-              )}
-            >
-              <span className="shrink-0 text-action-accent"><Settings size={18} /></span>
-              <strong className="font-normal truncate">{t('nav.settings', 'Cài đặt hệ thống')}</strong>
-            </ButtonLink>
-          </nav>
+          <ButtonLink
+            to="/settings"
+            variant={pathname === '/settings' ? 'secondary' : 'ghost'}
+            size="sm"
+            onClick={onClose}
+            className={cn(
+              'w-full justify-start gap-3 min-h-11 text-xs',
+              pathname === '/settings' ? 'font-semibold text-action-accent' : 'text-fg-primary'
+            )}
+          >
+            <span className="shrink-0 text-action-accent"><Settings size={18} /></span>
+            <strong className="font-normal truncate">{t('nav.settings')}</strong>
+          </ButtonLink>
         </div>
       </SheetContent>
     </Sheet>
