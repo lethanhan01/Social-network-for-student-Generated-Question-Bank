@@ -9,6 +9,7 @@ import { userService } from '@/services/user.service'
 import { courseService } from '@/services/course.service'
 import { relationshipService } from '@/services/relationship.service'
 import { sessionService } from '@/services/session.service'
+import { useAuthStore } from '@/stores/authStore'
 import FeedPage from './FeedPage'
 
 vi.mock('@/services/session.service', () => ({
@@ -56,6 +57,12 @@ describe('FeedPage Component', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     window.history.replaceState({}, '', '/feed')
+    useAuthStore.setState({
+      user: { user_id: 235, fullName: 'Nguyễn Văn An', roles: ['STUDENT'] },
+      token: 'test-token',
+      isAuthenticated: true,
+      hasHydrated: true,
+    })
     vi.mocked(userService.getMyProfile).mockResolvedValue({
       user_id: 235,
       full_name: 'Lê Thành An',
@@ -161,5 +168,44 @@ describe('FeedPage Component', () => {
     await user.click(screen.getByRole('button', { name: 'Ghi chú Giảng viên' }))
     await user.click(await screen.findByRole('button', { name: 'Xem thêm' }))
     expect(await screen.findByText('Matching lecturer post')).toBeInTheDocument()
+  })
+
+  it('does not fire feed or sidebar API calls when unauthenticated or missing token', () => {
+    useAuthStore.setState({ user: null, token: null, isAuthenticated: false, hasHydrated: true })
+    renderWithQueryClient(
+      <BrowserRouter>
+        <FeedPage />
+      </BrowserRouter>
+    )
+    expect(userService.getMyProfile).not.toHaveBeenCalled()
+    expect(courseService.getSubjects).not.toHaveBeenCalled()
+    expect(relationshipService.getMyFriends).not.toHaveBeenCalled()
+    expect(sessionService.getMyEnrolledSubjects).not.toHaveBeenCalled()
+    expect(feedService.getActivityFeeds).not.toHaveBeenCalled()
+    expect(postService.getMyPosts).not.toHaveBeenCalled()
+    expect(feedService.getNewFeedCount).not.toHaveBeenCalled()
+  })
+
+  it('defers GET /posts/me when tab is not MINE and fetches it on ?tab=MINE', async () => {
+    const first = renderWithQueryClient(
+      <BrowserRouter>
+        <FeedPage />
+      </BrowserRouter>
+    )
+    await screen.findByRole('button', { name: 'Tất cả bảng tin' })
+    expect(feedService.getActivityFeeds).toHaveBeenCalled()
+    expect(postService.getMyPosts).not.toHaveBeenCalled()
+    first.unmount()
+
+    vi.clearAllMocks()
+    window.history.replaceState({}, '', '/feed?tab=MINE')
+    renderWithQueryClient(
+      <BrowserRouter>
+        <FeedPage />
+      </BrowserRouter>
+    )
+    await screen.findByRole('button', { name: 'Tất cả bảng tin' })
+    expect(postService.getMyPosts).toHaveBeenCalled()
+    expect(feedService.getActivityFeeds).not.toHaveBeenCalled()
   })
 })

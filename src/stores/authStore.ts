@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createJSONStorage, persist } from 'zustand/middleware'
 
 export type Role = 'STUDENT' | 'LECTURER' | 'ADMIN' | 'student' | 'teacher' | 'admin' | 'user'
 
@@ -100,6 +100,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'sqb-auth-storage',
+      storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
         user: state.user,
         token: state.token,

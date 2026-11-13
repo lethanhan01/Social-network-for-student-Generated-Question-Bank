@@ -64,6 +64,7 @@ describe('ProfilePage Component', () => {
         role: 'STUDENT',
         roles: ['STUDENT'],
       },
+      token: 'test-token',
       isAuthenticated: true,
       hasHydrated: true,
     })

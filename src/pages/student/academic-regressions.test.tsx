@@ -5,6 +5,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { renderWithQueryClient } from '@/test/query-test-utils'
 import { practiceService } from '@/services/practice.service'
 import { sessionService } from '@/services/session.service'
+import { useAuthStore } from '@/stores/authStore'
 import i18n from '@/lib/i18n'
 import PracticePage from './practice/PracticePage'
 import QuestionAnalyticsPage from './questions/QuestionAnalyticsPage'
@@ -14,6 +15,12 @@ import { positiveId, type AcademicSession } from '@/types/academic.types'
 describe('Academic screen regressions', () => {
   beforeEach(async () => {
     vi.restoreAllMocks()
+    useAuthStore.setState({
+      user: { user_id: 1, roles: ['STUDENT'] },
+      token: 'test-token',
+      isAuthenticated: true,
+      hasHydrated: true,
+    })
     await i18n.changeLanguage('vi')
     vi.spyOn(sessionService, 'getMyEnrolledSubjects').mockResolvedValue([])
   })

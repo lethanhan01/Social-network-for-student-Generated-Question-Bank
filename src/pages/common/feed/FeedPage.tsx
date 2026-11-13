@@ -36,8 +36,8 @@ export default function FeedPage() {
   const { currentUser, subjects, friends, createPost } = useSocialFeed()
   const enrolled = useEnrolledSubjectsQuery()
   const mySubjects = enrolled.data ?? []
-  const activity = useInfiniteActivityFeedQuery()
-  const mine = useInfinitePostsFeedQuery()
+  const activity = useInfiniteActivityFeedQuery(10, tab !== 'MINE')
+  const mine = useInfinitePostsFeedQuery(10, tab === 'MINE')
   const query = tab === 'MINE' ? mine : activity
   const counter = useNewFeedCountQuery(since)
   const recent = useQuery<PostResponseDto[]>({

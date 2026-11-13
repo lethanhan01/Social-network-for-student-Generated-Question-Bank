@@ -258,7 +258,7 @@ Thư mục `src/stores/` duy trì tối giản và nghiêm ngặt đúng **2 mod
 
 | STT | File Store | Vai Trò Nghiệp Vụ SQB HUST | Trạng Thái Lưu Trữ Chính | Hàm / Hooks Xuất Bản | Tệp Kiểm Thử Tương Ứng |
 | :---: | :--- | :--- | :--- | :--- | :--- |
-| 1 | [`authStore.ts`](authStore.ts) | Quản lý phiên đăng nhập, JWT token, thông tin sinh viên/giảng viên, quyền hạn và đồng bộ dọn dẹp khi logout. | `token`, `refreshToken`, `user` (`userId`, `email`, `role`, `roles`, `studentId`, `department`), `isAuthenticated`, `hasHydrated`. Persist `localStorage` (`sqb-auth-storage`). | `useAuthStore`, `onLogout`, `notifyLogout`, `Role`, `AuthUser` | Kiểm thử tích hợp qua `useAuthQuery` & Auth tests |
+| 1 | [`authStore.ts`](authStore.ts) | Quản lý phiên đăng nhập, JWT token, thông tin sinh viên/giảng viên, quyền hạn và đồng bộ dọn dẹp khi logout. | `token`, `refreshToken`, `user` (`userId`, `email`, `role`, `roles`, `studentId`, `department`), `isAuthenticated`, `hasHydrated`. Persist `sessionStorage` (`sqb-auth-storage`). | `useAuthStore`, `onLogout`, `notifyLogout`, `Role`, `AuthUser` | Kiểm thử tích hợp qua `useAuthQuery` & Auth tests |
 | 2 | [`themeStore.ts`](themeStore.ts) | Quản lý chế độ giao diện Sáng / Tối / Theo hệ điều hành, tính toán theme thực tế và đồng bộ class `dataset.theme` trên `<html>`. | `theme` ('dark' \| 'light' \| 'system'), `resolvedTheme` ('dark' \| 'light'). Persist `localStorage` (`rogym-theme`). | `useThemeStore`, `useTheme`, `resolveTheme`, `applyTheme`, `Theme`, `ResolvedTheme` | [`themeStore.test.ts`](themeStore.test.ts) |
 
 ---
