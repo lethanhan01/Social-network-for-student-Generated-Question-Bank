@@ -64,7 +64,7 @@ export function NewChatModal({ open, onClose, onCreated }: Readonly<NewChatModal
   async function handleCreateGroup(e: FormEvent) {
     e.preventDefault()
     if (!groupName.trim()) {
-      toast.error(t('groupNamePlaceholder', 'Vui lòng nhập tên nhóm'))
+      toast.error(t('groupNamePlaceholder'))
       return
     }
     if (selectedFriendIds.length < 2) {
@@ -78,7 +78,7 @@ export function NewChatModal({ open, onClose, onCreated }: Readonly<NewChatModal
         member_ids: selectedFriendIds,
       })
       if (res.conversation_id) {
-        toast.success(t('createGroupSuccess', 'Tạo nhóm thành công'))
+        toast.success(t('createGroupSuccess'))
         onCreated(res.conversation_id)
         onClose()
       }
@@ -91,7 +91,7 @@ export function NewChatModal({ open, onClose, onCreated }: Readonly<NewChatModal
     <Modal
       open={open}
       onClose={onClose}
-      title={t('newMessage', 'Tạo đoạn chat mới')}
+      title={t('newMessage')}
       size="md"
     >
       {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [New chat modal container] */}
@@ -100,20 +100,20 @@ export function NewChatModal({ open, onClose, onCreated }: Readonly<NewChatModal
           value={mode}
           onValueChange={(val) => setMode(val as 'DIRECT' | 'GROUP')}
           options={[
-            { value: 'DIRECT', label: t('newDirect', 'Nhắn tin trực tiếp'), icon: <User size={16} /> },
-            { value: 'GROUP', label: t('newGroup', 'Tạo nhóm chat'), icon: <Users size={16} /> },
+            { value: 'DIRECT', label: t('newDirect'), icon: <User size={16} /> },
+            { value: 'GROUP', label: t('newGroup'), icon: <Users size={16} /> },
           ]}
         />
 
         {mode === 'GROUP' ? (
           <Form onSubmit={handleCreateGroup} noValidate>
-            <FormField label={t('groupName', 'Tên nhóm')}>
+            <FormField label={t('groupName')}>
               <Input
                 id="group-name-input"
-                aria-label={t('groupName', 'Tên nhóm')}
+                aria-label={t('groupName')}
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
-                placeholder={t('groupNamePlaceholder', 'Nhập tên nhóm trò chuyện...')}
+                placeholder={t('groupNamePlaceholder')}
                 className="mb-3"
               />
             </FormField>
@@ -123,8 +123,8 @@ export function NewChatModal({ open, onClose, onCreated }: Readonly<NewChatModal
         <SearchInput
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder={t('searchFriends', 'Tìm kiếm bạn bè theo tên...')}
-          aria-label={t('searchFriends', 'Tìm kiếm bạn bè')}
+          placeholder={t('searchFriends')}
+          aria-label={t('searchFriends')}
         />
 
         {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Friends scrollable list container] */}
@@ -183,7 +183,7 @@ export function NewChatModal({ open, onClose, onCreated }: Readonly<NewChatModal
             })
           ) : (
             <p className="p-4 text-center text-sm text-fg-muted">
-              {t('noFriendsFound', 'Không tìm thấy bạn bè nào')}
+              {t('noFriendsFound')}
             </p>
           )}
         </div>
@@ -196,8 +196,8 @@ export function NewChatModal({ open, onClose, onCreated }: Readonly<NewChatModal
             className="w-full min-h-11"
           >
             {createGroupMutation.isPending
-              ? t('creating', 'Đang tạo nhóm...')
-              : `${t('createGroup', 'Tạo nhóm')} (${selectedFriendIds.length})`}
+              ? t('creating')
+              : `${t('createGroup')} (${selectedFriendIds.length})`}
           </Button>
         ) : null}
       </div>

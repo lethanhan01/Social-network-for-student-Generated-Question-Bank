@@ -1,9 +1,18 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { useAuthStore } from '@/stores/authStore'
 import { Topbar } from './Topbar'
 
 describe('Topbar', () => {
+  beforeEach(() => {
+    useAuthStore.setState({
+      user: { user_id: 1, roles: ['STUDENT'] },
+      token: 'test-token',
+      isAuthenticated: true,
+      hasHydrated: true,
+    })
+  })
   it('renders a full-width fixed header with solid surface token (bg-surface-card) and border', () => {
     render(
       <MemoryRouter>
@@ -43,8 +52,8 @@ describe('Topbar', () => {
     expect(screen.getByRole('link', { name: /mạng xã hội học tập/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /bạn bè & kết nối/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /ngân hàng câu hỏi/i })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /ngân hàng đề thi/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /đấu trường minigame/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /cửa hàng & túi đồ/i })).toBeInTheDocument()
   })
 
   it('renders and toggles mobile menu button when onToggleMobileMenu is provided', () => {

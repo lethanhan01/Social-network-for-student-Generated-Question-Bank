@@ -50,7 +50,7 @@ export default function ProfilePage() {
     return (
       <section className="max-w-4xl mx-auto py-8 px-4 text-center">
         <Text size="sm" tone="muted">
-          {t('profile.loading', 'Đang tải thông tin hồ sơ...')}
+          {t('profile.loading')}
         </Text>
       </section>
     )
@@ -60,10 +60,10 @@ export default function ProfilePage() {
     return (
       <section className="max-w-4xl mx-auto py-8 px-4 text-center space-y-4">
         <Text size="sm" tone="muted">
-          {t('profile.notFound', 'Không tìm thấy hồ sơ người dùng.')}
+          {t('profile.notFound')}
         </Text>
         <ButtonLink to="/feed" variant="primary" className="min-h-11 px-6">
-          {t('common.backToFeed', 'Về bảng tin')}
+          {t('common.backToFeed')}
         </ButtonLink>
       </section>
     )
@@ -104,13 +104,13 @@ export default function ProfilePage() {
                 </Heading>
                 <Badge tone={profile.role === 'LECTURER' ? 'accent' : 'neutral'} size="sm">
                   {profile.role === 'LECTURER'
-                    ? t('friends.roleLecturer', 'Giảng viên')
-                    : t('friends.roleStudent', 'Sinh viên')}
+                    ? t('friends.roleLecturer')
+                    : t('friends.roleStudent')}
                 </Badge>
               </div>
               <Text size="xs" tone="muted">
                 {profile.student_lecturer_code
-                  ? `${t('profile.code', 'Mã số')}: ${profile.student_lecturer_code}`
+                  ? `${t('profile.code')}: ${profile.student_lecturer_code}`
                   : profile.email}
               </Text>
             </div>
@@ -127,7 +127,7 @@ export default function ProfilePage() {
                 className="min-h-11 px-4 gap-1.5"
                 leftIcon={<Edit3 size={15} />}
               >
-                {t('profile.edit', 'Chỉnh sửa hồ sơ')}
+                {t('profile.edit')}
               </Button>
             ) : (
               <ProfileActions
@@ -164,7 +164,7 @@ export default function ProfilePage() {
               {profile.created_at ? (
                 <strong className="font-normal inline-flex items-center gap-1.5">
                   <Calendar size={15} />
-                  {t('profile.joined', 'Gia nhập')}: {formatDate(profile.created_at)}
+                  {t('profile.joined')}: {formatDate(profile.created_at)}
                 </strong>
               ) : null}
             </div>
@@ -179,7 +179,7 @@ export default function ProfilePage() {
         {/* User's Posts Feed */}
         <section aria-label={t('social.profilePosts')} className="space-y-3 md:col-span-2">
           <Heading level={2} className="text-lg font-bold text-text-primary">
-            {t('profile.userPosts', 'Bài viết đã chia sẻ')} ({posts.length})
+            {t('profile.userPosts')} ({posts.length})
           </Heading>
           {postsQuery.isPending || postsQuery.isError ? (
             <QueryFeedback
@@ -202,7 +202,7 @@ export default function ProfilePage() {
           ) : (
             <Card padding="none" className="social-card p-4 text-center">
               <Text size="sm" tone="muted">
-                {t('profile.noPosts', 'Chưa có bài viết nào được đăng tải.')}
+                {t('profile.noPosts')}
               </Text>
             </Card>
           )}

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import type { ParseKeys } from 'i18next'
 import {
   Home,
   Users,
@@ -11,12 +12,14 @@ import {
   CheckSquare,
   ShieldAlert,
   Play,
+  ShoppingBag,
+  PenLine,
 } from 'lucide-react'
 import type { Role } from '@/stores/authStore'
 
 export interface NavItemConfig {
   id: string
-  labelKey: string
+  labelKey: ParseKeys<'common'>
   defaultLabel: string
   to: string
   icon: ReactNode
@@ -46,29 +49,29 @@ export const PRIMARY_NAV_ITEMS: NavItemConfig[] = [
     icon: <HelpCircle size={24} />,
   },
   {
-    id: 'exams',
-    labelKey: 'nav.exams',
-    defaultLabel: 'Ngân hàng đề thi',
-    to: '/student/practice',
-    icon: <BookOpen size={24} />,
-  },
-  {
     id: 'minigames',
     labelKey: 'nav.minigames',
     defaultLabel: 'Đấu trường Minigame',
     to: '/student/gamification/minigames',
     icon: <Gamepad2 size={24} />,
   },
+  {
+    id: 'shop',
+    labelKey: 'nav.shop',
+    defaultLabel: 'Cửa hàng & túi đồ',
+    to: '/student/shop',
+    icon: <ShoppingBag size={24} />,
+  },
 ]
 
 /** 5 Phân hệ chính dành riêng cho Giảng viên */
 export const TEACHER_PRIMARY_NAV_ITEMS: NavItemConfig[] = [
   {
-    id: 'feed',
-    labelKey: 'nav.feed',
-    defaultLabel: 'Mạng xã hội học tập',
-    to: '/feed',
-    icon: <Home size={26} />,
+    id: 'teacher-dashboard',
+    labelKey: 'nav.teacherDashboard',
+    defaultLabel: 'Tổng quan giảng dạy',
+    to: '/teacher/dashboard',
+    icon: <LayoutDashboard size={24} />,
   },
   {
     id: 'classes',
@@ -107,21 +110,35 @@ export const SECONDARY_SHORTCUT_ITEMS: NavItemConfig[] = [
     labelKey: 'nav.dashboard',
     defaultLabel: 'Tổng quan học tập',
     to: '/student/dashboard',
-    icon: <LayoutDashboard size={18} />,
+    icon: <LayoutDashboard size={18} className="text-action-accent shrink-0" />,
+  },
+  {
+    id: 'practice',
+    labelKey: 'nav.practice',
+    defaultLabel: 'Luyện đề thi',
+    to: '/student/practice',
+    icon: <BookOpen size={18} className="text-action-accent shrink-0" />,
+  },
+  {
+    id: 'proposals',
+    labelKey: 'nav.proposals',
+    defaultLabel: 'Đề xuất câu hỏi',
+    to: '/student/proposals',
+    icon: <PenLine size={18} className="text-action-accent shrink-0" />,
   },
   {
     id: 'leaderboard',
     labelKey: 'nav.leaderboard',
     defaultLabel: 'Điểm danh & Vinh danh',
     to: '/student/gamification/leaderboard',
-    icon: <CalendarCheck size={18} />,
+    icon: <CalendarCheck size={18} className="text-action-accent shrink-0" />,
   },
   {
     id: 'search',
     labelKey: 'nav.search',
     defaultLabel: 'Tìm kiếm toàn cục',
     to: '/search',
-    icon: <Search size={18} />,
+    icon: <Search size={18} className="text-action-accent shrink-0" />,
   },
 ]
 
@@ -132,34 +149,39 @@ export const TEACHER_SECONDARY_SHORTCUT_ITEMS: NavItemConfig[] = [
     labelKey: 'nav.teacherDashboard',
     defaultLabel: 'Tổng quan giảng dạy',
     to: '/teacher/dashboard',
-    icon: <LayoutDashboard size={18} />,
+    icon: <LayoutDashboard size={18} className="text-action-accent shrink-0" />,
   },
   {
     id: 'teacher-reports',
     labelKey: 'nav.teacherReports',
     defaultLabel: 'Báo cáo vi phạm',
     to: '/teacher/reports',
-    icon: <ShieldAlert size={18} />,
+    icon: <ShieldAlert size={18} className="text-action-accent shrink-0" />,
   },
   {
     id: 'search',
     labelKey: 'nav.search',
     defaultLabel: 'Tìm kiếm toàn cục',
     to: '/search',
-    icon: <Search size={18} />,
+    icon: <Search size={18} className="text-action-accent shrink-0" />,
   },
 ]
 
+export function isTeacherRole(roles?: Role[]): boolean {
+  return Boolean(
+    roles?.some((r) => ['TEACHER', 'LECTURER', 'ADMIN'].includes(r.toUpperCase()))
+  )
+}
+
+export function resolveUserRoles(roles?: Role[], role?: Role): Role[] | undefined {
+  if (roles && roles.length > 0) return roles
+  return role ? [role] : undefined
+}
+
 export function getPrimaryNavItems(roles?: Role[]): NavItemConfig[] {
-  if (roles?.some((r) => ['teacher', 'LECTURER', 'admin', 'ADMIN'].includes(r))) {
-    return TEACHER_PRIMARY_NAV_ITEMS
-  }
-  return PRIMARY_NAV_ITEMS
+  return isTeacherRole(roles) ? TEACHER_PRIMARY_NAV_ITEMS : PRIMARY_NAV_ITEMS
 }
 
 export function getSecondaryShortcutItems(roles?: Role[]): NavItemConfig[] {
-  if (roles?.some((r) => ['teacher', 'LECTURER', 'admin', 'ADMIN'].includes(r))) {
-    return TEACHER_SECONDARY_SHORTCUT_ITEMS
-  }
-  return SECONDARY_SHORTCUT_ITEMS
+  return isTeacherRole(roles) ? TEACHER_SECONDARY_SHORTCUT_ITEMS : SECONDARY_SHORTCUT_ITEMS
 }

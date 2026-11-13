@@ -61,11 +61,10 @@ export function Pagination({
                 from: Math.min((page - 1) * pageSize + 1, totalItems),
                 to: Math.min(page * pageSize, totalItems),
                 total: totalItems,
-                defaultValue: `Hiển thị ${Math.min((page - 1) * pageSize + 1, totalItems)} - ${Math.min(page * pageSize, totalItems)} trên ${totalItems}`,
               })}
             </span>
           ) : (
-            <span>{t('pagination.totalItems', { total: totalItems, defaultValue: `Tổng: ${totalItems}` })}</span>
+            <span>{t('pagination.totalItems', { total: totalItems })}</span>
           )}
         </div>
       )}
@@ -76,7 +75,7 @@ export function Pagination({
           size="compact"
           disabled={page <= 1}
           onClick={() => onPageChange(page - 1)}
-          aria-label={t('pagination.prev', 'Trang trước')}
+          aria-label={t('pagination.prev')}
         >
           <ChevronLeft size={16} />
         </Button>
@@ -117,7 +116,7 @@ export function Pagination({
           size="compact"
           disabled={page >= totalPages}
           onClick={() => onPageChange(page + 1)}
-          aria-label={t('pagination.next', 'Trang sau')}
+          aria-label={t('pagination.next')}
         >
           <ChevronRight size={16} />
         </Button>

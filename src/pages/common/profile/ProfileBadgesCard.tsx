@@ -20,17 +20,17 @@ export function ProfileBadgesCard({ userId }: Readonly<ProfileBadgesCardProps>) 
         <div className="flex items-center gap-2">
           <Icon icon={Award} size="sm" tone="warning" />
           <Heading level={3} className="text-sm font-bold text-text-primary">
-            {t('profile.badgesTitle', 'Huy hiệu thành tích')}
+            {t('profile.badgesTitle')}
           </Heading>
         </div>
         <Badge tone="accent" size="sm">
-          {badges.length} {t('profile.badgeUnit', 'huy hiệu')}
+          {badges.length} {t('profile.badgeUnit')}
         </Badge>
       </header>
 
       {isLoading ? (
         <Text size="xs" tone="muted" className="italic py-2 text-center">
-          {t('common.loading', 'Đang tải danh sách huy hiệu...')}
+          {t('common.loading')}
         </Text>
       ) : badges.length > 0 ? (
         /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Badges grid layout] */
@@ -74,7 +74,7 @@ export function ProfileBadgesCard({ userId }: Readonly<ProfileBadgesCardProps>) 
         <div className="text-center py-2 space-y-1">
           <Icon icon={ShieldAlert} size="lg" fg="muted" className="mx-auto" />
           <Text size="xs" tone="muted">
-            {t('profile.emptyBadges', 'Chưa đạt được huy hiệu học tập nào.')}
+            {t('profile.emptyBadges')}
           </Text>
         </div>
       )}

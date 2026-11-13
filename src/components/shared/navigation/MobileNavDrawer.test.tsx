@@ -1,9 +1,18 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { useAuthStore } from '@/stores/authStore'
 import { MobileNavDrawer } from './MobileNavDrawer'
 
 describe('MobileNavDrawer', () => {
+  beforeEach(() => {
+    useAuthStore.setState({
+      user: { user_id: 1, roles: ['STUDENT'] },
+      token: 'test-token',
+      isAuthenticated: true,
+      hasHydrated: true,
+    })
+  })
   it('renders drawer content when open and handles close trigger', () => {
     const onClose = vi.fn()
     const { rerender } = render(
@@ -37,7 +46,7 @@ describe('MobileNavDrawer', () => {
 
     expect(screen.getByRole('link', { name: /mạng xã hội học tập/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /tổng quan học tập/i })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /ngân hàng đề thi/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /luyện đề thi/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /cài đặt hệ thống/i })).toBeInTheDocument()
   })
 })

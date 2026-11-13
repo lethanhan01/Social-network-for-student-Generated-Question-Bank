@@ -110,10 +110,10 @@ export function ChatMessageList({
       /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Message list empty error state] */
       <div className="flex-1 min-h-0 flex flex-col items-center justify-center text-center p-6 space-y-3">
         <AlertCircle className="w-10 h-10 text-status-danger-fg" />
-        <p className="text-sm font-medium text-fg-primary">{t('loadError', 'Không thể tải tin nhắn')}</p>
-        <p className="text-xs text-fg-muted max-w-sm">{t('loadErrorDesc', 'Kết nối đến máy chủ bị gián đoạn. Vui lòng bấm Thử lại để tải lại tin nhắn.')}</p>
+        <p className="text-sm font-medium text-fg-primary">{t('loadError')}</p>
+        <p className="text-xs text-fg-muted max-w-sm">{t('loadErrorDesc')}</p>
         {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Action button row for retry] */}
-        <div className="flex items-center gap-2"><Button variant="secondary" size="sm" onClick={onRetry}>{t('retry', 'Thử lại')}</Button></div>
+        <div className="flex items-center gap-2"><Button variant="secondary" size="sm" onClick={onRetry}>{t('retry')}</Button></div>
       </div>
     )
   }
@@ -126,7 +126,7 @@ export function ChatMessageList({
         {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Empty conversation prompt info] */}
         <div>
           <p className="font-semibold text-fg-primary text-base">{activeConv?.display_name}</p>
-          <p className="text-xs text-fg-muted mt-1">{t('noMessagesDesc', 'Hãy gửi lời chào đầu tiên để bắt đầu trao đổi!')}</p>
+          <p className="text-xs text-fg-muted mt-1">{t('noMessagesDesc')}</p>
         </div>
       </div>
     )
@@ -143,7 +143,7 @@ export function ChatMessageList({
           /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Load older messages action container] */
           <div className="flex justify-center pb-2">
             <Button variant="ghost" size="sm" onClick={onLoadMore} loading={isFetchingNextPage} className="text-xs text-fg-muted">
-              {t('loadOlder', 'Tải tin nhắn cũ hơn')}
+              {t('loadOlder')}
             </Button>
           </div>
         ) : null}
@@ -151,7 +151,7 @@ export function ChatMessageList({
           /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Subtle warning banner for offline/cached messages] */
           <div className="flex items-center justify-center gap-1.5 py-1 px-3 text-xs text-status-warning-fg bg-surface-card rounded-md border border-line-subtle mb-2">
             <AlertCircle size={14} />
-            <p>{t('offlineCachedNote', 'Đang hiển thị tin nhắn từ bộ nhớ đệm')}</p>
+            <p>{t('offlineCachedNote')}</p>
           </div>
         ) : null}
         {allMessages.map((msg, idx) => {
@@ -165,7 +165,7 @@ export function ChatMessageList({
                   {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Left divider line] */}
                   <div className="flex-1 h-px bg-line-accent-subtle" />
                   <Badge tone="accent" size="xs" className="px-2.5 py-0.5 font-medium text-[11px] uppercase tracking-wider">
-                    {t('unreadMessagesDivider', 'Tin nhắn chưa đọc')}
+                    {t('unreadMessagesDivider')}
                   </Badge>
                   {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Right divider line] */}
                   <div className="flex-1 h-px bg-line-accent-subtle" />
@@ -179,16 +179,16 @@ export function ChatMessageList({
                   {isMe ? (
                     /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Actions hover bar for current user] */
                     <div className="hidden group-hover:flex items-center gap-1">
-                      <Button variant="ghost" size="sm" onClick={() => onReply(msg)} aria-label={t('reply', 'Trả lời')} className="w-7 h-7 p-0 rounded-full text-fg-muted hover:text-fg-primary"><Reply size={14} /></Button>
+                      <Button variant="ghost" size="sm" onClick={() => onReply(msg)} aria-label={t('reply')} className="w-7 h-7 p-0 rounded-full text-fg-muted hover:text-fg-primary"><Reply size={14} /></Button>
                       {msg.message_id && msg.message_id > 0 ? (
-                        <Button variant="ghost" size="sm" onClick={() => onRecall(msg)} aria-label={t('recallMessage', 'Thu hồi tin nhắn')} className="w-7 h-7 p-0 rounded-full text-status-danger-fg hover:bg-status-danger-bg"><Trash2 size={14} /></Button>
+                        <Button variant="ghost" size="sm" onClick={() => onRecall(msg)} aria-label={t('recallMessage')} className="w-7 h-7 p-0 rounded-full text-status-danger-fg hover:bg-status-danger-bg"><Trash2 size={14} /></Button>
                       ) : null}
                     </div>
                   ) : null}
                   {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Message bubble bubble content] */}
                   <div className={cn('px-3.5 py-2 rounded-2xl text-sm break-words', isMe ? 'bg-action-accent text-fg-on-solid rounded-br-xs' : 'bg-surface-elevated text-fg-primary rounded-bl-xs border border-line-subtle')}>
                     {msg.reply_to_message ? <blockquote className={cn('text-xs mb-1.5 p-1 rounded border-l-2', isMe ? 'border-fg-on-solid/50 bg-action-accent-soft/20' : 'border-line-accent-subtle bg-surface-sunken')}>{msg.reply_to_message.content_preview || 'Tin nhắn'}</blockquote> : null}
-                    {msg.revoked ? <em className="italic opacity-80">{t('recalledNote', 'Tin nhắn đã bị thu hồi')}</em> : (
+                    {msg.revoked ? <em className="italic opacity-80">{t('recalledNote')}</em> : (
                       <>
                         {msg.media_urls?.[0] ? <Image src={msg.media_urls[0]} alt="Media" className="rounded-lg max-h-48 mb-1.5 object-cover" /> : null}
                         <p>{msg.content}</p>
@@ -198,7 +198,7 @@ export function ChatMessageList({
                   {!isMe ? (
                     /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Actions hover bar for partner] */
                     <div className="hidden group-hover:flex items-center gap-1">
-                      <Button variant="ghost" size="sm" onClick={() => onReply(msg)} aria-label={t('reply', 'Trả lời')} className="w-7 h-7 p-0 rounded-full text-fg-muted hover:text-fg-primary"><Reply size={14} /></Button>
+                      <Button variant="ghost" size="sm" onClick={() => onReply(msg)} aria-label={t('reply')} className="w-7 h-7 p-0 rounded-full text-fg-muted hover:text-fg-primary"><Reply size={14} /></Button>
                     </div>
                   ) : null}
                 </div>
@@ -215,7 +215,7 @@ export function ChatMessageList({
           variant="secondary"
           size="sm"
           onClick={scrollToBottom}
-          aria-label={t('scrollToBottom', 'Cuộn xuống tin mới nhất')}
+          aria-label={t('scrollToBottom')}
           className="absolute bottom-4 right-4 z-10 w-11 h-11 min-h-[44px] min-w-[44px] rounded-full shadow-lg border border-line-subtle p-0 flex items-center justify-center bg-surface-elevated text-fg-primary hover:bg-surface-sunken"
         >
           <ArrowDown size={18} />

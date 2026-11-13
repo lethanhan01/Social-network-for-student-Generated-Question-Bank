@@ -1,9 +1,18 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { useAuthStore } from '@/stores/authStore'
 import { BottomNavBar } from './BottomNavBar'
 
 describe('BottomNavBar', () => {
+  beforeEach(() => {
+    useAuthStore.setState({
+      user: { user_id: 1, roles: ['STUDENT'] },
+      token: 'test-token',
+      isAuthenticated: true,
+      hasHydrated: true,
+    })
+  })
   it('renders fixed bottom navigation bar on mobile with 5 pure icon links without visible text', () => {
     render(
       <MemoryRouter initialEntries={['/feed']}>
@@ -21,8 +30,8 @@ describe('BottomNavBar', () => {
 
     expect(screen.getByRole('link', { name: /bạn bè & kết nối/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /ngân hàng câu hỏi/i })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /ngân hàng đề thi/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /đấu trường minigame/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /cửa hàng & túi đồ/i })).toBeInTheDocument()
 
     // No visible text inside the links
     expect(feedLink.textContent).toBe('')

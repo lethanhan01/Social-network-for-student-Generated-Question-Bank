@@ -29,16 +29,16 @@ export function TopbarSearch() {
         <Form
           onSubmit={handleSubmit}
           noValidate
-          aria-label={t('common.search', 'Tìm kiếm')}
+          aria-label={t('common.search')}
           className="flex items-center"
         >
           <SearchInput
             value={query}
             onChange={setQuery}
             onSearch={() => handleSubmit()}
-            placeholder={t('common.searchPlaceholder', 'Tìm kiếm trên SQB HUST')}
+            placeholder={t('common.searchPlaceholder')}
             size="sm"
-            aria-label={t('common.searchPlaceholder', 'Tìm kiếm trên SQB HUST')}
+            aria-label={t('common.searchPlaceholder')}
             className="w-48 2xl:w-64"
           />
         </Form>
@@ -49,8 +49,8 @@ export function TopbarSearch() {
         to="/search"
         variant="ghost"
         size="sm"
-        aria-label={t('common.search', 'Tìm kiếm')}
-        title={t('common.search', 'Tìm kiếm')}
+        aria-label={t('common.search')}
+        title={t('common.search')}
         className="flex xl:hidden min-h-11 min-w-11 p-0 rounded-full items-center justify-center bg-surface-base border border-line-subtle text-fg-muted hover:text-fg-primary hover:bg-surface-card-hover"
       >
         <Search size={18} />

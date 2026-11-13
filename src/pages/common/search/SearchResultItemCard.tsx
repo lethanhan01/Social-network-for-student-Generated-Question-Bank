@@ -35,8 +35,8 @@ export function SearchResultItemCard({ item }: Readonly<SearchResultItemCardProp
             </ButtonLink>
             <Text size="xs" tone="muted">
               {u.role === 'LECTURER'
-                ? t('friends.roleLecturer', 'Giảng viên')
-                : t('friends.roleStudent', 'Sinh viên')}{' '}
+                ? t('friends.roleLecturer')
+                : t('friends.roleStudent')}{' '}
               • {u.school_faculty || u.student_lecturer_code || 'HUST'}
             </Text>
           </div>
@@ -47,7 +47,7 @@ export function SearchResultItemCard({ item }: Readonly<SearchResultItemCardProp
           size="sm"
           className="min-h-11 text-xs shrink-0"
         >
-          {t('search.viewProfile', 'Xem hồ sơ')}
+          {t('search.viewProfile')}
         </ButtonLink>
       </Card>
     )
@@ -66,7 +66,7 @@ export function SearchResultItemCard({ item }: Readonly<SearchResultItemCardProp
             </Text>
           </div>
           <Badge tone="accent" size="sm">
-            {t('search.typePost', 'Bài viết')}
+            {t('search.typePost')}
           </Badge>
         </header>
         <p className="text-xs text-text-primary line-clamp-2 leading-relaxed whitespace-pre-wrap">
@@ -79,7 +79,7 @@ export function SearchResultItemCard({ item }: Readonly<SearchResultItemCardProp
             size="sm"
             className="text-xs text-action-accent font-semibold p-0 h-auto min-h-11 inline-flex items-center"
           >
-            {t('post.viewDetail', 'Xem chi tiết bài viết')} →
+            {t('post.viewDetail')} →
           </ButtonLink>
         </footer>
       </Card>
@@ -99,7 +99,7 @@ export function SearchResultItemCard({ item }: Readonly<SearchResultItemCardProp
             </Text>
           </div>
           <Badge tone="neutral" size="sm">
-            {t('search.typeQuestion', 'Câu hỏi ôn tập')}
+            {t('search.typeQuestion')}
           </Badge>
         </header>
         <p className="text-xs text-text-primary line-clamp-2 leading-relaxed">{q.content}</p>
@@ -110,7 +110,7 @@ export function SearchResultItemCard({ item }: Readonly<SearchResultItemCardProp
             size="sm"
             className="text-xs text-action-accent font-semibold p-0 h-auto min-h-11 inline-flex items-center"
           >
-            {t('search.viewQuestion', 'Xem câu hỏi')} →
+            {t('search.viewQuestion')} →
           </ButtonLink>
         </footer>
       </Card>

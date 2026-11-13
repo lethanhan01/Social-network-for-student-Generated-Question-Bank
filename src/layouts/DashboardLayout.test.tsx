@@ -1,9 +1,18 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { useAuthStore } from '@/stores/authStore'
 import DashboardLayout from './DashboardLayout'
 
 describe('DashboardLayout — Topbar Navigation & Responsive Architecture', () => {
+  beforeEach(() => {
+    useAuthStore.setState({
+      user: { user_id: 1, roles: ['STUDENT'] },
+      token: 'test-token',
+      isAuthenticated: true,
+      hasHydrated: true,
+    })
+  })
   function renderLayout() {
     return render(
       <MemoryRouter initialEntries={['/dashboard']}>

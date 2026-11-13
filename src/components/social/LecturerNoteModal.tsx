@@ -29,16 +29,16 @@ export function LecturerNoteModal({
 
   async function handleSubmit() {
     if (!note.trim()) {
-      setError(t('post.lecturerNote.required', 'Vui lòng nhập nội dung ghi chú chuyên môn.'))
+      setError(t('post.lecturerNote.required'))
       return
     }
 
     try {
       await updateNoteMutation.mutateAsync({ content: note.trim() })
-      toast.success(t('post.lecturerNote.success', 'Đã lưu ghi chú chuyên môn của giảng viên.'))
+      toast.success(t('post.lecturerNote.success'))
       onClose()
     } catch {
-      toast.error(t('post.lecturerNote.error', 'Không thể lưu ghi chú chuyên môn. Vui lòng thử lại.'))
+      toast.error(t('post.lecturerNote.error'))
     }
   }
 
@@ -53,7 +53,7 @@ export function LecturerNoteModal({
     <Modal
       open={isOpen}
       onClose={handleClose}
-      title={t('post.lecturerNote.title', 'Ghi chú chuyên môn giảng viên')}
+      title={t('post.lecturerNote.title')}
       size="md"
     >
       <Form onSubmit={handleSubmit} noValidate className="space-y-4">
@@ -61,24 +61,18 @@ export function LecturerNoteModal({
         <div className="flex items-start gap-2.5 p-3 rounded-xl bg-primary/10 border border-primary/20 text-primary text-xs">
           <GraduationCap size={18} className="shrink-0 mt-0.5" />
           <Text size="xs" className="leading-relaxed">
-            {t(
-              'post.lecturerNote.guideline',
-              'Ghi chú chuyên môn sẽ được hiển thị nổi bật trên bài viết nhằm đính chính hoặc cung cấp thông tin học thuật chuẩn mực cho sinh viên.'
-            )}
+            {t('post.lecturerNote.guideline')}
           </Text>
         </div>
 
         <FormField
-          label={t('post.lecturerNote.contentLabel', 'Nội dung nhận xét chuyên môn')}
+          label={t('post.lecturerNote.contentLabel')}
           error={error}
           required
         >
           <Textarea
             aria-label="Nội dung nhận xét chuyên môn"
-            placeholder={t(
-              'post.lecturerNote.placeholder',
-              'Nhập nhận xét, hướng dẫn giải hoặc lưu ý học thuật cho bài viết...'
-            )}
+            placeholder={t('post.lecturerNote.placeholder')}
             value={note}
             onChange={(e) => {
               setNote(e.target.value)
@@ -91,7 +85,7 @@ export function LecturerNoteModal({
           {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Char count container] */}
           <div className="flex justify-end mt-1">
             <Text size="xs" tone="muted">
-              {note.length}/1000 {t('feed.createPost.charCount', 'ký tự')}
+              {note.length}/1000 {t('feed.createPost.charCount')}
             </Text>
           </div>
         </FormField>
@@ -104,14 +98,14 @@ export function LecturerNoteModal({
             disabled={updateNoteMutation.isPending}
             className="min-h-11"
           >
-            {t('common.cancel', 'Hủy')}
+            {t('common.cancel')}
           </Button>
           <SubmitButton
             loading={updateNoteMutation.isPending}
             variant="primary"
             className="min-h-11 px-5"
           >
-            {t('post.lecturerNote.save', 'Lưu ghi chú')}
+            {t('post.lecturerNote.save')}
           </SubmitButton>
         </footer>
       </Form>

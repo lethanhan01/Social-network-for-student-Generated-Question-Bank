@@ -149,7 +149,7 @@ export function DatePickerInput({
             disabled={disabled}
             onClick={() => setOpen(!open)}
             className="absolute right-0 top-0 bottom-0 px-3 flex items-center justify-center min-w-[44px] min-h-[44px] h-full text-fg-muted hover:text-fg-primary transition-colors disabled:cursor-not-allowed disabled:opacity-50 bg-transparent hover:bg-transparent"
-            aria-label={t('datePicker.open', 'Mở lịch')}
+            aria-label={t('datePicker.open')}
           >
             <Calendar size={16} className="shrink-0" />
           </Button>

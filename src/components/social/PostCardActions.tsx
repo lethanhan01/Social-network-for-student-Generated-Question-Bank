@@ -39,7 +39,7 @@ export function PostCardActions({
             }`}
             leftIcon={<ThumbsUp size={16} />}
           >
-            {localReacted ? t('reaction.reacted', 'Đã thích') : t('reaction.like', 'Thích')}
+            {localReacted ? t('reaction.reacted') : t('reaction.like')}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
@@ -77,7 +77,7 @@ export function PostCardActions({
         className="justify-center gap-2 text-xs min-h-11"
         leftIcon={<MessageSquare size={16} />}
       >
-        {t('post.comment', 'Bình luận')}
+        {t('post.comment')}
       </Button>
 
       <Button
@@ -87,7 +87,7 @@ export function PostCardActions({
         className="justify-center gap-2 text-xs min-h-11"
         leftIcon={<Share2 size={16} />}
       >
-        {t('post.share', 'Chia sẻ')}
+        {t('post.share')}
       </Button>
     </div>
   )

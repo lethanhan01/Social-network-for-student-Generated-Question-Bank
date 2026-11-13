@@ -33,7 +33,7 @@ export function SearchHistorySection({ onSelectKeyword }: Readonly<SearchHistory
           <header className="flex items-center gap-2">
             <Icon icon={History} size="sm" tone="accent" />
             <Heading level={3} className="text-sm font-bold text-fg-primary">
-              {t('search.recentHistory', 'Lịch sử tìm kiếm gần đây')}
+              {t('search.recentHistory')}
             </Heading>
           </header>
           {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [History chips container] */}
@@ -60,7 +60,7 @@ export function SearchHistorySection({ onSelectKeyword }: Readonly<SearchHistory
           <header className="flex items-center gap-2">
             <Icon icon={TrendingUp} size="sm" tone="warning" />
             <Heading level={3} className="text-sm font-bold text-fg-primary">
-              {t('search.trendingTitle', 'Xu hướng tìm kiếm thịnh hành')}
+              {t('search.trendingTitle')}
             </Heading>
           </header>
           {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Trending chips container] */}

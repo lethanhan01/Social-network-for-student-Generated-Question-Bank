@@ -27,7 +27,7 @@ export function SocialRightSidebar({ friends = [] }: Readonly<SocialRightSidebar
             </Heading>
           </div>
           <Badge emphasis="outline" size="sm">
-            {friends.length} {t('friends.friendCountUnit', 'bạn')}
+            {friends.length} {t('friends.friendCountUnit')}
           </Badge>
         </header>
 
@@ -57,8 +57,8 @@ export function SocialRightSidebar({ friends = [] }: Readonly<SocialRightSidebar
                     <p className="text-sm font-semibold text-fg-primary truncate">{name}</p>
                     <p className="text-xs text-fg-muted truncate">
                       {friend.mutual_friends_count
-                        ? `${friend.mutual_friends_count} ${t('friends.mutualCount', 'bạn chung')}`
-                        : t('friends.connected', 'Bạn bè HUST')}
+                        ? `${friend.mutual_friends_count} ${t('friends.mutualCount')}`
+                        : t('friends.connected')}
                     </p>
                   </div>
                 </ButtonLink>
@@ -73,7 +73,7 @@ export function SocialRightSidebar({ friends = [] }: Readonly<SocialRightSidebar
                 size="sm"
                 className="text-xs w-full justify-center min-h-11"
               >
-                {t('friends.viewAll', 'Xem tất cả bạn bè')}
+                {t('friends.viewAll')}
               </ButtonLink>
             </div>
           </section>
@@ -85,7 +85,7 @@ export function SocialRightSidebar({ friends = [] }: Readonly<SocialRightSidebar
               <UserPlus size={18} />
             </div>
             <Text size="xs" tone="muted">
-              {t('friends.empty', 'Chưa có bạn bè nào được kết nối.')}
+              {t('friends.empty')}
             </Text>
             <ButtonLink
               to="/friends"
@@ -93,7 +93,7 @@ export function SocialRightSidebar({ friends = [] }: Readonly<SocialRightSidebar
               size="sm"
               className="text-xs w-full justify-center min-h-11"
             >
-              {t('friends.findFriends', 'Tìm kiếm & Kết nối')}
+              {t('friends.findFriends')}
             </ButtonLink>
           </div>
         )}

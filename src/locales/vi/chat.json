@@ -134,5 +134,10 @@
   "noFriendsFound": "Không tìm thấy bạn bè nào",
   "sendErrorDisconnected": "Không thể gửi tin nhắn. Kết nối máy chủ realtime bị gián đoạn. Vui lòng thử lại.",
   "unreadMessagesDivider": "Tin nhắn chưa đọc",
-  "scrollToBottom": "Cuộn xuống tin mới nhất"
+  "scrollToBottom": "Cuộn xuống tin mới nhất",
+  "recallSuccess": "Đã thu hồi tin nhắn",
+  "reply": "Trả lời",
+  "options": "Tùy chọn",
+  "createGroupSuccess": "Tạo nhóm thành công",
+  "creating": "Đang tạo nhóm..."
 }

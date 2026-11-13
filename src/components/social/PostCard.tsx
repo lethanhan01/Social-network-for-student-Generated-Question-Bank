@@ -70,7 +70,7 @@ export function PostCard({
     try {
       if (!navigator.clipboard) throw new Error(t('zone2.copyError'))
       await navigator.clipboard.writeText(postUrl)
-      toast.success(t('post.linkCopied', 'Đã sao chép liên kết bài viết!'))
+      toast.success(t('post.linkCopied'))
     } catch {
       toast.error(t('zone2.copyError'))
     }
@@ -101,7 +101,7 @@ export function PostCard({
             onClick={() => setIsExpanded((prev) => !prev)}
             className="font-semibold p-0 h-auto ml-1 min-h-11 inline-flex items-center"
           >
-            {isExpanded ? t('common.collapse', 'Thu gọn') : t('common.expand', 'Xem thêm')}
+            {isExpanded ? t('common.collapse') : t('common.expand')}
           </Button>
         ) : null}
       </article>
@@ -117,7 +117,7 @@ export function PostCard({
         >
           {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Lecturer note title row] */}
           <div className="flex items-center gap-2 text-action-accent font-bold text-xs">
-            <strong>{t('post.lecturerNote.title', 'Ghi chú chuyên môn từ Giảng viên')}</strong>
+            <strong>{t('post.lecturerNote.title')}</strong>
           </div>
           <Text size="xs" className="text-text-primary leading-relaxed">
             {post.lecturer_note}
@@ -129,7 +129,7 @@ export function PostCard({
       <footer className="flex items-center justify-between text-xs text-text-muted pt-1 border-t border-line-subtle">
         <strong className="font-normal flex items-center gap-1">
           <ThumbsUp size={13} className="text-action-accent" />
-          {reaction.count} {t('post.likeCountUnit', 'lượt tương tác')}
+          {reaction.count} {t('post.likeCountUnit')}
         </strong>
         <Button
           variant="link"
@@ -138,7 +138,7 @@ export function PostCard({
           onClick={() => setShowComments((prev) => !prev)}
           className="text-xs"
         >
-          {post.comment_count || 0} {t('post.commentCountUnit', 'bình luận')}
+          {post.comment_count || 0} {t('post.commentCountUnit')}
         </Button>
       </footer>
 

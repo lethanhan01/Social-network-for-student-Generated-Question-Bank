@@ -9,8 +9,12 @@
     "mutualFriends": "{{count}} bạn chung",
     "pendingConnection": "Đang chờ duyệt",
     "connectionStatus": {
-      "FRIENDS": "Bạn bè HUST", "RECEIVED": "Lời mời kết bạn", "SENT": "Đã gửi lời mời",
-      "BLOCKED": "Đã chặn", "FOLLOWING": "Đang theo dõi", "FOLLOWERS": "Đang theo dõi bạn"
+      "FRIENDS": "Bạn bè HUST",
+      "RECEIVED": "Lời mời kết bạn",
+      "SENT": "Đã gửi lời mời",
+      "BLOCKED": "Đã chặn",
+      "FOLLOWING": "Đang theo dõi",
+      "FOLLOWERS": "Đang theo dõi bạn"
     },
     "commentDeleted": "Bình luận này đã bị xóa.",
     "searchSubtitle": "Tìm kiếm người dùng, bài viết, câu hỏi, bộ câu hỏi và môn học.",
@@ -60,7 +64,11 @@
     "contentRequired": "Hãy nhập nội dung hoặc thêm tệp đính kèm.",
     "attachment": "Ảnh / Tài liệu",
     "remove": "Gỡ bỏ",
-    "visibility": { "PUBLIC": "Công khai", "FRIENDS": "Bạn bè", "ONLY_ME": "Chỉ mình tôi" },
+    "visibility": {
+      "PUBLIC": "Công khai",
+      "FRIENDS": "Bạn bè",
+      "ONLY_ME": "Chỉ mình tôi"
+    },
     "connections": {
       "FRIENDS": "Bạn bè",
       "RECEIVED": "Lời mời nhận được",
@@ -173,7 +181,18 @@
     "search": "Tìm kiếm toàn cục",
     "settings": "Cài đặt hệ thống",
     "shortcuts": "Lối tắt tính năng",
-    "mySubjects": "Môn học theo dõi"
+    "mySubjects": "Môn học theo dõi",
+    "practice": "Luyện đề thi",
+    "proposals": "Đề xuất câu hỏi",
+    "teacherDashboard": "Tổng quan giảng dạy",
+    "teacherReports": "Báo cáo vi phạm",
+    "classes": "Lớp học phần",
+    "reviews": "Thẩm định câu hỏi",
+    "academic": "Quản trị đào tạo",
+    "messages": "Đoạn chat",
+    "mainNav": "Thanh điều hướng chính",
+    "mobileNav": "Điều hướng di động",
+    "primaryModules": "Phân hệ chính"
   },
   "status": {
     "active": "Đang hoạt động",
@@ -247,7 +266,13 @@
     "trending_searches": "Từ khóa thịnh hành",
     "delete_history": "Xóa",
     "empty_results": "Không tìm thấy kết quả nào phù hợp với từ khóa",
-    "results_count": "Tìm thấy {{count}} kết quả"
+    "results_count": "Tìm thấy {{count}} kết quả",
+    "recentHistory": "Lịch sử tìm kiếm gần đây",
+    "trendingTitle": "Xu hướng tìm kiếm thịnh hành",
+    "viewProfile": "Xem hồ sơ",
+    "typePost": "Bài viết",
+    "typeQuestion": "Câu hỏi ôn tập",
+    "viewQuestion": "Xem câu hỏi"
   },
   "filter": {
     "title": "Bộ lọc"
@@ -255,7 +280,9 @@
   "pagination": {
     "prev": "Trước",
     "next": "Sau",
-    "pageOf": "Trang {{page}} / {{totalPages}}"
+    "pageOf": "Trang {{page}} / {{totalPages}}",
+    "showing": "Hiển thị {{from}} - {{to}} trên {{total}}",
+    "totalItems": "Tổng: {{total}}"
   },
   "dateRange": {
     "from": "Từ ngày",
@@ -412,6 +439,7 @@
     "appearanceDesc": "Tùy chỉnh chế độ sáng, tối hoặc tự động đồng bộ theo hệ điều hành."
   },
   "feed": {
+    "allPosts": "Tất cả bảng tin",
     "newPostsAvailable": "Có {{count}} hoạt động mới. Bấm để làm mới.",
     "createPost": {
       "title": "Tạo bài viết thảo luận mới",
@@ -472,7 +500,32 @@
       "public": "Công khai (Toàn trường)",
       "friends": "Chỉ bạn bè",
       "only_me": "Chỉ mình tôi"
-    }
+    },
+    "lecturerNote": {
+      "required": "Vui lòng nhập nội dung ghi chú chuyên môn.",
+      "success": "Đã lưu ghi chú chuyên môn của giảng viên.",
+      "error": "Không thể lưu ghi chú chuyên môn. Vui lòng thử lại.",
+      "title": "Ghi chú chuyên môn từ Giảng viên",
+      "guideline": "Ghi chú chuyên môn sẽ được hiển thị nổi bật trên bài viết nhằm đính chính hoặc cung cấp thông tin học thuật chuẩn mực cho sinh viên.",
+      "contentLabel": "Nội dung nhận xét chuyên môn",
+      "placeholder": "Nhập nhận xét, hướng dẫn giải hoặc lưu ý học thuật cho bài viết...",
+      "save": "Lưu ghi chú",
+      "menu": "Ghi chú chuyên môn"
+    },
+    "linkCopied": "Đã sao chép liên kết bài viết!",
+    "likeCountUnit": "lượt tương tác",
+    "commentCountUnit": "bình luận",
+    "comment": "Bình luận",
+    "share": "Chia sẻ",
+    "options": "Tùy chọn bài viết",
+    "viewDetail": "Xem chi tiết bài viết",
+    "copyLink": "Sao chép liên kết",
+    "loadingDetail": "Đang tải nội dung chi tiết bài viết...",
+    "errorForbiddenTitle": "Không có quyền truy cập bài viết",
+    "errorNotFoundTitle": "Bài viết không tồn tại hoặc đã bị gỡ",
+    "errorForbiddenDesc": "Bài viết này được đặt ở chế độ riêng tư hoặc chỉ dành cho nhóm sinh viên cụ thể.",
+    "errorNotFoundDesc": "Liên kết bài viết có thể bị sai, hoặc tác giả đã xóa bài viết khỏi hệ thống SQB HUST.",
+    "postIdLabel": "Mã bài viết"
   },
   "comment": {
     "title": "Bình luận",
@@ -492,7 +545,8 @@
     "like": "Thích",
     "love": "Yêu thích",
     "wow": "Bất ngờ",
-    "likes_count": "{{count}} lượt thích"
+    "likes_count": "{{count}} lượt thích",
+    "reacted": "Đã thích"
   },
   "profile": {
     "title": "Hồ sơ cá nhân",
@@ -531,7 +585,23 @@
     "unblock_user": "Bỏ chặn",
     "block_confirm": "Người này sẽ không thể xem hồ sơ hoặc tương tác với bạn.",
     "message_integration": "Nhắn tin",
-    "peer_rule_notice": "Chỉ có thể kết bạn đồng cấp giữa Sinh viên - Sinh viên hoặc Giảng viên - Giảng viên."
+    "peer_rule_notice": "Chỉ có thể kết bạn đồng cấp giữa Sinh viên - Sinh viên hoặc Giảng viên - Giảng viên.",
+    "updateSuccess": "Cập nhật thông tin hồ sơ thành công!",
+    "editTitle": "Chỉnh sửa hồ sơ cá nhân",
+    "fullNameLabel": "Họ và tên",
+    "genderLabel": "Giới tính",
+    "genderMale": "Nam",
+    "genderFemale": "Nữ",
+    "bioLabel": "Tiểu sử / Giới thiệu",
+    "badgesTitle": "Huy hiệu thành tích",
+    "badgeUnit": "huy hiệu",
+    "emptyBadges": "Chưa đạt được huy hiệu học tập nào.",
+    "loading": "Đang tải thông tin hồ sơ...",
+    "notFound": "Không tìm thấy hồ sơ người dùng.",
+    "edit": "Chỉnh sửa hồ sơ",
+    "joined": "Gia nhập",
+    "userPosts": "Bài viết đã chia sẻ",
+    "noPosts": "Chưa có bài viết nào được đăng tải."
   },
   "friends": {
     "title": "Bạn bè & Khối kết nối",
@@ -546,7 +616,15 @@
     "request_accepted": "Đã chấp nhận lời mời kết bạn",
     "request_declined": "Đã từ chối lời mời",
     "request_sent": "Đã gửi lời mời kết bạn",
-    "unblocked_success": "Đã bỏ chặn người dùng"
+    "unblocked_success": "Đã bỏ chặn người dùng",
+    "friendCountUnit": "bạn",
+    "mutualCount": "bạn chung",
+    "connected": "Bạn bè HUST",
+    "viewAll": "Xem tất cả bạn bè",
+    "empty": "Chưa có bạn bè nào được kết nối.",
+    "findFriends": "Tìm kiếm & Kết nối",
+    "roleLecturer": "Giảng viên",
+    "roleStudent": "Sinh viên"
   },
   "report": {
     "modal_title": "Báo cáo vi phạm nội dung",
@@ -566,5 +644,25 @@
     "placeholder": "Nhập lời khuyên, đính chính kiến thức hoặc nhận xét học thuật cho bài viết...",
     "submit": "Lưu ghi chú",
     "success": "Đã cập nhật ghi chú chuyên môn thành công!"
+  },
+  "common": {
+    "search": "Tìm kiếm",
+    "searchPlaceholder": "Tìm kiếm trên SQB HUST",
+    "cancel": "Hủy",
+    "collapse": "Thu gọn",
+    "expand": "Xem thêm",
+    "back": "Quay lại bảng tin",
+    "backToFeed": "Về bảng tin",
+    "saveChanges": "Lưu thay đổi",
+    "loading": "Đang tải..."
+  },
+  "time": {
+    "hour": "Giờ (HH)",
+    "minute": "Phút (MM)"
+  },
+  "errors": {
+    "pageNotFound": "Không tìm thấy trang yêu cầu",
+    "pageNotFoundDesc": "Đường dẫn bạn vừa truy cập không tồn tại hoặc đã được di chuyển sang địa chỉ mới.",
+    "backHome": "Quay về trang chủ"
   }
 }

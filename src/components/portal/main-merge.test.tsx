@@ -62,6 +62,12 @@ describe('Main merge integration', () => {
     expect(screen.getByRole('link', { name: 'Kho hội thoại ẩn' })).toHaveAttribute('href', '/messages/hidden-vault')
   })
   it('TC-MERGE-04: does not apply the full-screen chat overflow lock to the PIN vault', () => {
+    useAuthStore.setState({
+      user: { user_id: 1, roles: ['STUDENT'] },
+      token: 'test-token',
+      isAuthenticated: true,
+      hasHydrated: true,
+    })
     renderWithQueryClient(
       <MemoryRouter initialEntries={['/messages/hidden-vault']}>
         <Routes>

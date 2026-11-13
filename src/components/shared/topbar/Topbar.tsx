@@ -18,8 +18,8 @@ export function Topbar({
   const { t } = useTranslation('common')
   const { pathname } = useLocation()
   const toggleLabel = isMobileMenuOpen
-    ? t('nav.closeMenu', 'Đóng menu điều hướng')
-    : t('nav.openMenu', 'Mở menu điều hướng')
+    ? t('nav.closeMenu')
+    : t('nav.openMenu')
 
   return (
     <header
@@ -78,7 +78,7 @@ export function Topbar({
           to="/messages"
           variant="ghost"
           size="sm"
-          aria-label={t('nav.messages', 'Đoạn chat')}
+          aria-label={t('nav.messages')}
           aria-current={pathname.startsWith('/messages') ? 'page' : undefined}
           className={cn('min-h-11 min-w-11 p-0 rounded-full hover:bg-surface-card-hover flex items-center justify-center shrink-0', pathname.startsWith('/messages') ? 'text-action-accent border-b-2 border-action-accent' : 'text-fg-muted hover:text-fg-primary')}
         >
