@@ -16,7 +16,7 @@ describe('TopbarNav', () => {
 
   it('renders all 5 student navigation links with accessible names', () => {
     render(
-      <MemoryRouter initialEntries={['/feed']}>
+      <MemoryRouter initialEntries={['/feed']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <TopbarNav />
       </MemoryRouter>
     )
@@ -47,7 +47,7 @@ describe('TopbarNav', () => {
     })
 
     render(
-      <MemoryRouter initialEntries={['/teacher/dashboard']}>
+      <MemoryRouter initialEntries={['/teacher/dashboard']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <TopbarNav />
       </MemoryRouter>
     )
@@ -63,7 +63,7 @@ describe('TopbarNav', () => {
   it('renders nothing when unauthenticated', () => {
     useAuthStore.setState({ user: null, token: null, isAuthenticated: false, hasHydrated: true })
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <TopbarNav />
       </MemoryRouter>
     )

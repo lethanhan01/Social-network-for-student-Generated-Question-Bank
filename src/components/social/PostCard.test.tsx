@@ -31,7 +31,7 @@ describe('PostCard Component', () => {
       .mockResolvedValueOnce({ my_reaction: 'LOVE', total_count: 6 })
     const user = userEvent.setup()
     renderWithQueryClient(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <PostCard post={mockPost} onToggleReact={toggle} />
       </MemoryRouter>
     )
@@ -44,7 +44,7 @@ describe('PostCard Component', () => {
   })
   it('renders author, content, subject tag and lecturer note', () => {
     renderWithQueryClient(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <PostCard post={mockPost} />
       </MemoryRouter>
     )
@@ -61,7 +61,7 @@ describe('PostCard Component', () => {
     const handleToggleReact = vi.fn().mockResolvedValue({})
 
     renderWithQueryClient(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <PostCard post={mockPost} onToggleReact={handleToggleReact} />
       </MemoryRouter>
     )
@@ -78,7 +78,7 @@ describe('PostCard Component', () => {
   it('persists reactions when the parent does not provide a callback', async () => {
     vi.mocked(reactionService.toggleReact).mockResolvedValue({})
     renderWithQueryClient(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <PostCard post={mockPost} />
       </MemoryRouter>
     )
@@ -97,7 +97,7 @@ describe('PostCard Component', () => {
   it('rolls back the reaction count when saving fails', async () => {
     const onToggleReact = vi.fn().mockRejectedValue(new Error('Unavailable'))
     renderWithQueryClient(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <PostCard post={mockPost} onToggleReact={onToggleReact} />
       </MemoryRouter>
     )

@@ -168,7 +168,7 @@ describe('Messenger Chat Components', () => {
   describe('ChatSidebar', () => {
     it('renders sidebar title, action buttons, and search input without hidden vault link', () => {
       renderWithQueryClient(
-        <MemoryRouter><ChatSidebar onSelectConversation={vi.fn()} onOpenNewChat={vi.fn()} /></MemoryRouter>
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><ChatSidebar onSelectConversation={vi.fn()} onOpenNewChat={vi.fn()} /></MemoryRouter>
       )
 
       expect(screen.getByRole('heading', { level: 1, name: /đoạn chat/i })).toBeInTheDocument()

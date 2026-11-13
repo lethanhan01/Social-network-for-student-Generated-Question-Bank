@@ -28,7 +28,7 @@ describe('Open proposal composer', () => {
   it('opens the form even when randomUUID is unavailable in the browser', async () => {
     vi.stubGlobal('crypto', { getRandomValues: crypto.getRandomValues.bind(crypto) })
     const user = userEvent.setup()
-    renderWithQueryClient(<MemoryRouter><ProposalsPage /></MemoryRouter>)
+    renderWithQueryClient(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><ProposalsPage /></MemoryRouter>)
     await user.click(screen.getByRole('button', { name: 'Tạo đề xuất' }))
     expect(await screen.findByRole('dialog', { name: 'Tạo đề xuất câu hỏi' })).toBeInTheDocument()
     expect(await screen.findByRole('combobox', { name: 'Lớp học phần' })).toBeInTheDocument()

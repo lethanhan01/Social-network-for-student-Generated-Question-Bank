@@ -13,7 +13,7 @@ import {
 describe('Breadcrumb Component', () => {
   it('renders breadcrumb items, links and current page', () => {
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>

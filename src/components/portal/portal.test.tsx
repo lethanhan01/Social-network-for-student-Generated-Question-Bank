@@ -26,7 +26,7 @@ describe('Portal security and forms', () => {
 
   it('TC-DIRECT-02: renders direct conversation details without hidden vault action', () => {
     renderWithQueryClient(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <ChatPortalActions conversationId={12} conversation={{ conversation_id: 12, type: 'DIRECT', display_name: 'Lan' }} onClose={vi.fn()} />
       </MemoryRouter>
     )

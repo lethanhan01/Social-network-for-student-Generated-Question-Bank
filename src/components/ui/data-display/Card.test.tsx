@@ -69,7 +69,7 @@ describe('Card UI Primitive Component', () => {
 
   it('renders React Router Link when `to` prop is provided', () => {
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Card to="/dashboard">Go to Dashboard</Card>
       </MemoryRouter>
     )

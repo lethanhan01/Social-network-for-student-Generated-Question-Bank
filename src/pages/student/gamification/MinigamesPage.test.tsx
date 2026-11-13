@@ -26,7 +26,7 @@ const mockedService = vi.mocked(gamificationService)
 
 function renderPage() {
   return renderWithQueryClient(
-    <MemoryRouter>
+    <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <MinigamesPage />
     </MemoryRouter>
   )

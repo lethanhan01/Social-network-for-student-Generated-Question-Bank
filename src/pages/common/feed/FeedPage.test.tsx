@@ -104,7 +104,7 @@ describe('FeedPage Component', () => {
 
   it('renders header, tabs, create box, and posts', async () => {
     renderWithQueryClient(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <FeedPage />
       </BrowserRouter>
     )
@@ -122,7 +122,7 @@ describe('FeedPage Component', () => {
 
   it('syncs the sidebar subject filter with the feed URL and subject selector', async () => {
     const user = userEvent.setup()
-    renderWithQueryClient(<BrowserRouter><FeedPage /></BrowserRouter>)
+    renderWithQueryClient(<BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><FeedPage /></BrowserRouter>)
 
     await user.click(await screen.findByRole('button', { name: /Công nghệ Web/ }))
     expect(new URLSearchParams(window.location.search).get('subject')).toBe('1')
@@ -136,7 +136,7 @@ describe('FeedPage Component', () => {
       post_id: 102, subject_id: 2, content: 'A post from another subject',
     })
     const user = userEvent.setup()
-    renderWithQueryClient(<BrowserRouter><FeedPage /></BrowserRouter>)
+    renderWithQueryClient(<BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><FeedPage /></BrowserRouter>)
     expect(await screen.findByText('A post from another subject')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Môn học của tôi' }))
     expect(screen.queryByText('A post from another subject')).not.toBeInTheDocument()
@@ -161,7 +161,7 @@ describe('FeedPage Component', () => {
     }))
     const user = userEvent.setup()
     renderWithQueryClient(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <FeedPage />
       </BrowserRouter>
     )
@@ -173,7 +173,7 @@ describe('FeedPage Component', () => {
   it('does not fire feed or sidebar API calls when unauthenticated or missing token', () => {
     useAuthStore.setState({ user: null, token: null, isAuthenticated: false, hasHydrated: true })
     renderWithQueryClient(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <FeedPage />
       </BrowserRouter>
     )
@@ -188,7 +188,7 @@ describe('FeedPage Component', () => {
 
   it('defers GET /posts/me when tab is not MINE and fetches it on ?tab=MINE', async () => {
     const first = renderWithQueryClient(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <FeedPage />
       </BrowserRouter>
     )
@@ -200,7 +200,7 @@ describe('FeedPage Component', () => {
     vi.clearAllMocks()
     window.history.replaceState({}, '', '/feed?tab=MINE')
     renderWithQueryClient(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <FeedPage />
       </BrowserRouter>
     )

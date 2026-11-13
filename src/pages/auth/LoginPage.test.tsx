@@ -28,7 +28,7 @@ describe('LoginPage Component', () => {
 
   it('renders login form with default credentials', () => {
     render(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <LoginPage />
       </BrowserRouter>
     )
@@ -51,7 +51,7 @@ describe('LoginPage Component', () => {
     })
 
     render(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <LoginPage />
       </BrowserRouter>
     )
@@ -81,7 +81,7 @@ describe('LoginPage Component', () => {
     })
 
     render(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <LoginPage />
       </BrowserRouter>
     )

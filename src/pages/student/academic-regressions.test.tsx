@@ -29,14 +29,14 @@ describe('Academic screen regressions', () => {
     vi.spyOn(sessionService, 'getMySubmissions').mockResolvedValue({ contents: [
       session,
     ] })
-    renderWithQueryClient(<MemoryRouter initialEntries={['/proposals?status=PENDING']}><ProposalsPage /></MemoryRouter>)
+    renderWithQueryClient(<MemoryRouter initialEntries={['/proposals?status=PENDING']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><ProposalsPage /></MemoryRouter>)
     expect(await screen.findByText(/Chưa có đề xuất phù hợp/)).toBeInTheDocument()
     expect(screen.queryByText('Rejected session')).not.toBeInTheDocument()
   })
   it('rejects out-of-range question URLs instead of declaring completion', async () => {
     vi.spyOn(practiceService, 'getSessionQuestions').mockResolvedValue({ questions: [{ question_id: 3, content: 'Question' }] })
     const list = vi.spyOn(sessionService, 'getMySubmissions')
-    renderWithQueryClient(<MemoryRouter initialEntries={['/practice/1?question=999']}><Routes>
+    renderWithQueryClient(<MemoryRouter initialEntries={['/practice/1?question=999']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><Routes>
       <Route path="/practice/:sessionId" element={<PracticePage />} />
     </Routes></MemoryRouter>)
     expect(await screen.findByText('Đường dẫn không hợp lệ.')).toBeInTheDocument()
@@ -47,7 +47,7 @@ describe('Academic screen regressions', () => {
     vi.spyOn(practiceService, 'getQuestionStatistics').mockResolvedValue({ total_answer: 2 })
     vi.spyOn(practiceService, 'getQuestionRatings').mockResolvedValue({ items: [] })
     vi.spyOn(practiceService, 'getSessionQuestions').mockResolvedValue({ questions: [] })
-    renderWithQueryClient(<MemoryRouter initialEntries={['/questions/3/analytics?sessionId=1&question=4']}><Routes>
+    renderWithQueryClient(<MemoryRouter initialEntries={['/questions/3/analytics?sessionId=1&question=4']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><Routes>
       <Route path="/questions/:id/analytics" element={<QuestionAnalyticsPage />} />
     </Routes></MemoryRouter>)
     expect(await screen.findByText('Chưa có đánh giá nào.')).toBeInTheDocument()
@@ -64,7 +64,7 @@ describe('Academic screen regressions', () => {
       .mockResolvedValueOnce({ items: [{ user_id: 1, comment: 'First review' }], pagination: { has_next: true, after: 7 } })
       .mockResolvedValueOnce({ items: [{ user_id: 2, comment: 'Next review' }], pagination: { has_next: false } })
     const user = userEvent.setup()
-    renderWithQueryClient(<MemoryRouter initialEntries={['/questions/3/analytics']}><Routes>
+    renderWithQueryClient(<MemoryRouter initialEntries={['/questions/3/analytics']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><Routes>
       <Route path="/questions/:id/analytics" element={<QuestionAnalyticsPage />} />
     </Routes></MemoryRouter>)
     expect(await screen.findByText('First review')).toBeInTheDocument()

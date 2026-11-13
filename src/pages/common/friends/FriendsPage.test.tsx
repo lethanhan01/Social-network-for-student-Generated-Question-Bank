@@ -57,7 +57,7 @@ describe('FriendsPage Component', () => {
 
   it('renders friends list and tabs', async () => {
     renderWithQueryClient(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <FriendsPage />
       </BrowserRouter>
     )
@@ -72,7 +72,7 @@ describe('FriendsPage Component', () => {
   it('does not show an empty friends list when the request fails', async () => {
     vi.mocked(relationshipService.getMyFriends).mockRejectedValue(new Error('Friends unavailable'))
     renderWithQueryClient(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <FriendsPage />
       </BrowserRouter>
     )
@@ -92,7 +92,7 @@ describe('FriendsPage Component', () => {
       })
     const user = userEvent.setup()
     renderWithQueryClient(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <FriendsPage />
       </BrowserRouter>
     )
@@ -108,7 +108,7 @@ describe('FriendsPage Component', () => {
 
   it('shows received requests with accept and decline actions in the restored tabs', async () => {
     const user = userEvent.setup()
-    renderWithQueryClient(<BrowserRouter><FriendsPage /></BrowserRouter>)
+    renderWithQueryClient(<BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><FriendsPage /></BrowserRouter>)
     await user.click(screen.getByRole('tab', { name: /Lời mời nhận/ }))
     expect(await screen.findByText('Vũ Thị Hạnh')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Chấp nhận kết bạn' })).toBeInTheDocument()

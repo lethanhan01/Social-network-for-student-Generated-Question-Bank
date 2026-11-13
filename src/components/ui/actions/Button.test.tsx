@@ -291,7 +291,7 @@ describe('Button Primitive', () => {
   it('renders ButtonLink as a router link and guards disabled clicks', () => {
     const handleClick = vi.fn()
     const { unmount } = render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <ButtonLink to="/dashboard" onClick={handleClick}>
           Về trang chủ
         </ButtonLink>
@@ -309,7 +309,7 @@ describe('Button Primitive', () => {
 
     const handleDisabledClick = vi.fn()
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <ButtonLink to="/dashboard" disabled onClick={handleDisabledClick}>
           Liên kết bị khóa
         </ButtonLink>
@@ -327,7 +327,7 @@ describe('Button Primitive', () => {
   it('supports Button.Link and Button.Anchor namespace aliases', () => {
     const handleAnchorClick = vi.fn((e) => e.preventDefault())
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Button.Link to="/settings">Cài đặt</Button.Link>
         <Button.Anchor href="https://example.com" onClick={handleAnchorClick}>
           Trang chủ đối tác

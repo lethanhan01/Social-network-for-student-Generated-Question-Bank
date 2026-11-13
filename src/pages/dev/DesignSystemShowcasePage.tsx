@@ -4,9 +4,11 @@ import {
   Zap,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/data-display'
+import { Button } from '@/components/ui/actions'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/navigation'
 import { LanguageSwitcher } from '@/components/ui/typography'
 import { ThemeToggle } from '@/components/ui/navigation'
+import { cn } from '@/utils/cn'
 import { QuickComponentFinder } from './showcase/components/QuickComponentFinder'
 import { ButtonsShowcase } from './showcase/sections/ButtonsShowcase'
 import { FormsShowcase } from './showcase/sections/FormsShowcase'
@@ -32,7 +34,7 @@ export default function DesignSystemShowcasePage() {
 
   return (
     <div
-      className="min-h-screen bg-[var(--rogym-bg-base)] text-text-primary p-4 sm:p-8 space-y-10"
+      className="min-h-screen bg-surface-base text-text-primary p-4 sm:p-8 space-y-10"
       style={{ '--rogym-tone': activeTone } as React.CSSProperties}
     >
       {/* Header Banner */}
@@ -64,16 +66,20 @@ export default function DesignSystemShowcasePage() {
               { label: 'Amber Gold', hex: '#f59e0b' },
               { label: 'Purple Violet', hex: '#8b5cf6' },
             ].map((tone) => (
-              <button
+              <Button
                 key={tone.hex}
                 type="button"
+                variant="plain"
+                size="sm"
                 onClick={() => setActiveTone(tone.hex)}
-                className="w-6 h-6 rounded-full border-2 transition-transform hover:scale-110 cursor-pointer"
-                style={{
-                  backgroundColor: tone.hex,
-                  borderColor: activeTone === tone.hex ? '#ffffff' : 'transparent',
-                }}
+                aria-label={tone.label}
+                aria-pressed={activeTone === tone.hex}
                 title={tone.label}
+                className={cn(
+                  'w-6 h-6 min-h-0 p-0 rounded-full border bg-[var(--rogym-tone)] transition-transform hover:scale-110',
+                  activeTone === tone.hex ? 'border-line-strong ring-2 ring-ring ring-offset-1' : 'border-transparent'
+                )}
+                style={{ '--rogym-tone': tone.hex } as React.CSSProperties}
               />
             ))}
           </div>

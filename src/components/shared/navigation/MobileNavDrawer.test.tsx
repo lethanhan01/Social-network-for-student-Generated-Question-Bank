@@ -16,7 +16,7 @@ describe('MobileNavDrawer', () => {
   it('renders drawer content when open and handles close trigger', () => {
     const onClose = vi.fn()
     const { rerender } = render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <MobileNavDrawer isOpen={false} onClose={onClose} />
       </MemoryRouter>
     )
@@ -24,7 +24,7 @@ describe('MobileNavDrawer', () => {
     expect(screen.queryByRole('img', { name: 'SQB HUST' })).not.toBeInTheDocument()
 
     rerender(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <MobileNavDrawer isOpen={true} onClose={onClose} />
       </MemoryRouter>
     )
@@ -40,7 +40,7 @@ describe('MobileNavDrawer', () => {
 
   it('renders primary modules and secondary shortcuts inside drawer when open', () => {
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <MobileNavDrawer isOpen={true} onClose={vi.fn()} />
       </MemoryRouter>
     )

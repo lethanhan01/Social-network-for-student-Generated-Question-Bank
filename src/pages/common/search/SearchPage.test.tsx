@@ -26,7 +26,7 @@ describe('SearchPage Component', () => {
 
   it('renders search history and trending when query is empty', async () => {
     renderWithQueryClient(
-      <MemoryRouter initialEntries={['/search']}>
+      <MemoryRouter initialEntries={['/search']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           <Route path="/search" element={<SearchPage />} />
         </Routes>
@@ -55,7 +55,7 @@ describe('SearchPage Component', () => {
     })
 
     renderWithQueryClient(
-      <MemoryRouter initialEntries={['/search?q=Nam']}>
+      <MemoryRouter initialEntries={['/search?q=Nam']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           <Route path="/search" element={<SearchPage />} />
         </Routes>
@@ -68,7 +68,7 @@ describe('SearchPage Component', () => {
 
   it('shows a retry action instead of an empty result when search fails', async () => {
     vi.mocked(utilityService.search).mockRejectedValue(new Error('Search unavailable'))
-    renderWithQueryClient(<MemoryRouter initialEntries={['/search?q=Nam']}><SearchPage /></MemoryRouter>)
+    renderWithQueryClient(<MemoryRouter initialEntries={['/search?q=Nam']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><SearchPage /></MemoryRouter>)
     expect(await screen.findByRole('alert')).toHaveTextContent('Search unavailable')
     expect(screen.getByRole('button', { name: 'Thử lại' })).toBeInTheDocument()
     expect(screen.queryByText('Không tìm thấy kết quả phù hợp')).not.toBeInTheDocument()

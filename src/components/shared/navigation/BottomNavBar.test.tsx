@@ -15,7 +15,7 @@ describe('BottomNavBar', () => {
   })
   it('renders fixed bottom navigation bar on mobile with 5 pure icon links without visible text', () => {
     render(
-      <MemoryRouter initialEntries={['/feed']}>
+      <MemoryRouter initialEntries={['/feed']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <BottomNavBar />
       </MemoryRouter>
     )

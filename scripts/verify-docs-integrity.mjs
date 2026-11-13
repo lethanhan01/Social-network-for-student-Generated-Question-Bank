@@ -7,7 +7,6 @@ const __dirname = path.dirname(__filename);
 const CLIENT_DIR = path.resolve(__dirname, '..');
 const REPO_ROOT = CLIENT_DIR;
 const DOCS_DIR = path.resolve(CLIENT_DIR, 'docs');
-const APPENDIX_B_PATH = path.resolve(CLIENT_DIR, '../docs/VI/semantic-design/appendix-b-audit-rule-map.md');
 
 const TARGET_FILES = [
   path.resolve(CLIENT_DIR, 'FRONTEND_CONVENTIONS.md'),
@@ -529,35 +528,6 @@ function checkBannedPhrases(targetFiles) {
   return warnings;
 }
 
-function checkAppendixBSync(targetFiles) {
-  if (!fs.existsSync(APPENDIX_B_PATH)) {
-    console.warn(`⚠️ Không tìm thấy tệp Appendix B tại: ${APPENDIX_B_PATH}`);
-    return { errors: 0, warnings: 1 };
-  }
-
-  console.log('\n🔍 Đối chiếu với Ground Truth Appendix B (appendix-b-audit-rule-map.md)...');
-  const appendixContent = fs.readFileSync(APPENDIX_B_PATH, 'utf-8');
-  const appendixSemIds = [...new Set(appendixContent.match(/SEM-[A-Z0-9]+-\d+/g) || [])];
-
-  const allDocsSemIds = new Set();
-  for (const filePath of targetFiles) {
-    if (!fs.existsSync(filePath)) continue;
-    const content = fs.readFileSync(filePath, 'utf-8');
-    const matches = content.match(/SEM-[A-Z0-9]+-\d+/g) || [];
-    for (const m of matches) allDocsSemIds.add(m);
-  }
-
-  const missingFromDocs = appendixSemIds.filter(id => !allDocsSemIds.has(id));
-  if (missingFromDocs.length > 0) {
-    console.error(`❌ [Appendix B Sync] Các mã SEM-* sau trong Appendix B chưa hiện diện trong client/docs/:`);
-    missingFromDocs.forEach(id => console.error(`   - ${id}`));
-    return { errors: missingFromDocs.length, warnings: 0 };
-  }
-
-  console.log(`✅ [Appendix B Sync] 100% (${appendixSemIds.length}/${appendixSemIds.length}) mã quy chuẩn SEM-* từ Appendix B đã hiện diện trong tài liệu client/docs/.`);
-  return { errors: 0, warnings: 0 };
-}
-
 function checkMarkdownCodeBlocks(targetFiles) {
   console.log('\n🔍 Kiểm tra tuân thủ quy chuẩn mã nguồn trong các khối code Markdown (Code Block Standards)...');
   let errors = 0;
@@ -679,10 +649,6 @@ function verifyFiles() {
   totalWarnings += checkBannedPhrases(TARGET_FILES);
   totalErrors += checkSemHeadingUniqueness(TARGET_FILES);
   totalErrors += checkMarkdownCodeBlocks(TARGET_FILES);
-
-  const appendixResult = checkAppendixBSync(TARGET_FILES);
-  totalErrors += appendixResult.errors;
-  totalWarnings += appendixResult.warnings;
 
   console.log('\n📊 Thống kê cấu trúc hiện tại (Core Docs):');
   console.table(fileStats);

@@ -27,7 +27,7 @@ describe('Main merge integration', () => {
     const user = userEvent.setup()
     const create = vi.spyOn(chatService, 'createDirectConversation').mockResolvedValue({ conversation_id: 24 })
     renderWithQueryClient(
-      <MemoryRouter initialEntries={['/messages?userId=9']}>
+      <MemoryRouter initialEntries={['/messages?userId=9']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <StartDirectConversation />
         <Location />
       </MemoryRouter>
@@ -41,7 +41,7 @@ describe('Main merge integration', () => {
     vi.spyOn(chatService, 'getGroupMembers').mockResolvedValue([{ user_id: 9, full_name: 'Mai Anh' }])
     const user = userEvent.setup()
     renderWithQueryClient(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <ChatPortalActions conversationId={24} conversation={{ conversation_id: 24, type: 'GROUP', display_name: 'Study group' }} onClose={vi.fn()} />
       </MemoryRouter>
     )

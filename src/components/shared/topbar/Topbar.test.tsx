@@ -15,7 +15,7 @@ describe('Topbar', () => {
   })
   it('renders a full-width fixed header with solid surface token (bg-surface-card) and border', () => {
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Topbar />
       </MemoryRouter>
     )
@@ -43,7 +43,7 @@ describe('Topbar', () => {
 
   it('renders 5 primary navigation tabs in TopbarNav', () => {
     render(
-      <MemoryRouter initialEntries={['/feed']}>
+      <MemoryRouter initialEntries={['/feed']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Topbar />
       </MemoryRouter>
     )
@@ -61,7 +61,7 @@ describe('Topbar', () => {
   it('renders and toggles mobile menu button when onToggleMobileMenu is provided', () => {
     const onToggle = vi.fn()
     const { rerender } = render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Topbar isMobileMenuOpen={false} onToggleMobileMenu={onToggle} />
       </MemoryRouter>
     )
@@ -73,7 +73,7 @@ describe('Topbar', () => {
     expect(onToggle).toHaveBeenCalledTimes(1)
 
     rerender(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Topbar isMobileMenuOpen={true} onToggleMobileMenu={onToggle} />
       </MemoryRouter>
     )

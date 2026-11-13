@@ -19,7 +19,7 @@ const mockedService = vi.mocked(cosmeticService)
 
 function renderPage(initialEntry = '/shop') {
   return renderWithQueryClient(
-    <MemoryRouter initialEntries={[initialEntry]}>
+    <MemoryRouter initialEntries={[initialEntry]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <ShopPage />
     </MemoryRouter>
   )

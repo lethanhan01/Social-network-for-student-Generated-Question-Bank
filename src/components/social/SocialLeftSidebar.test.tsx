@@ -47,7 +47,7 @@ describe('SocialLeftSidebar', () => {
 
   it('renders user summary with full name, student code and role badge', () => {
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <SocialLeftSidebar user={mockUser} subjects={mockSubjects} />
       </MemoryRouter>
     )
@@ -60,7 +60,7 @@ describe('SocialLeftSidebar', () => {
 
   it('renders student-only feature shortcuts links', () => {
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <SocialLeftSidebar user={mockUser} subjects={mockSubjects} />
       </MemoryRouter>
     )
@@ -79,7 +79,7 @@ describe('SocialLeftSidebar', () => {
 
   it('renders lecturer-only feature shortcuts links without student routes', () => {
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <SocialLeftSidebar user={mockLecturer} subjects={mockSubjects} />
       </MemoryRouter>
     )
@@ -95,7 +95,7 @@ describe('SocialLeftSidebar', () => {
   it('renders bilingual Japanese labels when language is switched to ja', async () => {
     await i18n.changeLanguage('ja')
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <SocialLeftSidebar user={mockUser} subjects={mockSubjects} />
       </MemoryRouter>
     )
@@ -111,7 +111,7 @@ describe('SocialLeftSidebar', () => {
   it('renders subjects list and calls onSelectSubject when clicked', () => {
     const onSelect = vi.fn()
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <SocialLeftSidebar
           user={mockUser}
           subjects={mockSubjects}

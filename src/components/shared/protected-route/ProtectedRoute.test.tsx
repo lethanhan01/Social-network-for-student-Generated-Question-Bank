@@ -18,7 +18,7 @@ function LocationView() {
 
 function renderProtectedRoute(initialEntry: string, allowedRoles: Role[]) {
   return render(
-    <MemoryRouter initialEntries={[initialEntry]}>
+    <MemoryRouter initialEntries={[initialEntry]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
         <Route
           path="/member/*"

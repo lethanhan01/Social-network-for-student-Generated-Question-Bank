@@ -15,7 +15,7 @@ describe('DashboardLayout — Topbar Navigation & Responsive Architecture', () =
   })
   function renderLayout() {
     return render(
-      <MemoryRouter initialEntries={['/dashboard']}>
+      <MemoryRouter initialEntries={['/dashboard']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<h1>Trang tổng quan</h1>} />
