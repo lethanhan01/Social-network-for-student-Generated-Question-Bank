@@ -150,4 +150,45 @@ describe('websocketService', () => {
     unsubscribeStatus()
     unsubscribeConnection()
   })
+
+  it('normalizes camelCase, string IDs, nested sender, and data-wrapped STOMP messages', () => {
+    useAuthStore.setState({ token: 'test-token' })
+    const received: unknown[] = []
+    const unsub = websocketService.onMessage((msg) => received.push(msg))
+    websocketService.connect()
+
+    const clientInstance = vi.mocked(Client).mock.results[0]?.value
+    const subscribeCall = clientInstance.subscribe.mock.calls.find(
+      (call: [string, (msg: { body: string }) => void]) => call[0] === '/user/queue/messages'
+    )
+    expect(subscribeCall).toBeDefined()
+    const handler = subscribeCall[1]
+
+    handler({
+      body: JSON.stringify({
+        data: {
+          messageId: '901',
+          conversationId: '15',
+          content: 'Xin chào',
+          messageType: 'TEXT',
+          sender: { userId: '42', fullName: 'Minh An', avatarUrl: 'https://img/a.png' },
+          createdAt: '2026-11-13T07:00:00Z',
+        },
+      }),
+    })
+
+    expect(received).toEqual([
+      expect.objectContaining({
+        message_id: 901,
+        conversation_id: 15,
+        sender_id: 42,
+        sender_name: 'Minh An',
+        sender_avatar: 'https://img/a.png',
+        content: 'Xin chào',
+        message_type: 'TEXT',
+        created_at: '2026-11-13T07:00:00Z',
+      }),
+    ])
+    unsub()
+  })
 })

@@ -7,7 +7,6 @@ import {
   HelpCircle,
   MessageSquare,
   Users,
-  Search,
   Sparkles,
   Settings,
   CalendarCheck,

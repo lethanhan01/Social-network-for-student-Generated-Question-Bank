@@ -25,7 +25,7 @@ export interface TypingWsRequestDto {
 export interface WsMessageBroadcastDto {
   message_id: number
   conversation_id: number
-  sender_id: number
+  sender_id?: number
   sender_name?: string
   sender_avatar?: string | null
   content: string

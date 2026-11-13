@@ -12,6 +12,7 @@ import {
   useRecallMessageMutation,
   useSendMessageMutation,
   useAutoMarkAsRead,
+  resolveCurrentUserId,
 } from '@/hooks/queries/useChatQuery'
 import { useInfiniteConversationsQuery } from '@/hooks/queries/useMessengerQuery'
 import { type WsConnectionStatus } from '@/services/websocket.service'
@@ -36,7 +37,7 @@ export function ChatConversationView({
 }: Readonly<ChatConversationViewProps>) {
   const { t } = useTranslation('chat')
   const { t: tp } = useTranslation('portal')
-  const currentUserId = useAuthStore((state) => state.user?.user_id ?? Number(state.user?.userId))
+  const currentUserId = useAuthStore((state) => resolveCurrentUserId(state.user))
   const resolvedTheme = useThemeStore((state) => state.resolvedTheme)
   const [text, setText] = useState('')
   const [mediaUrl, setMediaUrl] = useState<string | null>(null)
@@ -120,11 +121,11 @@ export function ChatConversationView({
         mediaUrls: urls,
         replyTo: prevReply,
       })
-    } catch {
+    } catch (err) {
       setText(prevText)
       setMediaUrl(prevMedia)
       setReplyTo(prevReply)
-      toast.error(t('sendErrorDisconnected'))
+      toast.error(err instanceof Error && err.message === 'WS_DISCONNECTED' ? t('sendErrorDisconnected') : getApiError(err, t('sendErrorDisconnected')))
     }
   }
 

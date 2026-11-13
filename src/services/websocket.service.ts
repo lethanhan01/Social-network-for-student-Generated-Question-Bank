@@ -11,6 +11,53 @@ import type {
 
 export type WsConnectionStatus = 'CONNECTED' | 'CONNECTING' | 'DISCONNECTED'
 
+function toFiniteNumber(value: unknown): number | undefined {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : undefined
+  if (typeof value === 'string' && value.trim() !== '') {
+    const parsed = Number(value)
+    return Number.isFinite(parsed) ? parsed : undefined
+  }
+  return undefined
+}
+
+function asRecord(value: unknown): Record<string, unknown> | undefined {
+  return value !== null && typeof value === 'object' ? (value as Record<string, unknown>) : undefined
+}
+
+function normalizeWsMessage(raw: unknown): WsMessageBroadcastDto | null {
+  const root = asRecord(raw)
+  if (!root) return null
+  const obj = asRecord(root.data) ?? root
+  const sender = asRecord(obj.sender)
+
+  const messageId = toFiniteNumber(obj.message_id ?? obj.messageId ?? obj.id)
+  const conversationId = toFiniteNumber(obj.conversation_id ?? obj.conversationId)
+  if (messageId === undefined || conversationId === undefined) return null
+
+  const senderId = toFiniteNumber(
+    obj.sender_id ?? obj.senderId ?? sender?.user_id ?? sender?.userId ?? sender?.id
+  )
+  const senderNameRaw =
+    obj.sender_name ?? obj.senderName ?? sender?.full_name ?? sender?.fullName ?? sender?.username ?? sender?.name
+  const senderAvatarRaw =
+    obj.sender_avatar ?? obj.senderAvatar ?? sender?.avatar_url ?? sender?.avatarUrl
+  const mediaRaw = obj.media_urls ?? obj.mediaUrls
+  const createdAtRaw = obj.created_at ?? obj.createdAt
+
+  return {
+    message_id: messageId,
+    conversation_id: conversationId,
+    sender_id: senderId,
+    sender_name: typeof senderNameRaw === 'string' ? senderNameRaw : undefined,
+    sender_avatar: typeof senderAvatarRaw === 'string' ? senderAvatarRaw : null,
+    content: typeof obj.content === 'string' ? obj.content : String(obj.content ?? ''),
+    message_type: (obj.message_type ?? obj.messageType ?? 'TEXT') as WsMessageBroadcastDto['message_type'],
+    media_urls: Array.isArray(mediaRaw) ? mediaRaw.filter((u): u is string => typeof u === 'string') : undefined,
+    reply_to_message_id: toFiniteNumber(obj.reply_to_message_id ?? obj.replyToMessageId) ?? null,
+    created_at: typeof createdAtRaw === 'string' ? createdAtRaw : new Date().toISOString(),
+  }
+}
+
 class WebSocketService {
   private client: Client | null = null
   private isConnected = false
@@ -93,8 +140,11 @@ class WebSocketService {
     if (!this.client || !this.isConnected) return
     this.client.subscribe('/user/queue/messages', (message: IMessage) => {
       try {
-        const payload: WsMessageBroadcastDto = JSON.parse(message.body)
-        this.messageListeners.forEach((listener) => listener(payload))
+        const parsed: unknown = JSON.parse(message.body)
+        const payload = normalizeWsMessage(parsed)
+        if (payload) {
+          this.messageListeners.forEach((listener) => listener(payload))
+        }
       } catch {
         // ignore parse error
       }

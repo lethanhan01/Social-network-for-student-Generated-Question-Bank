@@ -13,6 +13,65 @@ interface ChatMessageListProps {
   hasNextPage?: boolean; isFetchingNextPage?: boolean; onLoadMore?: () => void; unreadCount?: number
 }
 
+interface MessageItemRowProps {
+  msg: MessageDto; isMe: boolean; showUnreadDivider: boolean
+  unreadDividerRef: RefObject<HTMLDivElement | null>
+  onReply: (msg: MessageDto) => void; onRecall: (msg: MessageDto) => void
+}
+
+function MessageItemRow({ msg, isMe, showUnreadDivider, unreadDividerRef, onReply, onRecall }: Readonly<MessageItemRowProps>) {
+  const { t } = useTranslation('chat')
+  return (
+    /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Message item and optional divider fragment] */
+    <div className="space-y-3">
+      {showUnreadDivider ? (
+        /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Unread messages divider bar] */
+        <div ref={unreadDividerRef} className="flex items-center gap-3 my-4 py-1" role="separator">
+          {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Left divider line] */}
+          <div className="flex-1 h-px bg-line-accent-subtle" />
+          <Badge tone="accent" size="xs" className="px-2.5 py-0.5 font-medium text-[11px] uppercase tracking-wider">
+            {t('unreadMessagesDivider')}
+          </Badge>
+          {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Right divider line] */}
+          <div className="flex-1 h-px bg-line-accent-subtle" />
+        </div>
+      ) : null}
+      {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Message item flex row] */}
+      <div className={cn('flex items-end gap-2 group', isMe ? 'justify-end' : 'justify-start')}>
+        {!isMe ? <Avatar src={msg.avatar_url} name={msg.sender_name ?? 'User'} size="xs" tone="neutral" className="mb-1 shrink-0" /> : null}
+        {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Bubble and actions wrapper] */}
+        <div className="flex items-center gap-1.5 max-w-[75%]">
+          {isMe ? (
+            /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Actions hover bar for current user] */
+            <div className="hidden group-hover:flex items-center gap-1">
+              <Button variant="ghost" size="sm" onClick={() => onReply(msg)} aria-label={t('reply')} className="w-7 h-7 p-0 rounded-full text-fg-muted hover:text-fg-primary"><Reply size={14} /></Button>
+              {msg.message_id && msg.message_id > 0 ? (
+                <Button variant="ghost" size="sm" onClick={() => onRecall(msg)} aria-label={t('recallMessage')} className="w-7 h-7 p-0 rounded-full text-status-danger-fg hover:bg-status-danger-bg"><Trash2 size={14} /></Button>
+              ) : null}
+            </div>
+          ) : null}
+          {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Message bubble bubble content] */}
+          <div className={cn('px-3.5 py-2 rounded-2xl text-sm break-words', isMe ? 'bg-action-accent text-fg-on-solid rounded-br-xs' : 'bg-surface-elevated text-fg-primary rounded-bl-xs border border-line-subtle')}>
+            {msg.reply_to_message ? <blockquote className={cn('text-xs mb-1.5 p-1 rounded border-l-2', isMe ? 'border-fg-on-solid/50 bg-action-accent-soft/20' : 'border-line-accent-subtle bg-surface-sunken')}>{msg.reply_to_message.content_preview || 'Tin nhắn'}</blockquote> : null}
+            {msg.revoked ? <em className="italic opacity-80">{t('recalledNote')}</em> : (
+              <>
+                {msg.media_urls?.[0] ? <Image src={msg.media_urls[0]} alt="Media" className="rounded-lg max-h-48 mb-1.5 object-cover" /> : null}
+                <p>{msg.content}</p>
+              </>
+            )}
+          </div>
+          {!isMe ? (
+            /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Actions hover bar for partner] */
+            <div className="hidden group-hover:flex items-center gap-1">
+              <Button variant="ghost" size="sm" onClick={() => onReply(msg)} aria-label={t('reply')} className="w-7 h-7 p-0 rounded-full text-fg-muted hover:text-fg-primary"><Reply size={14} /></Button>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function ChatMessageList({
   allMessages, currentUserId, isLoading, isError, activeConv, typingNames,
   messagesEndRef, onReply, onRecall, onRetry, hasNextPage, isFetchingNextPage, onLoadMore, unreadCount,
@@ -71,14 +130,18 @@ export function ChatMessageList({
       const isNearBottom = container
         ? container.scrollHeight - container.scrollTop - container.clientHeight < 200
         : true
-      if (isNearBottom) {
+      const newestMsg = allMessages.at(-1)
+      const newestSenderId = newestMsg?.sender_id != null ? Number(newestMsg.sender_id) : undefined
+      const isNewestMine =
+        currentUserId != null && Number.isFinite(currentUserId) && newestSenderId === currentUserId
+      if (isNearBottom || isNewestMine) {
         messagesEndRef.current?.scrollIntoView?.({ behavior: 'smooth' })
       } else {
         setShowScrollBottom(true)
       }
     }
     prevLengthRef.current = allMessages.length
-  }, [allMessages.length, messagesEndRef])
+  }, [allMessages, currentUserId, messagesEndRef])
 
   function handleScroll(e: React.UIEvent<HTMLDivElement>) {
     const el = e.currentTarget
@@ -155,55 +218,13 @@ export function ChatMessageList({
           </div>
         ) : null}
         {allMessages.map((msg, idx) => {
-          const isMe = msg.sender_id === currentUserId
+          const msgSenderId = msg.sender_id != null ? Number(msg.sender_id) : undefined
+          const isMe = currentUserId != null && Number.isFinite(currentUserId) && msgSenderId === currentUserId
           return (
-            /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Message item and optional divider fragment] */
-            <div key={msg.message_id} className="space-y-3">
-              {idx === unreadIndex ? (
-                /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Unread messages divider bar] */
-                <div ref={unreadDividerRef} className="flex items-center gap-3 my-4 py-1" role="separator">
-                  {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Left divider line] */}
-                  <div className="flex-1 h-px bg-line-accent-subtle" />
-                  <Badge tone="accent" size="xs" className="px-2.5 py-0.5 font-medium text-[11px] uppercase tracking-wider">
-                    {t('unreadMessagesDivider')}
-                  </Badge>
-                  {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Right divider line] */}
-                  <div className="flex-1 h-px bg-line-accent-subtle" />
-                </div>
-              ) : null}
-              {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Message item flex row] */}
-              <div className={cn('flex items-end gap-2 group', isMe ? 'justify-end' : 'justify-start')}>
-                {!isMe ? <Avatar src={msg.avatar_url} name={msg.sender_name ?? 'User'} size="xs" tone="neutral" className="mb-1 shrink-0" /> : null}
-                {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Bubble and actions wrapper] */}
-                <div className="flex items-center gap-1.5 max-w-[75%]">
-                  {isMe ? (
-                    /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Actions hover bar for current user] */
-                    <div className="hidden group-hover:flex items-center gap-1">
-                      <Button variant="ghost" size="sm" onClick={() => onReply(msg)} aria-label={t('reply')} className="w-7 h-7 p-0 rounded-full text-fg-muted hover:text-fg-primary"><Reply size={14} /></Button>
-                      {msg.message_id && msg.message_id > 0 ? (
-                        <Button variant="ghost" size="sm" onClick={() => onRecall(msg)} aria-label={t('recallMessage')} className="w-7 h-7 p-0 rounded-full text-status-danger-fg hover:bg-status-danger-bg"><Trash2 size={14} /></Button>
-                      ) : null}
-                    </div>
-                  ) : null}
-                  {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Message bubble bubble content] */}
-                  <div className={cn('px-3.5 py-2 rounded-2xl text-sm break-words', isMe ? 'bg-action-accent text-fg-on-solid rounded-br-xs' : 'bg-surface-elevated text-fg-primary rounded-bl-xs border border-line-subtle')}>
-                    {msg.reply_to_message ? <blockquote className={cn('text-xs mb-1.5 p-1 rounded border-l-2', isMe ? 'border-fg-on-solid/50 bg-action-accent-soft/20' : 'border-line-accent-subtle bg-surface-sunken')}>{msg.reply_to_message.content_preview || 'Tin nhắn'}</blockquote> : null}
-                    {msg.revoked ? <em className="italic opacity-80">{t('recalledNote')}</em> : (
-                      <>
-                        {msg.media_urls?.[0] ? <Image src={msg.media_urls[0]} alt="Media" className="rounded-lg max-h-48 mb-1.5 object-cover" /> : null}
-                        <p>{msg.content}</p>
-                      </>
-                    )}
-                  </div>
-                  {!isMe ? (
-                    /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Actions hover bar for partner] */
-                    <div className="hidden group-hover:flex items-center gap-1">
-                      <Button variant="ghost" size="sm" onClick={() => onReply(msg)} aria-label={t('reply')} className="w-7 h-7 p-0 rounded-full text-fg-muted hover:text-fg-primary"><Reply size={14} /></Button>
-                    </div>
-                  ) : null}
-                </div>
-              </div>
-            </div>
+            <MessageItemRow
+              key={msg.message_id} msg={msg} isMe={isMe} showUnreadDivider={idx === unreadIndex}
+              unreadDividerRef={unreadDividerRef} onReply={onReply} onRecall={onRecall}
+            />
           )
         })}
         {typingNames ? <p className="text-xs text-fg-muted italic animate-pulse">{t('typing', { name: typingNames })}</p> : null}
@@ -212,10 +233,7 @@ export function ChatMessageList({
       </div>
       {showScrollBottom ? (
         <Button
-          variant="secondary"
-          size="sm"
-          onClick={scrollToBottom}
-          aria-label={t('scrollToBottom')}
+          variant="secondary" size="sm" onClick={scrollToBottom} aria-label={t('scrollToBottom')}
           className="absolute bottom-4 right-4 z-10 w-11 h-11 min-h-[44px] min-w-[44px] rounded-full shadow-lg border border-line-subtle p-0 flex items-center justify-center bg-surface-elevated text-fg-primary hover:bg-surface-sunken"
         >
           <ArrowDown size={18} />

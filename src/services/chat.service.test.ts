@@ -151,7 +151,42 @@ describe('chatService', () => {
     // The latest message from conversation preview was prepended
     expect(res.messages?.[0]?.message_id).toBe(70)
     expect(res.messages?.[0]?.content).toBe('Tin mới nhất')
+    expect(res.messages?.[0]?.sender_id).toBeUndefined()
     expect(res.messages?.[1]?.message_id).toBe(68)
+  })
+
+  it('preserves sender_id in level 2 fallback when provided on last_message', async () => {
+    vi.mocked(api.get).mockRejectedValueOnce(new Error('500'))
+    vi.mocked(api.get).mockResolvedValueOnce({
+      data: {
+        code: '1000',
+        data: {
+          items: [
+            {
+              conversation_id: 5,
+              display_name: 'Bạn học',
+              last_message: {
+                message_id: 71,
+                sender_id: 9,
+                content: 'Tin của mình',
+                message_type: 'TEXT',
+                created_at: '2026-11-01T00:00:00Z',
+              },
+            },
+          ],
+        },
+      },
+    })
+    vi.mocked(api.get).mockRejectedValueOnce(new Error('Rejected +1'))
+    vi.mocked(api.get).mockResolvedValueOnce({
+      data: {
+        code: '1000',
+        data: { conversation_id: 5, messages: [], pagination: { has_next: false } },
+      },
+    })
+
+    const res = await chatService.getMessages(5, { limit: 20 })
+    expect(res.messages?.[0]?.sender_id).toBe(9)
   })
 
   it('getMessages handles empty conversation with no messages gracefully on 500', async () => {

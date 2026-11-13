@@ -152,7 +152,7 @@ export const chatService = {
           }
         )
         const msgs = probeRes.data?.data?.messages
-        if (msgs && msgs.length > 0 && msgs.some((m) => m.message_id === lastMsg.message_id)) {
+        if (msgs?.some((m) => m.message_id === lastMsg.message_id)) {
           return probeRes.data.data
         }
       } catch {
@@ -172,15 +172,20 @@ export const chatService = {
           const data = probeRes.data.data
           const exists = data.messages?.some((m) => m.message_id === lastMsg.message_id)
           if (!exists && lastMsg.content) {
+            const lastMsgMeta = lastMsg as typeof lastMsg & {
+              sender_id?: number
+              sender_name?: string
+              avatar_url?: string
+            }
             data.messages = [
               {
                 message_id: lastMsg.message_id,
                 content: lastMsg.content,
                 message_type: lastMsg.message_type as 'TEXT' | 'IMAGE' | 'VIDEO' | 'GIF',
                 created_at: lastMsg.created_at,
-                sender_id: 0,
-                sender_name: conv?.display_name || 'Tin nhắn mới',
-                avatar_url: conv?.display_avatar_url || undefined,
+                sender_id: lastMsgMeta.sender_id,
+                sender_name: lastMsgMeta.sender_name || conv?.display_name || 'Tin nhắn mới',
+                avatar_url: lastMsgMeta.avatar_url || conv?.display_avatar_url || undefined,
               },
               ...(data.messages || []),
             ]

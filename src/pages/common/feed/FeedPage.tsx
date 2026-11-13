@@ -51,7 +51,17 @@ export default function FeedPage() {
   const events = activity.data?.pages.flatMap((page) => page.items ?? []) ?? []
   const recentPosts = recent.data
   const recentIds = new Set(recentPosts.map((post) => post.post_id))
-  const subjectIds = tab === 'MY_SUBJECTS' ? mySubjects.flatMap((subject) => subject.subject_id ? [subject.subject_id] : []) : undefined
+  const subjectIds =
+    tab === 'MY_SUBJECTS'
+      ? mySubjects.map((subject) => subject.subject_id).filter((id): id is number => Boolean(id))
+      : undefined
+  const tabIcons = {
+    ALL: <Sparkles size={16} />,
+    MY_SUBJECTS: <BookOpen size={16} />,
+    LECTURERS: <GraduationCap size={16} />,
+  } as const
+  const visibleFeedCount = tab === 'MINE' ? posts.length : events.length
+  const showEmptyFeed = query.isSuccess && visibleFeedCount === 0 && recentPosts.length === 0
   const matches = (post: PostResponseDto) =>
     (!subjectId || post.subject_id === subjectId) &&
     (tab !== 'LECTURERS' || Boolean(post.lecturer_note))
@@ -81,7 +91,7 @@ export default function FeedPage() {
           <Button
             key={value}
             variant={tab === value ? 'primary' : 'ghost'}
-            leftIcon={value === 'ALL' ? <Sparkles size={16} /> : value === 'MY_SUBJECTS' ? <BookOpen size={16} /> : <GraduationCap size={16} />}
+            leftIcon={tabIcons[value]}
             className="min-h-11 shrink-0 text-sm"
             aria-pressed={tab === value}
             onClick={() => update('tab', value)}
@@ -151,9 +161,7 @@ export default function FeedPage() {
                 lecturers={tab === 'LECTURERS'}
               />
             ))}
-      {query.isSuccess &&
-      (tab === 'MINE' ? posts.length : events.length) === 0 &&
-      recentPosts.length === 0 ? (
+      {showEmptyFeed ? (
         <p className="py-8 text-center text-text-muted">{t('social.emptyFeed')}</p>
       ) : null}
       <LoadMore query={query} />
