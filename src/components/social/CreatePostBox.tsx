@@ -1,7 +1,6 @@
 import { HelpCircle, Sparkles, Image as ImageIcon } from 'lucide-react'
 import { Card, Avatar } from '@/components/ui/data-display'
 import { Button } from '@/components/ui/actions'
-import { Separator } from '@/components/ui/layout'
 import type { ProfileResponse } from '@/types'
 import { useTranslation } from 'react-i18next'
 
@@ -10,66 +9,48 @@ interface CreatePostBoxProps {
   onOpenCreateModal: () => void
 }
 
+const composerActions = [
+  { label: 'social.discussion', Icon: HelpCircle, color: 'text-tone-warning' },
+  { label: 'social.attachment', Icon: ImageIcon, color: 'text-action-accent' },
+  { label: 'social.share', Icon: Sparkles, color: 'text-tone-info' },
+] as const
+
 export function CreatePostBox({ user, onOpenCreateModal }: Readonly<CreatePostBoxProps>) {
   const { t } = useTranslation()
   const displayName = user?.full_name || t('social.member')
   const initials = displayName.trim().charAt(0).toUpperCase()
 
   return (
-    <Card as="section" padding="none" className="social-card p-3 space-y-2">
-      {/* Top Input Trigger */}
-      {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Flex layout container for post trigger bar] */}
-      <div className="flex items-center gap-3">
-        <Avatar
-          src={user?.avatar_url || undefined}
-          name={displayName}
-          fallback={initials}
-          size="md"
-          tone="accent"
-        />
+    <Card as="section" padding="none" className="social-card flex items-center gap-1 p-2 sm:gap-2">
+      <Avatar
+        src={user?.avatar_url || undefined}
+        name={displayName}
+        fallback={initials}
+        size="sm"
+        tone="accent"
+        className="shrink-0"
+      />
+      <Button
+        variant="secondary"
+        onClick={onOpenCreateModal}
+        className="min-h-11 min-w-0 flex-1 justify-start rounded-full bg-surface-hover px-3 text-left text-sm font-normal text-fg-muted"
+      >
+        {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Keep the composer prompt on one line without shortening its accessible name] */}
+        <span className="min-w-0 truncate">{t('social.composerPrompt')}</span>
+      </Button>
+      {composerActions.map(({ label, Icon, color }) => (
         <Button
-          variant="secondary"
-          size="md"
-          onClick={onOpenCreateModal}
-          className="flex-1 min-w-0 justify-start text-text-muted hover:text-text-primary bg-surface-hover rounded-full px-4 h-auto min-h-11 py-2 text-left text-sm font-normal border border-line-subtle whitespace-normal"
-        >
-          {t('social.composerPrompt')}
-        </Button>
-      </div>
-
-      <Separator />
-
-      {/* Action Buttons Row */}
-      {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Grid layout container for post action buttons] */}
-      <div className="grid grid-cols-3 gap-2">
-        <Button
+          key={label}
           variant="ghost"
-          size="sm"
+          size="icon"
+          aria-label={t(label)}
+          title={t(label)}
           onClick={onOpenCreateModal}
-          className="justify-center gap-1.5 px-1.5 text-sm min-h-11 whitespace-normal"
-          leftIcon={<HelpCircle size={18} className="text-tone-warning" />}
+          className="min-h-11 min-w-11 rounded-full"
         >
-          <strong className="font-normal">{t('social.discussion')}</strong>
+          <Icon size={20} className={color} aria-hidden="true" />
         </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onOpenCreateModal}
-          className="justify-center gap-1.5 px-1.5 text-sm min-h-11 whitespace-normal"
-          leftIcon={<ImageIcon size={18} className="text-action-accent" />}
-        >
-          <strong className="font-normal">{t('social.attachment')}</strong>
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onOpenCreateModal}
-          className="justify-center gap-1.5 px-1.5 text-sm min-h-11 whitespace-normal"
-          leftIcon={<Sparkles size={18} className="text-tone-info" />}
-        >
-          <strong className="font-normal">{t('social.share')}</strong>
-        </Button>
-      </div>
+      ))}
     </Card>
   )
 }
