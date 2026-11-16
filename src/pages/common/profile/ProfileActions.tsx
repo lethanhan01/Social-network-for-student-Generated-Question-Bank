@@ -17,6 +17,39 @@ import { toast } from '@/lib/toast'
 import { getApiError } from '@/lib/api-error'
 import type { ProfileResponse } from '@/types'
 
+function getFriendLabelKey(isFriend: boolean, pending: boolean) {
+  if (isFriend) return 'profile.is_friend' as const
+  if (pending) return 'profile.cancel_friend_request' as const
+  return 'profile.send_friend_request' as const
+}
+
+function getRelationshipView(
+  profile: ProfileResponse,
+  rel?: {
+    blocked?: boolean
+    friend?: boolean
+    following?: boolean
+    friend_request_status?: string
+  },
+  myRole?: string
+) {
+  const isFriend = rel?.friend ?? profile.relationships?.is_friend ?? false
+  const following = rel?.following ?? profile.relationships?.is_following ?? false
+  const pending =
+    (rel?.friend_request_status ?? profile.relationships?.friend_request_status) === 'PENDING'
+
+  return {
+    blocked: rel?.blocked === true,
+    isFriend,
+    following,
+    pending,
+    sameRole: (myRole === 'STUDENT' || myRole === 'LECTURER') && myRole === profile.role,
+    friendLabelKey: getFriendLabelKey(isFriend, pending),
+    friendVariant: isFriend ? ('outline' as const) : ('primary' as const),
+    followLabelKey: following ? ('social.unfollow' as const) : ('social.follow' as const),
+  }
+}
+
 export function ProfileActions({
   profile,
   myRole,
@@ -31,25 +64,30 @@ export function ProfileActions({
   const block = useBlockUserMutation()
   const unblock = useUnblockUserMutation()
   const follow = useFollowMutation()
-  const busy =
-    send.isPending || unfriend.isPending || block.isPending || unblock.isPending || follow.isPending
-  const blocked = stats.data?.relationship_with_me?.blocked === true
-  const isFriend =
-    stats.data?.relationship_with_me?.friend ?? profile.relationships?.is_friend ?? false
-  const following =
-    stats.data?.relationship_with_me?.following ?? profile.relationships?.is_following ?? false
-  const pending =
-    (stats.data?.relationship_with_me?.friend_request_status ??
-      profile.relationships?.friend_request_status) === 'PENDING'
-  const sameRole = (myRole === 'STUDENT' || myRole === 'LECTURER') && myRole === profile.role
+  const busy = [send, unfriend, block, unblock, follow].some((m) => m.isPending)
+  const {
+    blocked,
+    isFriend,
+    following,
+    pending,
+    sameRole,
+    friendLabelKey,
+    friendVariant,
+    followLabelKey,
+  } = getRelationshipView(profile, stats.data?.relationship_with_me, myRole)
+
   async function perform(action: 'send' | 'unfriend' | 'block' | 'unblock' | 'follow') {
-    if (!profile.user_id || busy) return
+    const userId = profile.user_id
+    if (!userId || busy) return
+    const handlers = {
+      send: () => send.mutateAsync({ addressee_id: userId }),
+      unfriend: () => unfriend.mutateAsync(userId),
+      block: () => block.mutateAsync(userId),
+      unblock: () => unblock.mutateAsync(userId),
+      follow: () => follow.mutateAsync({ id: userId, following }),
+    }
     try {
-      if (action === 'send') await send.mutateAsync({ addressee_id: profile.user_id })
-      else if (action === 'unfriend') await unfriend.mutateAsync(profile.user_id)
-      else if (action === 'block') await block.mutateAsync(profile.user_id)
-      else if (action === 'unblock') await unblock.mutateAsync(profile.user_id)
-      else await follow.mutateAsync({ id: profile.user_id, following })
+      await handlers[action]()
       toast.success(t('social.saved'))
       setConfirm(undefined)
     } catch (error) {
@@ -72,14 +110,10 @@ export function ProfileActions({
               size="sm"
               className="min-h-11"
               disabled={busy || pending}
-              variant={isFriend ? 'outline' : 'primary'}
+              variant={friendVariant}
               onClick={() => (isFriend ? setConfirm('unfriend') : void perform('send'))}
             >
-              {isFriend
-                ? t('profile.is_friend')
-                : pending
-                  ? t('profile.cancel_friend_request')
-                  : t('profile.send_friend_request')}
+              {t(friendLabelKey)}
             </Button>
           ) : null}
           <Button
@@ -91,7 +125,7 @@ export function ProfileActions({
               void perform('follow')
             }}
           >
-            {t(following ? 'social.unfollow' : 'social.follow')}
+            {t(followLabelKey)}
           </Button>
         </>
       )}

@@ -1,5 +1,7 @@
 /**
  * Module dọn dẹp và Rollback dữ liệu đã tạo theo Manifest hoặc Quét tag #SQB_SEED
+ * (Lưu ý: Các thực thể đã khóa/không có API xóa trên Backend như Lớp học phần, Đề thi
+ * và Phiên câu hỏi đã chốt RESOLVED sẽ được bảo vệ bằng cơ chế Idempotent khi seed lại).
  */
 
 import fs from 'node:fs';
@@ -55,7 +57,7 @@ export async function rollbackAll(sessionMap, options = {}) {
       }
     }
 
-    // 1.2 Xóa posts
+    // 1.2 Xóa posts (cả Student & Teacher)
     for (const p of entities.posts || []) {
       const postId = typeof p === 'object' ? p.id : p;
       const authorId = typeof p === 'object' ? p.authorId : null;
@@ -69,7 +71,7 @@ export async function rollbackAll(sessionMap, options = {}) {
       }
     }
 
-    // 1.3 Xóa sessions
+    // 1.3 Xóa các phiên đề xuất nếu còn ở trạng thái PENDING (Backend khóa xóa phiên RESOLVED)
     for (const s of entities.sessions || []) {
       const sessionId = typeof s === 'object' ? s.id : s;
       const authorId = typeof s === 'object' ? s.authorId : null;
@@ -79,7 +81,7 @@ export async function rollbackAll(sessionMap, options = {}) {
       const res = await httpClient.delete(`/sessions/my-submissions/${sessionId}`, token);
       if (res.ok) {
         deletedSessions++;
-        console.log(`  ✓ Đã xóa phiên đề xuất câu hỏi [ID: ${sessionId}]`);
+        console.log(`  ✓ Đã xóa phiên đề xuất PENDING [ID: ${sessionId}]`);
       }
     }
 
@@ -98,9 +100,9 @@ export async function rollbackAll(sessionMap, options = {}) {
 
   // 2. Fallback Tag Scan nếu được yêu cầu qua --force-scan hoặc không có manifest
   if (options.forceScan || !manifest) {
-    console.log(`\n[ROLLBACK - LỚP 2] Đang quét API backend tìm các thực thể mang tag "${CONFIG.SEED_TAG}"...`);
+    console.log(`\n[ROLLBACK - LỚP 2] Đang quét API backend tìm các thực thể mang tag "${CONFIG.SEED_TAG}" trên cả 10 tài khoản...`);
 
-    for (const [userId, session] of sessionMap.entries()) {
+    for (const [, session] of sessionMap.entries()) {
       // 2.1 Quét bài viết của tài khoản
       const myPostsRes = await httpClient.get('/posts/me?limit=50', session.token);
       const postsToDel = (myPostsRes.data?.contents || myPostsRes.data?.items || [])
@@ -117,32 +119,34 @@ export async function rollbackAll(sessionMap, options = {}) {
         }
       }
 
-      // 2.2 Quét phiên đề xuất câu hỏi của tài khoản
-      const mySessionsRes = await httpClient.get('/sessions/my-submissions?limit=50', session.token);
-      const sessionsToDel = (mySessionsRes.data?.contents || mySessionsRes.data?.items || [])
-        .filter(s => (s.title || '').includes(CONFIG.SEED_TAG));
+      // 2.2 Quét phiên đề xuất câu hỏi còn PENDING của sinh viên
+      if (session.role === 'STUDENT') {
+        const mySessionsRes = await httpClient.get('/sessions/my-submissions?limit=50', session.token);
+        const sessionsToDel = (mySessionsRes.data?.contents || mySessionsRes.data?.items || [])
+          .filter(s => (s.title || '').includes(CONFIG.SEED_TAG) && s.status === 'PENDING');
 
-      for (const sess of sessionsToDel) {
-        const delRes = await httpClient.delete(`/sessions/my-submissions/${sess.session_id}`, session.token);
-        if (delRes.ok) {
-          deletedSessions++;
-          console.log(`  ✓ [Tag Scan] Đã xóa phiên đề xuất [ID: ${sess.session_id}] của ${session.shortName}`);
+        for (const sess of sessionsToDel) {
+          const delRes = await httpClient.delete(`/sessions/my-submissions/${sess.session_id}`, session.token);
+          if (delRes.ok) {
+            deletedSessions++;
+            console.log(`  ✓ [Tag Scan] Đã xóa phiên PENDING [ID: ${sess.session_id}] của ${session.shortName}`);
+          }
         }
       }
 
       // 2.3 Quét nhóm chat mang tag
       const myConvsRes = await httpClient.get('/conversations?limit=50', session.token);
       const groupsToLeave = (myConvsRes.data?.items || [])
-        .filter(c => c.type === 'GROUP' && (c.name || '').includes(CONFIG.SEED_TAG));
+        .filter(c => c.type === 'GROUP' && ((c.name || '').includes(CONFIG.SEED_TAG) || (c.display_name || '').includes(CONFIG.SEED_TAG)));
 
       for (const grp of groupsToLeave) {
         await httpClient.post(`/conversations/${grp.conversation_id}/leave`, null, session.token);
-        console.log(`  ✓ [Tag Scan] Rời nhóm chat [ID: ${grp.conversation_id}]`);
+        console.log(`  ✓ [Tag Scan] ${session.shortName} đã rời nhóm chat [ID: ${grp.conversation_id}]`);
       }
     }
   }
 
   console.log('\n============================================================');
-  console.log(`🎉 HOÀN TẤT ROLLBACK: Đã xóa ${deletedPosts} bài viết, ${deletedComments} bình luận, ${deletedSessions} phiên đề xuất.`);
+  console.log(`🎉 HOÀN TẤT ROLLBACK: Đã xóa ${deletedPosts} bài viết, ${deletedComments} bình luận, ${deletedSessions} phiên PENDING.`);
   console.log('============================================================\n');
 }

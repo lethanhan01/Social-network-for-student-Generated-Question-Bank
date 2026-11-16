@@ -1,149 +1,310 @@
 {
-  "seeded_at": "2026-10-30T09:01:53.809Z",
+  "seeded_at": "2026-11-16T07:07:20.235Z",
   "environment": "https://snsqb.duckdns.org/api/v1",
   "created_entities": {
+    "classes": [
+      {
+        "key": "cls_t1_web",
+        "course_class_id": 102,
+        "class_code": "171150",
+        "subject_id": 2,
+        "lecturerId": 252
+      },
+      {
+        "key": "cls_t1_mob",
+        "course_class_id": 52,
+        "class_code": "171149",
+        "subject_id": 1,
+        "lecturerId": 252
+      },
+      {
+        "key": "cls_t2_web",
+        "course_class_id": 103,
+        "class_code": "171151",
+        "subject_id": 2,
+        "lecturerId": 253
+      },
+      {
+        "key": "cls_t2_mob",
+        "course_class_id": 104,
+        "class_code": "171152",
+        "subject_id": 1,
+        "lecturerId": 253
+      }
+    ],
     "sessions": [
       {
-        "id": 53,
+        "key": "sess_1",
+        "id": 653,
         "authorId": 157,
-        "title": "Bộ câu hỏi ôn tập Chương 1: Kiến trúc Web Client-Server & HTTP Protocols #SQB_SEED"
+        "reviewerId": 252,
+        "classKey": "cls_t1_web",
+        "courseClassId": 102,
+        "title": "Bộ câu hỏi Chương 1: Kiến trúc Web, HTTP/2/3 & CORS Preflight (Lớp 171150) #SQB_SEED",
+        "questionsCount": 5
       },
       {
-        "id": 54,
+        "key": "sess_2",
+        "id": 654,
         "authorId": 164,
-        "title": "Bộ câu hỏi ôn tập Chương 2: RESTful API & Bảo mật Ứng dụng Web #SQB_SEED"
+        "reviewerId": 252,
+        "classKey": "cls_t1_web",
+        "courseClassId": 102,
+        "title": "Bộ câu hỏi Chương 2: Thiết kế RESTful API & Bảo mật JWT/XSS/CSRF (Lớp 171150) #SQB_SEED",
+        "questionsCount": 5
       },
       {
-        "id": 55,
+        "key": "sess_3",
+        "id": 655,
         "authorId": 139,
-        "title": "Bộ câu hỏi ôn tập Chương 3: CSS Modern Layout & Hiệu Năng Tải Trang Web #SQB_SEED"
+        "reviewerId": 253,
+        "classKey": "cls_t2_web",
+        "courseClassId": 103,
+        "title": "Bộ câu hỏi Chương 3 & 4: CSS Modern Layout, Core Web Vitals & React 19 (Lớp 171151) #SQB_SEED",
+        "questionsCount": 5
+      },
+      {
+        "key": "sess_4",
+        "id": 656,
+        "authorId": 163,
+        "reviewerId": 252,
+        "classKey": "cls_t1_mob",
+        "courseClassId": 52,
+        "title": "Bộ câu hỏi Đa nền tảng Phần 1: React Native New Architecture (JSI, Fabric, TurboModules) #SQB_SEED",
+        "questionsCount": 5
+      },
+      {
+        "key": "sess_5",
+        "id": 657,
+        "authorId": 158,
+        "reviewerId": 253,
+        "classKey": "cls_t2_mob",
+        "courseClassId": 104,
+        "title": "Bộ câu hỏi Đa nền tảng Phần 2: Lưu trữ Offline-first, Bảo mật Keychain & Push FCM #SQB_SEED",
+        "questionsCount": 5
+      },
+      {
+        "key": "sess_6",
+        "id": 658,
+        "authorId": 157,
+        "reviewerId": 253,
+        "classKey": "cls_t2_web",
+        "courseClassId": 103,
+        "title": "Bộ câu hỏi Chương 5: Giao tiếp Thời gian thực WebSocket STOMP & Caching Redis (Lớp 171151) #SQB_SEED",
+        "questionsCount": 5
+      }
+    ],
+    "exams": [
+      {
+        "id": 102,
+        "title": "Đề thi Giữa kỳ Công nghệ Web IT4409 - Ca 1 (Học kỳ 20261) #SQB_SEED",
+        "lecturerId": 252
+      },
+      {
+        "id": 103,
+        "title": "Đề thi Giữa kỳ Phát triển Đa nền tảng IT4788 - Ca 1 (Học kỳ 20261) #SQB_SEED",
+        "lecturerId": 252
+      },
+      {
+        "id": 104,
+        "title": "Đề thi Cuối kỳ Công nghệ Web IT4409 - Đề chuẩn hóa SoICT #SQB_SEED",
+        "lecturerId": 253
+      },
+      {
+        "id": 105,
+        "title": "Đề kiểm tra Thực hành Đa nền tảng IT4788 - Đề số 2 #SQB_SEED",
+        "lecturerId": 253
       }
     ],
     "posts": [
       {
-        "id": 55,
+        "id": 717,
         "authorId": 157
       },
       {
-        "id": 56,
+        "id": 718,
         "authorId": 164
       },
       {
-        "id": 57,
+        "id": 719,
         "authorId": 139
       },
       {
-        "id": 58,
+        "id": 720,
         "authorId": 163
       },
       {
-        "id": 59,
+        "id": 721,
         "authorId": 158
       },
       {
-        "id": 60,
+        "id": 722,
         "authorId": 157
       },
       {
-        "id": 61,
+        "id": 723,
         "authorId": 164
       },
       {
-        "id": 62,
+        "id": 724,
         "authorId": 139
+      },
+      {
+        "id": 725,
+        "authorId": 252
+      },
+      {
+        "id": 726,
+        "authorId": 253
+      },
+      {
+        "id": 727,
+        "authorId": 254
+      },
+      {
+        "id": 728,
+        "authorId": 255
+      },
+      {
+        "id": 729,
+        "authorId": 256
       }
     ],
     "comments": [
       {
-        "id": 55,
+        "id": 654,
         "authorId": 164
       },
       {
-        "id": 56,
+        "id": 655,
         "authorId": 157
       },
       {
-        "id": 57,
+        "id": 656,
+        "authorId": 252
+      },
+      {
+        "id": 657,
         "authorId": 139
       },
       {
-        "id": 58,
+        "id": 658,
+        "authorId": 157
+      },
+      {
+        "id": 659,
+        "authorId": 256
+      },
+      {
+        "id": 660,
+        "authorId": 164
+      },
+      {
+        "id": 661,
+        "authorId": 157
+      },
+      {
+        "id": 662,
+        "authorId": 164
+      },
+      {
+        "id": 663,
+        "authorId": 163
+      },
+      {
+        "id": 664,
+        "authorId": 255
+      },
+      {
+        "id": 665,
+        "authorId": 139
+      },
+      {
+        "id": 666,
+        "authorId": 157
+      },
+      {
+        "id": 667,
+        "authorId": 164
+      },
+      {
+        "id": 668,
+        "authorId": 163
+      },
+      {
+        "id": 669,
+        "authorId": 157
+      },
+      {
+        "id": 670,
+        "authorId": 157
+      },
+      {
+        "id": 671,
+        "authorId": 252
+      },
+      {
+        "id": 672,
+        "authorId": 163
+      },
+      {
+        "id": 673,
+        "authorId": 253
+      },
+      {
+        "id": 674,
         "authorId": 158
       },
       {
-        "id": 59,
-        "authorId": 157
+        "id": 675,
+        "authorId": 253
       },
       {
-        "id": 60,
-        "authorId": 163
+        "id": 676,
+        "authorId": 252
       },
       {
-        "id": 61,
-        "authorId": 164
-      },
-      {
-        "id": 62,
-        "authorId": 157
-      },
-      {
-        "id": 63,
-        "authorId": 164
-      },
-      {
-        "id": 64,
-        "authorId": 163
-      },
-      {
-        "id": 65,
-        "authorId": 157
-      },
-      {
-        "id": 66,
+        "id": 677,
         "authorId": 139
       },
       {
-        "id": 67,
-        "authorId": 157
+        "id": 678,
+        "authorId": 252
       },
       {
-        "id": 68,
+        "id": 679,
         "authorId": 164
       },
       {
-        "id": 69,
-        "authorId": 139
+        "id": 680,
+        "authorId": 252
       },
       {
-        "id": 70,
-        "authorId": 163
-      },
-      {
-        "id": 71,
-        "authorId": 158
-      },
-      {
-        "id": 72,
-        "authorId": 157
-      },
-      {
-        "id": 73,
-        "authorId": 139
+        "id": 681,
+        "authorId": 253
       }
     ],
     "conversations": {
       "direct": [
         2,
-        4
+        755,
+        756,
+        757
       ],
       "group": [
-        5
+        758,
+        759,
+        760
       ]
     },
     "friend_requests": [
       {
         "requester_id": 158,
         "addressee_id": 163
+      },
+      {
+        "requester_id": 256,
+        "addressee_id": 255
       }
     ]
   }
