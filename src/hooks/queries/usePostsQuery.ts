@@ -51,7 +51,8 @@ export function useInfinitePostsFeedQuery(limit = 10, enabled = true) {
     queryFn: ({ pageParam, signal }) =>
       postService.getMyPosts({ cursor: pageParam as string | undefined, limit }, { signal }),
     initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage) => getNextCursor(lastPage.pagination),
+    getNextPageParam: (lastPage, _allPages, lastPageParam) =>
+      getNextCursor(lastPage.pagination, lastPage.items ?? [], lastPageParam),
     enabled: isAuthReady && enabled,
   })
 }
@@ -63,7 +64,8 @@ export function useInfiniteActivityFeedQuery(limit = 10, enabled = true) {
     queryFn: ({ pageParam, signal }) =>
       feedService.getActivityFeeds({ cursor: pageParam as string | undefined, limit }, { signal }),
     initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage) => getNextCursor(lastPage.pagination),
+    getNextPageParam: (lastPage, _allPages, lastPageParam) =>
+      getNextCursor(lastPage.pagination, lastPage.items ?? [], lastPageParam),
     enabled: isAuthReady && enabled,
   })
 }

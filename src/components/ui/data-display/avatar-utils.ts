@@ -8,7 +8,7 @@ export type AvatarStatus = 'online' | 'offline' | 'busy' | 'away'
 export type AvatarTone = Tone | 'auto'
 
 export const avatarVariants = cva(
-  'relative inline-flex shrink-0 select-none items-center justify-center overflow-hidden transition-colors',
+  'relative inline-flex shrink-0 select-none items-center justify-center overflow-hidden transition-all duration-150 hover:border-action-accent hover:ring-2 hover:ring-action-accent group-hover:border-action-accent group-hover:ring-2 group-hover:ring-action-accent group-focus-visible:border-action-accent group-focus-visible:ring-2 group-focus-visible:ring-action-accent',
   {
     variants: {
       size: {

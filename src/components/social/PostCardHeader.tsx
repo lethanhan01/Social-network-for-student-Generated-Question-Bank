@@ -53,8 +53,8 @@ export function PostCardHeader({
         {authorId ? (
           <ButtonLink
             to={`/profile/${authorId}`}
-            variant="ghost"
-            className="p-0 h-auto rounded-full min-h-11 min-w-11"
+            variant="plain"
+            className="group inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full p-0 focus-visible:ring-0"
           >
             <Avatar
               src={post.author?.avatar_url || undefined}
@@ -62,6 +62,7 @@ export function PostCardHeader({
               fallback={initials}
               size="md"
               tone="accent"
+              className="h-11 w-11"
             />
           </ButtonLink>
         ) : (
@@ -71,6 +72,7 @@ export function PostCardHeader({
             fallback={initials}
             size="md"
             tone="accent"
+            className="h-11 w-11"
           />
         )}
         {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Author metadata column] */}

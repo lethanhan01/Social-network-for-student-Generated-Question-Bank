@@ -123,7 +123,7 @@ export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(
         ref={ref}
         className={cn(
           avatarVariants({ size, shape, border }),
-          toneClass,
+          hasImage ? 'bg-surface-card border-line-subtle' : toneClass,
           className
         )}
         {...props}

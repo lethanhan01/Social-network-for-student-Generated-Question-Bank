@@ -1,16 +1,16 @@
 /**
- * Module thiết lập hội thoại 1-1, nhóm chat học tập và gửi tin nhắn qua STOMP WebSocket
+ * Module thiết lập hội thoại 1-1, 3 nhóm chat đa vai trò (Student, Teacher, Lớp học phần),
+ * tự động chấp nhận lời mời nhóm cho thành viên khác vai trò và gửi tin nhắn qua STOMP WebSocket.
  */
 
 import { CHAT_DATA } from '../data/chat.data.mjs';
 import { httpClient } from './client.mjs';
 
 function sendWsMessage(token, conversationId, content) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const sessionId = Math.random().toString(36).substring(2, 10);
     const wsUrl = `wss://snsqb.duckdns.org/api/v1/ws/999/${sessionId}/websocket`;
     const ws = new WebSocket(wsUrl);
-    let isConnected = false;
 
     const timeout = setTimeout(() => {
       try { ws.close(); } catch {}
@@ -24,7 +24,6 @@ function sendWsMessage(token, conversationId, content) {
 
     ws.onmessage = (e) => {
       if (typeof e.data === 'string' && e.data.includes('CONNECTED')) {
-        isConnected = true;
         const payload = JSON.stringify({
           conversation_id: conversationId,
           content
@@ -40,7 +39,7 @@ function sendWsMessage(token, conversationId, content) {
       }
     };
 
-    ws.onerror = (err) => {
+    ws.onerror = () => {
       clearTimeout(timeout);
       try { ws.close(); } catch {}
       resolve(false);
@@ -48,30 +47,65 @@ function sendWsMessage(token, conversationId, content) {
   });
 }
 
+async function acceptPendingGroupInvitations(sessionMap, memberIds, groupConvId) {
+  for (const memberId of memberIds) {
+    const memberSession = sessionMap.get(memberId);
+    if (!memberSession) continue;
+
+    const invRes = await httpClient.get('/conversations/group/invitations', memberSession.token);
+    const invitations = Array.isArray(invRes.data)
+      ? invRes.data
+      : (invRes.data?.items || invRes.data?.contents || []);
+
+    for (const inv of invitations) {
+      const invId = inv.invitation_id || inv.id;
+      const targetConvId = inv.conversation_id || inv.conversation?.conversation_id;
+      if (invId && (!targetConvId || targetConvId === groupConvId)) {
+        const accRes = await httpClient.post(
+          `/conversations/group/invitations/${invId}/accept`,
+          null,
+          memberSession.token
+        );
+        if (accRes.ok) {
+          console.log(`    ✓ [${memberSession.shortName}] Đã chấp nhận lời mời tham gia nhóm [ID: ${groupConvId}]`);
+        }
+      }
+    }
+  }
+}
+
 export async function setupChatAndMessages(sessionMap) {
-  console.log('\n[5/7 CHAT] Đang thiết lập các cuộc hội thoại và gửi tin nhắn thời gian thực...');
+  console.log('\n[CHAT] Đang thiết lập 5 cuộc hội thoại 1-1 và 3 nhóm chat đa vai trò qua STOMP WebSocket...');
   const recordedDirects = [];
   const recordedGroups = [];
 
-  // 1. Tạo các cuộc hội thoại 1-1
+  // 1. Tạo các cuộc hội thoại 1-1 (Student-Student, Teacher-Student, Teacher-Teacher)
   for (const directDef of CHAT_DATA.directs) {
     const sessionA = sessionMap.get(directDef.userA);
     const sessionB = sessionMap.get(directDef.userB);
     if (!sessionA || !sessionB) continue;
 
-    const res = await httpClient.post(
+    let res = await httpClient.post(
       '/conversations/direct',
       { target_user_id: directDef.userB },
       sessionA.token
     );
+    if (!res.ok) {
+      res = await httpClient.post(
+        '/conversations/direct',
+        { target_user_id: directDef.userA },
+        sessionB.token
+      );
+    }
 
     let convId = null;
     if (res.ok && res.data?.conversation_id) {
       convId = res.data.conversation_id;
     } else {
-      // Nếu đã tồn tại hội thoại từ trước, fetch danh sách conversations
-      const listRes = await httpClient.get('/conversations', sessionA.token);
-      const existing = listRes.data?.items?.find(c => c.type === 'DIRECT' && c.partner?.user_id === directDef.userB);
+      const listRes = await httpClient.get('/conversations?limit=50', sessionA.token);
+      const existing = (listRes.data?.items || []).find(
+        c => c.type === 'DIRECT' && (c.partner?.user_id === directDef.userB || c.display_name?.includes(sessionB.shortName))
+      );
       if (existing) convId = existing.conversation_id;
     }
 
@@ -79,45 +113,53 @@ export async function setupChatAndMessages(sessionMap) {
       recordedDirects.push(convId);
       console.log(`  ✓ Hội thoại 1-1 [ID: ${convId}]: ${sessionA.shortName} <-> ${sessionB.shortName}`);
 
-      // Gửi các tin nhắn mẫu
       for (const msg of directDef.messages) {
         const sender = sessionMap.get(msg.senderId);
         if (!sender) continue;
         const sent = await sendWsMessage(sender.token, convId, msg.text);
         if (sent) {
-          console.log(`    ↳ [${sender.shortName}]: "${msg.text.slice(0, 45)}..."`);
+          console.log(`    ↳ [${sender.shortName}]: "${msg.text.slice(0, 52)}..."`);
         }
       }
     }
   }
 
-  // 2. Tạo nhóm chat học tập chung
-  const groupDef = CHAT_DATA.group;
-  const creatorSession = sessionMap.get(groupDef.creatorId);
+  // 2. Tạo 3 nhóm chat (Student Study Group, Teacher Faculty Group, Class Group Teacher+Student)
+  const groupDefs = CHAT_DATA.groups || (CHAT_DATA.group ? [CHAT_DATA.group] : []);
 
-  if (creatorSession) {
-    const groupRes = await httpClient.post(
-      '/conversations/group',
-      {
-        name: groupDef.name,
-        member_ids: groupDef.memberIds
-      },
-      creatorSession.token
+  for (const groupDef of groupDefs) {
+    const creatorSession = sessionMap.get(groupDef.creatorId);
+    if (!creatorSession) continue;
+
+    // Kiểm tra xem nhóm đã tồn tại từ trước chưa
+    const listRes = await httpClient.get('/conversations?limit=50', creatorSession.token);
+    const existingGroup = (listRes.data?.items || []).find(
+      c => c.type === 'GROUP' && (c.display_name === groupDef.name || c.name === groupDef.name)
     );
 
-    let groupConvId = null;
-    if (groupRes.ok && groupRes.data?.conversation_id) {
-      groupConvId = groupRes.data.conversation_id;
-    } else {
-      // Tìm lại nếu đã tạo trước đó
-      const listRes = await httpClient.get('/conversations', creatorSession.token);
-      const existing = listRes.data?.items?.find(c => c.type === 'GROUP' && c.name?.includes(groupDef.name));
-      if (existing) groupConvId = existing.conversation_id;
+    let groupConvId = existingGroup?.conversation_id;
+
+    if (!groupConvId) {
+      const groupRes = await httpClient.post(
+        '/conversations/group',
+        {
+          name: groupDef.name,
+          member_ids: groupDef.memberIds
+        },
+        creatorSession.token
+      );
+
+      if (groupRes.ok && groupRes.data?.conversation_id) {
+        groupConvId = groupRes.data.conversation_id;
+      }
     }
 
     if (groupConvId) {
       recordedGroups.push(groupConvId);
-      console.log(`  ✓ Nhóm chat [ID: ${groupConvId}]: "${groupDef.name}" (4 thành viên)`);
+      console.log(`  ✓ Nhóm chat [ID: ${groupConvId}]: "${groupDef.name}" (Tạo bởi: ${creatorSession.shortName})`);
+
+      // Tự động chấp nhận lời mời nhóm cho các thành viên khác vai trò (ví dụ: Student được Teacher mời)
+      await acceptPendingGroupInvitations(sessionMap, groupDef.memberIds, groupConvId);
 
       // Gửi chuỗi tin nhắn trao đổi trong nhóm
       for (const msg of groupDef.messages) {
@@ -125,9 +167,11 @@ export async function setupChatAndMessages(sessionMap) {
         if (!sender) continue;
         const sent = await sendWsMessage(sender.token, groupConvId, msg.text);
         if (sent) {
-          console.log(`    ↳ [${sender.shortName}]: "${msg.text.slice(0, 50)}..."`);
+          console.log(`    ↳ [${sender.shortName}]: "${msg.text.slice(0, 52)}..."`);
         }
       }
+    } else {
+      console.warn(`  ⚠️ Không thể tạo nhóm chat "${groupDef.name}"`);
     }
   }
 
@@ -136,4 +180,3 @@ export async function setupChatAndMessages(sessionMap) {
     groups: recordedGroups
   };
 }
-

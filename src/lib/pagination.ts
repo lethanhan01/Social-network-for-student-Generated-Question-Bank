@@ -6,10 +6,17 @@ import type { CursorPaginationDto } from '@/types'
  * `after` value. This is the single place where that contract is interpreted so it can be
  * corrected in one spot if the backend semantics differ.
  */
-export function getNextCursor(pagination?: CursorPaginationDto): string | undefined {
+export function getNextCursor(
+  pagination?: CursorPaginationDto,
+  items?: readonly unknown[],
+  previousCursor?: string
+): string | undefined {
   if (!pagination?.has_next) return undefined
+  if (items !== undefined && items.length === 0) return undefined
   if (pagination.after === undefined || pagination.after === null) return undefined
-  return String(pagination.after)
+  const nextCursor = String(pagination.after)
+  if (previousCursor !== undefined && nextCursor === previousCursor) return undefined
+  return nextCursor
 }
 
 export const getCursorFromPagination = getNextCursor

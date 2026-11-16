@@ -1,8 +1,12 @@
 /**
- * Danh sách 8 bài viết xã hội và các luồng tương tác bình luận, cảm xúc
+ * Danh sách 13 bài viết xã hội (8 bài Student + 5 bài Teacher),
+ * luồng bình luận phân cấp cha-con, cảm xúc và ghi chú chuyên môn của Giảng viên (Lecturer Notes).
  */
 
 export const POSTS_DATA = [
+  // =========================================================================
+  // 8 BÀI VIẾT CỦA 5 SINH VIÊN (Có thêm tương tác từ các Giảng viên)
+  // =========================================================================
   {
     key: 'p1',
     authorId: 157, // Lê Thành An
@@ -37,19 +41,21 @@ const [state, formAction, isPending] = useActionState(async (prevState, formData
         ]
       },
       {
-        authorId: 139, // Nguyễn Sỹ Lộc
-        content: 'Thầy trên lớp cũng vừa nhắc tuần này về Core Web Vitals và INP. Diffing nhanh nhưng main thread bị block thì điểm INP vẫn thấp.'
+        authorId: 252, // TS. Trần Hoàng Hải (Teacher 01)
+        content: 'Chủ đề thảo luận rất đáng khen ngợi! Các em lưu ý phân tích thêm chi phí bộ nhớ của Subscriptions trong mô hình Fine-grained Reactivity khi quy mô DOM lớn nhé.'
       },
       {
-        authorId: 158, // Nguyễn Trung Kiên
-        content: 'Tuyệt vời anh An ơi, note lại để tuần sau thi trắc nghiệm phần này!'
+        authorId: 139, // Nguyễn Sỹ Lộc
+        content: 'Thầy Hải trên lớp cũng vừa nhắc tuần này về Core Web Vitals và INP. Diffing nhanh nhưng main thread bị block thì điểm INP vẫn thấp.'
       }
     ],
     reactions: [
       { userId: 164, type: 'LOVE' },
       { userId: 139, type: 'LIKE' },
       { userId: 163, type: 'WOW' },
-      { userId: 158, type: 'LIKE' }
+      { userId: 158, type: 'LIKE' },
+      { userId: 252, type: 'LOVE' },
+      { userId: 253, type: 'LIKE' }
     ]
   },
   {
@@ -72,14 +78,15 @@ Khi thiết kế backend Spring Boot kết hợp Frontend React, nhiều bạn h
         content: 'Mutex refresh trong Axios Interceptors là bài học kinh điển khi làm app SPA đa luồng. Cảm ơn Tuấn Anh chia sẻ!'
       },
       {
-        authorId: 163, // Nguyễn Mạnh Tiếp
-        content: 'Cho mình hỏi nếu token hết hạn giữa chừng khi đang upload file lớn thì cơ chế retry xử lý thế nào bạn?'
+        authorId: 256, // TS. Đỗ Quốc Huy (Teacher 05)
+        content: 'Tổng hợp rất chuẩn xác! Khi bảo vệ đồ án cuối kỳ, các nhóm áp dụng đúng Mutex Refresh và Idempotency Key sẽ được cộng điểm kiến trúc bảo mật.'
       }
     ],
     reactions: [
       { userId: 157, type: 'LOVE' },
       { userId: 139, type: 'LIKE' },
-      { userId: 158, type: 'WOW' }
+      { userId: 158, type: 'WOW' },
+      { userId: 256, type: 'LOVE' }
     ]
   },
   {
@@ -89,7 +96,7 @@ Khi thiết kế backend Spring Boot kết hợp Frontend React, nhiều bạn h
 
 Chào các bạn, nhóm mình hiện có 2 thành viên đang triển khai đề tài: *"Nền tảng chia sẻ câu hỏi trắc nghiệm & mạng xã hội học tập HUST"*.
 
-Nhóm cần tìm thêm 1 bạn cùng lớp học phần \`171146\` có thế mạnh:
+Nhóm cần tìm thêm 1 bạn cùng lớp học phần \`171150\` / \`171151\` có thế mạnh:
 - Nắm vững CSS Tailwind / Responsive Design
 - Có tinh thần trách nhiệm, sẵn sàng code sprint cuối kỳ
 - Biết sử dụng Git/GitHub căn bản
@@ -141,14 +148,14 @@ Bạn nào có kinh nghiệm cấu hình CORS chuẩn cho cả WebSocket SockJS 
         ]
       },
       {
-        authorId: 157, // Lê Thành An
-        content: 'Nhớ check cả allowCredentials(true) nếu dùng Cookie cho session nha bạn.'
+        authorId: 255, // ThS. Lê Minh Tuấn (Teacher 04)
+        content: 'Em nhớ thiết lập thêm Access-Control-Max-Age (ví dụ 3600 giây) trên Nginx/Spring để trình duyệt cache lại kết quả Preflight, giảm tải số lượng request OPTIONS nhé!'
       }
     ],
     reactions: [
       { userId: 164, type: 'LOVE' },
       { userId: 157, type: 'LIKE' },
-      { userId: 158, type: 'WOW' }
+      { userId: 255, type: 'LIKE' }
     ]
   },
   {
@@ -188,17 +195,16 @@ Mọi người có extension nào tâm đắc nữa không?
   {
     key: 'p6',
     authorId: 157, // Lê Thành An
-    content: `📚 **Tổng hợp Tài liệu ôn tập Chương 1-3 Môn Công nghệ Web (IT4409)**
+    content: `📚 **Tổng hợp Tài liệu ôn tập Chương 1-5 Môn Công nghệ Web (IT4409) & Đa nền tảng (IT4788)**
 
-Gửi các bạn sinh viên lớp \`171146\` bộ tài liệu tóm tắt kiến thức trọng tâm chuẩn bị cho đợt thi trắc nghiệm giữa kỳ:
+Gửi các bạn sinh viên lớp \`171150\` và \`171151\` bộ tài liệu tóm tắt kiến thức trọng tâm chuẩn bị cho đợt thi trắc nghiệm giữa kỳ:
 
-- **Chương 1**: Giao thức HTTP 1.1/2/3, RESTful constraints, Kiến trúc MVC vs Microservices.
-- **Chương 2**: Quản lý trạng thái, Session/Cookie, JWT Tokens, Bảo mật XSS, CSRF, SQL Injection.
-- **Chương 3**: Layout hiện đại với CSS Grid & Flexbox, Tối ưu hiệu năng tải trang và Core Web Vitals (LCP, FID/INP, CLS).
+- **IT4409**: Giao thức HTTP 1.1/2/3, RESTful constraints, Bảo mật JWT/XSS/CSRF, Layout CSS Grid & Flexbox, Core Web Vitals (LCP, INP, CLS), WebSocket STOMP & Redis Caching.
+- **IT4788**: Kiến trúc React Native JSI/Fabric/TurboModules, Flutter Widget/Element/RenderObject Tree, Lưu trữ an toàn Keychain/Keystore & Offline-first Outbox.
 
 Chúc các bạn ôn thi đạt điểm A+! 💪
 
-#SQB_SEED #IT4409 #TaiLieuOnTap #HUST`,
+#SQB_SEED #IT4409 #IT4788 #TaiLieuOnTap #HUST`,
     visibility: 'PUBLIC',
     subjectId: 2,
     comments: [
@@ -207,23 +213,16 @@ Chúc các bạn ôn thi đạt điểm A+! 💪
         content: 'Tài liệu quá đầy đủ và tâm huyết, cảm ơn An nhiều!'
       },
       {
-        authorId: 139, // Nguyễn Sỹ Lộc
-        content: 'Lưu về ngay để ôn, đề thi môn này phần phân biệt HTTP status code hay bẫy lắm.'
-      },
-      {
         authorId: 163, // Nguyễn Mạnh Tiếp
-        content: 'Đã tải về, mong các bạn trong nhóm cùng đạt kết quả tốt!'
-      },
-      {
-        authorId: 158, // Nguyễn Trung Kiên
-        content: 'Tuyệt vời ạ, cảm ơn bạn đã chia sẻ cho cả lớp.'
+        content: 'Đã tải về và luyện hết bộ 30 câu hỏi trắc nghiệm trên hệ thống, cực kỳ bám sát đề cương!'
       }
     ],
     reactions: [
       { userId: 164, type: 'LOVE' },
       { userId: 139, type: 'LOVE' },
       { userId: 163, type: 'LIKE' },
-      { userId: 158, type: 'LIKE' }
+      { userId: 158, type: 'LIKE' },
+      { userId: 252, type: 'LOVE' }
     ]
   },
   {
@@ -239,8 +238,6 @@ Tranh cãi muôn thuở giữa cộng đồng Web Developers:
 - Cấp \`Access Token\` lưu trong JavaScript Memory (React State / Zustand) với thời gian sống ngắn (15 phút).
 - Cấp \`Refresh Token\` lưu trong \`HttpOnly Cookie\` (SameSite=Strict, Secure). Khi reload trang, gửi request silent refresh để lấy lại access token mới!
 
-Mời anh em thảo luận!
-
 #SQB_SEED #WebSecurity #JWT #Authentication`,
     visibility: 'FRIENDS',
     subjectId: 2,
@@ -248,10 +245,6 @@ Mời anh em thảo luận!
       {
         authorId: 157, // Lê Thành An
         content: 'Chuẩn bài kiến trúc của hệ thống SQB HUST luôn! Memory state chống XSS đánh cắp vĩnh viễn, còn cookie silent refresh đảm bảo UX không bị bắt đăng nhập lại.'
-      },
-      {
-        authorId: 139, // Nguyễn Sỹ Lộc
-        content: 'Một góc nhìn rất sắc bén từ chuyên gia bảo mật của lớp!'
       }
     ],
     reactions: [
@@ -262,13 +255,12 @@ Mời anh em thảo luận!
   {
     key: 'p8',
     authorId: 139, // Nguyễn Sỹ Lộc
-    content: `📝 **Ghi chú cá nhân: Checklist hoàn thiện BTL Công nghệ Web trước ngày 15/11**
+    content: `📝 **Ghi chú cá nhân: Checklist hoàn thiện BTL Công nghệ Web trước hạn nộp**
 
 - [x] Thiết lập cấu hình dự án Vite + React 19 + Tailwind v4.
 - [x] Tích hợp bộ quy chuẩn semantic HTML và kiểm soát tương phản màu sắc.
-- [ ] Hoàn thiện tính năng bình luận thời gian thực qua STOMP WebSocket.
-- [ ] Chạy kiểm thử tự động toàn diện: \`npm run audit:strict\` và \`npm test\`.
-- [ ] Đóng gói Docker container và deploy lên staging.
+- [x] Hoàn thiện tính năng bình luận thời gian thực qua STOMP WebSocket.
+- [x] Chạy kiểm thử tự động toàn diện: \`npm run audit:strict\` và \`npm test\`.
 
 Cố lên tôi ơi! 🎯
 
@@ -277,6 +269,193 @@ Cố lên tôi ơi! 🎯
     subjectId: 2,
     comments: [],
     reactions: []
+  },
+
+  // =========================================================================
+  // 5 BÀI VIẾT CỦA 5 GIẢNG VIÊN (TEACHER 01..05)
+  // =========================================================================
+  {
+    key: 'p9',
+    authorId: 252, // TS. Trần Hoàng Hải (Teacher 01)
+    content: `📢 **[THÔNG BÁO HỌC THUẬT] Hướng dẫn Đóng góp Ngân hàng Câu hỏi & Tiêu chí Đánh giá Học phần IT4409 (Lớp 171150) và IT4788 (Lớp 171149)**
+
+Chào các em sinh viên Trường CNTT&TT (SoICT - HUST),
+
+Trong học kỳ \`20261\`, thầy đã mở đầy đủ các lớp học phần **Công nghệ Web (\`171150\`)** và **Phát triển ứng dụng đa nền tảng (\`171149\`)** trên hệ thống **SQB HUST**. Khi biên soạn và đề xuất phiên câu hỏi trắc nghiệm, các em cần lưu ý 3 tiêu chuẩn chất lượng:
+
+1. **Tính chính xác & Nguồn tham chiếu**: Mỗi câu hỏi phải có đúng 1 đáp án đúng rõ ràng và lời giải thích (Explanation) trích dẫn từ đặc tả chuẩn (MDN, W3C, RFC, React/Flutter Docs).
+2. **Chất lượng phương án gây nhiễu (Distractors)**: 3 phương án sai phải phản ánh các nhầm lẫn kỹ thuật phổ biến trong thực tế, tránh đặt phương án vô nghĩa.
+3. **Khai báo trung thực nguồn gốc AI (\`LLM\`) hay Tự biên soạn (\`HOMO_SAPIENS\`)**: Phục vụ hệ thống kiểm định ảo giác Btprop và trò chơi dự đoán học thuật hàng tuần.
+
+Toàn bộ các phiên câu hỏi chất lượng cao đã được thầy thẩm định và đưa vào Ngân hàng đề thi chính thức. Chúc các em học tập hiệu quả! 🎓
+
+#SQB_SEED #SoICT #IT4409 #IT4788 #LecturerAnnouncement`,
+    visibility: 'PUBLIC',
+    subjectId: 2,
+    comments: [
+      {
+        authorId: 157, // Lê Thành An
+        content: 'Em cảm ơn thầy Hải ạ! Nhóm em đã nộp các bộ câu hỏi Chương 1-2 kèm trích dẫn RFC 9110 đầy đủ và đã được thầy phê duyệt vào ngân hàng đề rồi ạ.',
+        replies: [
+          {
+            authorId: 252, // TS. Trần Hoàng Hải reply
+            content: 'Thầy đã xem và đánh giá rất cao bộ câu hỏi HTTP/2 Multiplexing và CORS của nhóm An. Tiếp tục phát huy ở các chương tiếp theo nhé!'
+          }
+        ]
+      },
+      {
+        authorId: 163, // Nguyễn Mạnh Tiếp
+        content: 'Thưa thầy, phần câu hỏi React Native JSI và TurboModules của lớp 171149 em cũng vừa hoàn thành luyện tập xong, rất sát nội dung thực hành ạ!'
+      },
+      {
+        authorId: 253, // PGS.TS. Phạm Văn Đồng (Teacher 02)
+        content: 'Bộ tiêu chí rất rõ ràng thầy Hải ơi, bên lớp 171151 và 171152 của tôi cũng áp dụng chung khung đánh giá này để đồng bộ ngân hàng đề toàn khoa.'
+      }
+    ],
+    reactions: [
+      { userId: 157, type: 'LOVE' },
+      { userId: 164, type: 'LOVE' },
+      { userId: 139, type: 'LIKE' },
+      { userId: 163, type: 'LOVE' },
+      { userId: 158, type: 'LIKE' },
+      { userId: 253, type: 'LOVE' },
+      { userId: 254, type: 'LIKE' }
+    ]
+  },
+  {
+    key: 'p10',
+    authorId: 253, // PGS.TS. Phạm Văn Đồng (Teacher 02)
+    content: `📱 **[CHUYÊN ĐỀ ĐA NỀN TẢNG - IT4788] Tối ưu Hiệu năng 60/120 FPS trên Thiết bị Di động: Từ Cầu nối Bất đồng bộ đến JSI & Impeller**
+
+Khi chấm đồ án môn **Phát triển ứng dụng đa nền tảng (IT4788 - Lớp 171152)**, lỗi phổ biến nhất khiến ứng dụng của sinh viên bị giật cục (Frame Drop) là nghẽn luồng giao tiếp và dựng danh sách chưa tối ưu:
+
+- **Tránh truyền tải JSON khổng lồ qua mỗi khung hình**: Tận dụng **JSI (JavaScript Interface)** và **MMKV** để đọc/ghi đồng bộ các trạng thái cần tốc độ cao.
+- **Chiến lược Offline-first chuẩn mực**: Kết hợp SQLite cục bộ với **Outbox Queue** có gắn \`Idempotency-Key\` để đảm bảo người dùng thao tác mượt mà ngay cả khi đi vào thang máy hoặc vùng sóng yếu.
+- **Bảo mật dữ liệu nhạy cảm**: Tuyệt đối không lưu Refresh Token trong \`AsyncStorage\` thuần; bắt buộc sử dụng \`Keychain\` (iOS) và \`Keystore\` (Android).
+
+Thầy đã khởi tạo sẵn **2 đề thi chuẩn hóa** từ Ngân hàng câu hỏi của lớp để các em đối chiếu cấu trúc ôn tập. 💡
+
+#SQB_SEED #IT4788 #MobileArchitecture #ReactNative #Flutter #SoICT`,
+    visibility: 'PUBLIC',
+    subjectId: 1,
+    comments: [
+      {
+        authorId: 158, // Nguyễn Trung Kiên
+        content: 'Bài tổng hợp của thầy Đồng giúp em hiểu rõ hẳn lý do tại sao phải dùng Outbox Queue kèm Idempotency Key khi đồng bộ mạng chập chờn. Em cảm ơn thầy ạ!',
+        replies: [
+          {
+            authorId: 253, // PGS.TS. Phạm Văn Đồng reply
+            content: 'Tốt lắm Kiên! Em áp dụng ngay mô hình này vào bài tập lớn của nhóm tuần tới nhé.'
+          }
+        ]
+      },
+      {
+        authorId: 252, // TS. Trần Hoàng Hải
+        content: 'Chia sẻ rất thiết thực cho sinh viên cả 2 lớp 171149 và 171152. Cảm ơn PGS. Đồng!'
+      }
+    ],
+    reactions: [
+      { userId: 157, type: 'LIKE' },
+      { userId: 163, type: 'LOVE' },
+      { userId: 158, type: 'LOVE' },
+      { userId: 252, type: 'LOVE' },
+      { userId: 255, type: 'WOW' }
+    ]
+  },
+  {
+    key: 'p11',
+    authorId: 254, // TS. Nguyễn Thị Thanh Huyền (Teacher 03)
+    content: `🤖 **[AI TRONG GIÁO DỤC] Cơ chế Kiểm định Ảo giác Btprop (Belief Tree Propagation) cho Ngân hàng Câu hỏi Sinh viên Khởi tạo**
+
+Một thách thức thú vị của mô hình **Crowdsourced Question Bank (SQB)** là làm sao hỗ trợ sinh viên dùng AI tinh chỉnh câu hỏi mà không đưa thông tin ảo giác (Hallucination) vào ngân hàng đề:
+
+1. **Cây niềm tin kiểm định (Belief Tree Audit)**: Phân rã đề bài, đáp án đúng và lời giải thành các mệnh đề nguyên tử để kiểm tra tính nhất quán logic.
+2. **Đánh giá chéo cộng đồng (Peer Rating 0-4 sao) & Game 6**: Kết hợp đánh giá của giảng viên, đánh giá của bạn học cùng lớp và thử thách nhận diện câu hỏi AI định kỳ.
+
+Rất ấn tượng khi thấy tỷ lệ câu hỏi đạt chuẩn của sinh viên K68 kỳ này đạt trên 95%! 🌟
+
+#SQB_SEED #AIinEducation #Btprop #QuestionBank #HUST`,
+    visibility: 'PUBLIC',
+    subjectId: 2,
+    comments: [
+      {
+        authorId: 139, // Nguyễn Sỹ Lộc
+        content: 'Tính năng AI Tinh chỉnh kèm kiểm định ảo giác trên hệ thống giúp tụi em rà soát lại lời giải câu hỏi rất nhanh trước khi gửi thầy cô duyệt ạ!'
+      },
+      {
+        authorId: 252, // TS. Trần Hoàng Hải
+        content: 'Nhờ mô hình kiểm định trùng lặp và gợi ý AI của nhóm nghiên cứu cô Huyền mà khối lượng thời gian giảng viên duyệt bài giảm đi đáng kể.'
+      }
+    ],
+    reactions: [
+      { userId: 157, type: 'WOW' },
+      { userId: 139, type: 'LOVE' },
+      { userId: 252, type: 'LOVE' },
+      { userId: 253, type: 'LIKE' }
+    ]
+  },
+  {
+    key: 'p12',
+    authorId: 255, // ThS. Lê Minh Tuấn (Teacher 04)
+    content: `🐳 **[HƯỚNG DẪN THỰC HÀNH] Checklist Đóng gói Docker & Triển khai Production cho Đồ án Môn học IT4409 / IT4788**
+
+Dành cho các nhóm sinh viên chuẩn bị демо Bài tập lớn cuối kỳ tại phòng Lab Trung tâm Máy tính:
+
+- **Frontend SPA**: Sử dụng Multi-stage Dockerfile (\`node:20-alpine\` cho bước build Vite và \`nginx:alpine\` cho bước serve tĩnh), cấu hình \`try_files $uri $uri/ /index.html;\` để không bị lỗi 404 khi F5 trên React Router.
+- **Reverse Proxy & WebSocket**: Đảm bảo truyền đủ bộ header \`Upgrade: websocket\` và \`Connection: "upgrade"\` cho endpoint \`/api/v1/ws\`.
+- **Kiểm tra chất lượng tự động**: Luôn chạy \`npm run audit:strict\` và \`npm test\` xanh 100% trong pipeline trước khi merge nhánh chính.
+
+Chúc các nhóm triển khai suôn sẻ! 🚀
+
+#SQB_SEED #DevOps #Docker #Nginx #Deployment #SoICT`,
+    visibility: 'PUBLIC',
+    subjectId: 2,
+    comments: [
+      {
+        authorId: 164, // Bùi Tuấn Anh
+        content: 'Checklist quá chi tiết thầy Tuấn ơi! Nhóm em vừa cấu hình xong proxy WebSocket theo đúng hướng dẫn của thầy, kết nối STOMP ổn định tuyệt đối ạ.'
+      }
+    ],
+    reactions: [
+      { userId: 157, type: 'LIKE' },
+      { userId: 164, type: 'LOVE' },
+      { userId: 158, type: 'LIKE' },
+      { userId: 252, type: 'LIKE' }
+    ]
+  },
+  {
+    key: 'p13',
+    authorId: 256, // TS. Đỗ Quốc Huy (Teacher 05)
+    content: `🔒 **[GHI CHÚ HỘI ĐỒNG GIẢNG VIÊN] Thống nhất bộ câu hỏi Vấn đáp Bảo mật Web & API cho đợt bảo vệ BTL cuối kỳ**
+
+Gửi các thầy cô trong tổ bộ môn Công nghệ Web & Phát triển Đa nền tảng:
+
+Tôi đã rà soát các câu hỏi thuộc chủ đề **Authentication, OAuth2 PKCE, CORS, XSS/CSRF và Mobile Keychain** trong ngân hàng câu hỏi chung. Đề xuất hội đồng sử dụng trực tiếp các bộ đề thi đã kết xuất từ hệ thống SQB làm ngân hàng câu hỏi trắc nghiệm đầu giờ trước khi vào phần demo trực tiếp của từng nhóm sinh viên.
+
+#SQB_SEED #FacultyNote #SecurityReview #SoICT`,
+    visibility: 'FRIENDS',
+    subjectId: 2,
+    comments: [
+      {
+        authorId: 252, // TS. Trần Hoàng Hải
+        content: 'Hoàn toàn nhất trí với thầy Huy! Tôi và PGS. Đồng đã khởi tạo sẵn 4 bộ đề thi chuẩn hóa trên hệ thống cho cả 2 môn IT4409 và IT4788.'
+      },
+      {
+        authorId: 253, // PGS.TS. Phạm Văn Đồng
+        content: 'Nhất trí cao! Các câu hỏi do sinh viên đóng góp kỳ này được biên tập rất kỹ, hoàn toàn đáp ứng yêu cầu kiểm tra đánh giá.'
+      }
+    ],
+    reactions: [
+      { userId: 252, type: 'LOVE' },
+      { userId: 253, type: 'LOVE' },
+      { userId: 254, type: 'LIKE' },
+      { userId: 255, type: 'LIKE' }
+    ]
   }
 ];
 
+export const LECTURER_NOTES = [
+  '🌟 [Nhận xét Giảng viên]: Bộ câu hỏi được biên soạn rất công phu, bám sát chuẩn RFC và kiến trúc thực tế. Khuyến khích cả lớp vào làm bài luyện tập! #SQB_SEED',
+  '🎓 [Đánh giá Chuyên môn]: Các phương án lựa chọn có tính phân loại cao, lời giải thích mạch lạc giúp củng cố vững chắc kiến thức trọng tâm học phần. #SQB_SEED',
+  '✅ [Xác nhận Ngân hàng đề]: Đã thẩm định và đưa vào danh mục câu hỏi ôn tập chính thức phục vụ kỳ thi giữa kỳ và cuối kỳ tại SoICT HUST. #SQB_SEED'
+];

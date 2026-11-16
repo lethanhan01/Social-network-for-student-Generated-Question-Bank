@@ -166,4 +166,27 @@ describe('ProfilePage Component', () => {
     expect(await screen.findByRole('button', { name: /Chỉnh sửa hồ sơ/ })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Tùy chọn hồ sơ' })).not.toBeInTheDocument()
   })
+
+  it('renders cover banner preview, hero avatar, and accessible form controls in EditProfileModal', async () => {
+    const user = userEvent.setup()
+    vi.mocked(userService.getMyProfile).mockResolvedValue({
+      user_id: 100,
+      role: 'STUDENT',
+      full_name: 'Nguyễn Văn Minh',
+      cover_url: 'https://example.com/cover.jpg',
+    })
+    renderWithQueryClient(
+      <MemoryRouter initialEntries={['/profile/me']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Routes>
+          <Route path="/profile/:userId" element={<ProfilePage />} />
+        </Routes>
+      </MemoryRouter>
+    )
+    await user.click(await screen.findByRole('button', { name: 'Chỉnh sửa hồ sơ' }))
+    expect(await screen.findByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Đổi ảnh bìa' })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Đổi ảnh bìa' })).toHaveAttribute('src', 'https://example.com/cover.jpg')
+    expect(screen.getByLabelText('Ngày sinh')).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Múi giờ' })).toBeInTheDocument()
+  })
 })

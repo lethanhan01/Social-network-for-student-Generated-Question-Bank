@@ -125,31 +125,33 @@ export function PostCard({
         </aside>
       ) : null}
 
-      {/* Stats Bar */}
-      <footer className="flex items-center justify-between text-xs text-text-muted pt-1 border-t border-line-subtle">
-        <strong className="font-normal flex items-center gap-1">
-          <ThumbsUp size={13} className="text-action-accent" />
-          {reaction.count} {t('post.likeCountUnit')}
-        </strong>
-        <Button
-          variant="link"
-          tone="neutral"
-          size="sm"
-          onClick={() => setShowComments((prev) => !prev)}
-          className="text-xs"
-        >
-          {post.comment_count || 0} {t('post.commentCountUnit')}
-        </Button>
-      </footer>
+      {/* Single-row Footer: Actions (Left) + Stats (Right) */}
+      <footer className="flex items-center justify-between gap-2 pt-1 border-t border-line-subtle text-xs text-text-muted whitespace-nowrap">
+        <PostCardActions
+          disabled={reaction.pending || !post.post_id}
+          localReacted={reaction.reacted}
+          onReact={reaction.react}
+          onToggleComments={() => setShowComments((prev) => !prev)}
+          onShare={handleCopyLink}
+        />
 
-      {/* Action Buttons */}
-      <PostCardActions
-        disabled={reaction.pending || !post.post_id}
-        localReacted={reaction.reacted}
-        onReact={reaction.react}
-        onToggleComments={() => setShowComments((prev) => !prev)}
-        onShare={handleCopyLink}
-      />
+        {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Right-aligned post stats group] */}
+        <div className="flex items-center gap-3 shrink-0">
+          <strong className="font-normal flex items-center gap-1">
+            <ThumbsUp size={13} className="text-action-accent" />
+            {reaction.count} {t('post.likeCountUnit')}
+          </strong>
+          <Button
+            variant="link"
+            tone="neutral"
+            size="sm"
+            onClick={() => setShowComments((prev) => !prev)}
+            className="text-xs px-0"
+          >
+            {post.comment_count || 0} {t('post.commentCountUnit')}
+          </Button>
+        </div>
+      </footer>
 
       {/* Comments Drawer / Section */}
       {showComments && post.post_id ? (

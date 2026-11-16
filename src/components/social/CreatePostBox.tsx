@@ -26,14 +26,14 @@ export function CreatePostBox({ user, onOpenCreateModal }: Readonly<CreatePostBo
         src={user?.avatar_url || undefined}
         name={displayName}
         fallback={initials}
-        size="sm"
+        size="md"
         tone="accent"
         className="shrink-0"
       />
       <Button
         variant="secondary"
         onClick={onOpenCreateModal}
-        className="min-h-11 min-w-0 flex-1 justify-start rounded-full bg-surface-hover px-3 text-left text-sm font-normal text-fg-muted"
+        className="min-h-11 min-w-0 flex-1 justify-start rounded-xl bg-surface-hover px-3 text-left text-sm font-normal text-fg-muted"
       >
         {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Keep the composer prompt on one line without shortening its accessible name] */}
         <span className="min-w-0 truncate">{t('social.composerPrompt')}</span>

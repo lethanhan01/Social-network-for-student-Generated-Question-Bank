@@ -1,12 +1,13 @@
 /**
- * Module đăng bài viết, bình luận phân cấp và thả cảm xúc mạng xã hội
+ * Module đăng bài viết (8 bài Student + 5 bài Teacher), bình luận phân cấp,
+ * thả cảm xúc mạng xã hội và gắn Ghi chú chuyên môn của Giảng viên (Lecturer Notes) lên bài Vinh danh.
  */
 
-import { POSTS_DATA } from '../data/posts.data.mjs';
+import { POSTS_DATA, LECTURER_NOTES } from '../data/posts.data.mjs';
 import { httpClient } from './client.mjs';
 
 export async function createSocialContent(sessionMap) {
-  console.log('\n[4/7 SOCIAL] Đang khởi tạo 8 bài viết, bình luận và cảm xúc...');
+  console.log('\n[SOCIAL] Đang khởi tạo 13 bài viết (8 SV + 5 GV), bình luận, cảm xúc và Lecturer Notes...');
   const createdPosts = [];
   const createdComments = [];
 
@@ -17,7 +18,6 @@ export async function createSocialContent(sessionMap) {
       continue;
     }
 
-    // 1. Tạo bài viết sinh viên (SOCIAL_POST không truyền subject_id)
     const postPayload = {
       content: postDef.content,
       visibility: postDef.visibility,
@@ -32,7 +32,7 @@ export async function createSocialContent(sessionMap) {
 
     const postId = postRes.data.post_id;
     createdPosts.push({ id: postId, authorId: postDef.authorId });
-    console.log(`  ✓ Đã đăng bài viết [ID: ${postId}] của ${authorSession.shortName} (${postDef.visibility})`);
+    console.log(`  ✓ [${authorSession.role}] Đã đăng bài viết [ID: ${postId}] của ${authorSession.shortName} (${postDef.visibility})`);
 
     // 2. Tạo bình luận và phản hồi phân cấp
     for (const commentDef of postDef.comments || []) {
@@ -95,7 +95,46 @@ export async function createSocialContent(sessionMap) {
     }
   }
 
-  console.log(`  ✓ Tổng kết Social: ${createdPosts.length} bài viết, ${createdComments.length} bình luận đã tạo.`);
+  // 4. Teacher 01 (252) & Teacher 02 (253) gắn Ghi chú chuyên môn (Lecturer Notes) lên các bài Vinh danh câu hỏi
+  let notedCount = 0;
+  for (const teacherId of [252, 253]) {
+    const teacherSession = sessionMap.get(teacherId);
+    if (!teacherSession) continue;
+
+    const feedRes = await httpClient.get('/activity-feeds?limit=40', teacherSession.token);
+    const feedItems = feedRes.data?.items || feedRes.data?.contents || [];
+    const honorItems = feedItems.filter(
+      item =>
+        (item.action_type === 'SESSION_RESOLVED_APPROVED' ||
+          item.content?.post_type === 'QUESTION_APPROVED_NOTIFICATION') &&
+        item.target_id
+    );
+
+    for (let idx = 0; idx < honorItems.length; idx++) {
+      const honor = honorItems[idx];
+      const postId = honor.target_id;
+      const noteText = LECTURER_NOTES[(idx + teacherId) % LECTURER_NOTES.length];
+
+      const noteRes = await httpClient.put(
+        `/posts/${postId}/lecturer-notes`,
+        { content: noteText },
+        teacherSession.token
+      );
+
+      if (noteRes.ok) {
+        notedCount++;
+        console.log(`  ✓ [Lecturer Note] ${teacherSession.shortName} đã gắn ghi chú chuyên môn lên bài vinh danh [Post ID: ${postId}]`);
+        // Thả thêm cảm xúc LOVE của Giảng viên lên bài vinh danh
+        await httpClient.post(
+          '/react',
+          { target_type: 'POST', target_id: postId, reaction_type: 'LOVE' },
+          teacherSession.token
+        );
+      }
+    }
+  }
+
+  console.log(`  ✓ Tổng kết Social: ${createdPosts.length} bài viết, ${createdComments.length} bình luận, ${notedCount} ghi chú vinh danh Giảng viên.`);
   return {
     posts: createdPosts,
     comments: createdComments
