@@ -120,13 +120,13 @@ describe('FeedPage Component', () => {
     expect(screen.getByRole('link', { name: 'Tìm kiếm & Kết nối' })).toHaveAttribute('href', '/friends')
   })
 
-  it('syncs the sidebar subject filter with the feed URL and subject selector', async () => {
+  it('syncs the sidebar subject filter with the feed URL', async () => {
     const user = userEvent.setup()
     renderWithQueryClient(<BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><FeedPage /></BrowserRouter>)
 
+    expect(screen.queryByRole('combobox', { name: 'Lọc theo môn học' })).not.toBeInTheDocument()
     await user.click(await screen.findByRole('button', { name: /Công nghệ Web/ }))
     expect(new URLSearchParams(window.location.search).get('subject')).toBe('1')
-    expect(screen.getByRole('combobox', { name: 'Lọc theo môn học' })).toHaveTextContent('IT4409')
 
     await user.click(screen.getByRole('button', { name: /Công nghệ Web/ }))
     expect(new URLSearchParams(window.location.search).has('subject')).toBe(false)

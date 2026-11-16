@@ -5,7 +5,6 @@ import { Sparkles, BookOpen, GraduationCap } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Heading } from '@/components/ui/typography/Heading'
 import { Button } from '@/components/ui/actions/Button'
-import { Select } from '@/components/ui/forms/Select'
 import { Page } from '@/components/ui/layout/PageUI'
 import { SocialFeedLayout } from '@/components/social/SocialFeedLayout'
 import { SocialLeftSidebar } from '@/components/social/SocialLeftSidebar'
@@ -100,21 +99,6 @@ export default function FeedPage() {
           </Button>
         ))}
       </nav>
-      <Select
-        ariaLabel={t('social.subjectFilter')}
-        value={subjectId ? String(subjectId) : ''}
-        placeholder={t('social.allSubjects')}
-        onValueChange={(value) => update('subject', value)}
-        options={[
-          { value: '', label: t('social.allSubjects') },
-          ...subjects
-            .filter((subject) => subject.subject_id)
-            .map((subject) => ({
-              value: String(subject.subject_id),
-              label: `${subject.code} · ${subject.name}`,
-            })),
-        ]}
-      />
       {(counter.data?.new_count ?? 0) > 0 ? (
         <Button
           variant="secondary"
@@ -131,7 +115,11 @@ export default function FeedPage() {
         <QueryFeedback pending={query.isPending} error={query.error} onRetry={query.refetch} />
       ) : null}
       {tab === 'MY_SUBJECTS' && (enrolled.isPending || enrolled.isError) ? (
-        <QueryFeedback pending={enrolled.isPending} error={enrolled.error} onRetry={enrolled.refetch} />
+        <QueryFeedback
+          pending={enrolled.isPending}
+          error={enrolled.error}
+          onRetry={enrolled.refetch}
+        />
       ) : null}
       {recentPosts.map((post) =>
         post.post_id ? (
