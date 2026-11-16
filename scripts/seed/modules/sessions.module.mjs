@@ -320,31 +320,32 @@ export async function practiceAndGenerateExams(sessionMap, classIdMap, proposedS
         const studentSession = sessionMap.get(studentId);
         if (!studentSession) continue;
 
-        if (!(liveQ.my_interaction?.answered && studentId === 157)) {
-          const pickCorrect = ((qIdx + sIdx) % 5) !== 4;
-          const selectedKey = pickCorrect ? correctOpt : wrongOpt;
+        if (liveQ.my_interaction?.answered && studentId === 157) continue;
 
-          const ansPayload = {
-            selected_options: [selectedKey]
-          };
-          if (liveQ.updated_at) {
-            ansPayload.question_updated_at = liveQ.updated_at;
-          }
+        const pickCorrect = ((qIdx + sIdx) % 5) !== 4;
+        const selectedKey = pickCorrect ? correctOpt : wrongOpt;
 
-          const ansRes = await httpClient.post(`/questions/${qId}/answer`, ansPayload, studentSession.token);
-          if (ansRes.ok) {
-            totalAnswers++;
-          }
+        const ansPayload = {
+          selected_options: [selectedKey]
+        };
+        if (liveQ.updated_at) {
+          ansPayload.question_updated_at = liveQ.updated_at;
         }
 
-        // Cho 3 Student đánh giá chất lượng mỗi câu hỏi (tránh tự đánh giá câu của chính mình)
-        if (studentId !== sessionDef.authorId && (sIdx === 0 || sIdx === 1 || sIdx === 2)) {
+        const ansRes = await httpClient.post(`/questions/${qId}/answer`, ansPayload, studentSession.token);
+        if (ansRes.ok) {
+          totalAnswers++;
+        }
+
+        // Cho 2 Student đánh giá chất lượng mỗi câu hỏi (tránh tự đánh giá câu của chính mình nếu backend chặn)
+        if (studentId !== sessionDef.authorId && (sIdx === 0 || sIdx === 2)) {
           const ratingScore = (qIdx + sIdx) % 3 === 0 ? 3 : 4;
           const commentText = PRACTICE_COMMENTS[(qIdx + sIdx) % PRACTICE_COMMENTS.length];
           const rateRes = await httpClient.post(
             `/questions/${qId}/rate`,
             {
               rating: ratingScore,
+              is_error: false,
               comment: commentText
             },
             studentSession.token
