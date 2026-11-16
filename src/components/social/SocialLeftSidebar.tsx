@@ -41,7 +41,7 @@ export function SocialLeftSidebar({
           src={user?.avatar_url || undefined}
           name={displayName}
           fallback={initials}
-          size="md"
+          size="lg"
           tone="accent"
         />
         {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [User profile text layout] */}

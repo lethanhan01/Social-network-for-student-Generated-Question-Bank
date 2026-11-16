@@ -61,17 +61,18 @@ export function TopbarAvatarDropdown() {
         {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS, SEMANTIC_CLICK [Radix DropdownMenuTrigger asChild interactive avatar button] */}
         <button
           type="button"
+          data-no-sweep=""
           onClick={() => setOpen((v) => !v)}
-          className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-transparent transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-line-focus cursor-pointer"
+          className="group inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-0 bg-transparent p-0 focus-visible:outline-none cursor-pointer"
           aria-label={tCommon('user.menu', 'Menu người dùng')}
         >
           <Avatar
             src={user?.avatarUrl ?? undefined}
             name={user?.fullName ?? 'User'}
             fallback={initials}
-            size="sm"
+            size="md"
             tone="accent"
-            className={cn(open && 'ring-2 ring-line-focus')}
+            className={cn('h-11 w-11', open && 'border-action-accent ring-2 ring-action-accent')}
           />
         </button>
       </DropdownMenuTrigger>

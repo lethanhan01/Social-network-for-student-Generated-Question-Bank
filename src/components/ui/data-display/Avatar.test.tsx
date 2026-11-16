@@ -17,12 +17,16 @@ describe('Avatar Component', () => {
   })
 
   it('falls back to initials when image fails to load', () => {
-    render(<Avatar src="https://invalid-image-url.example/test.jpg" name="Trần Bình" />)
+    const { container } = render(<Avatar src="https://invalid-image-url.example/test.jpg" name="Trần Bình" tone="accent" />)
+    const avatarEl = container.firstChild as HTMLElement
     const img = screen.getByRole('img')
     expect(img).toBeInTheDocument()
+    expect(avatarEl).toHaveClass('border-line-subtle', 'hover:ring-2', 'hover:ring-action-accent')
+    expect(avatarEl).not.toHaveClass('border-status-accent-border')
 
     fireEvent.error(img)
     expect(screen.getByText('TB')).toBeInTheDocument()
+    expect(avatarEl).toHaveClass('border-status-accent-border')
   })
 
   it('renders status indicator for all statuses', () => {

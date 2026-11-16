@@ -57,8 +57,8 @@ export function CommentForm({
         <Avatar
           name={avatarName || t('social.member')}
           src={avatarUrl || undefined}
-          size="sm"
-          className="mt-1 shrink-0"
+          size="md"
+          className="mt-0.5 shrink-0"
         />
       ) : null}
       <FormField error={error} className="min-w-0 flex-1">

@@ -72,12 +72,17 @@ export function CommentItem({
   }
   return (
     <article className="flex items-start gap-2.5 py-1">
-      <Avatar
-        name={author}
-        src={comment.author?.avatar_url || undefined}
-        size="sm"
-        className="mt-0.5 shrink-0"
-      />
+      <ButtonLink
+        to={`/profile/${comment.author?.user_id ?? 'me'}`}
+        variant="plain"
+        className="group mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full p-0 focus-visible:ring-0"
+      >
+        <Avatar
+          name={author}
+          src={comment.author?.avatar_url || undefined}
+          size="md"
+        />
+      </ButtonLink>
       {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Right-hand comment content column] */}
       <div className="min-w-0 flex-1 space-y-1">
         <header className="flex items-center gap-1.5">

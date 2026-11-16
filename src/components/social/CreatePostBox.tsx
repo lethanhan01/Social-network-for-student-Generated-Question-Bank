@@ -26,7 +26,7 @@ export function CreatePostBox({ user, onOpenCreateModal }: Readonly<CreatePostBo
         src={user?.avatar_url || undefined}
         name={displayName}
         fallback={initials}
-        size="sm"
+        size="md"
         tone="accent"
         className="shrink-0"
       />
