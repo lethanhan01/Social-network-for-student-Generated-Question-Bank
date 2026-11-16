@@ -21,7 +21,36 @@ import {
   useNewFeedCountQuery,
 } from '@/hooks/queries/usePostsQuery'
 import { queryKeys } from '@/lib/query-keys'
-import type { PostResponseDto } from '@/types'
+import type { ActivityFeedItemDto, PostResponseDto } from '@/types'
+
+function dedupePosts(posts: PostResponseDto[], excludedPostIds: Set<number | undefined>) {
+  const seenPostIds = new Set(excludedPostIds)
+  return posts.filter((post) => {
+    if (post.post_id === undefined) return true
+    if (seenPostIds.has(post.post_id)) return false
+    seenPostIds.add(post.post_id)
+    return true
+  })
+}
+
+function dedupeActivityEvents(
+  events: ActivityFeedItemDto[],
+  excludedPostIds: Set<number | undefined>
+) {
+  const seenFeedIds = new Set<number>()
+  const seenPostIds = new Set(excludedPostIds)
+  return events.filter((item) => {
+    if (item.feed_id !== undefined) {
+      if (seenFeedIds.has(item.feed_id)) return false
+      seenFeedIds.add(item.feed_id)
+    }
+    if (item.target_type === 'POST' && item.target_id !== undefined) {
+      if (seenPostIds.has(item.target_id)) return false
+      seenPostIds.add(item.target_id)
+    }
+    return true
+  })
+}
 
 export default function FeedPage() {
   const { t } = useTranslation()
@@ -45,7 +74,9 @@ export default function FeedPage() {
   const events = activity.data?.pages.flatMap((page) => page.items ?? []) ?? []
   const recentPosts = recent.data
   const recentIds = new Set(recentPosts.map((post) => post.post_id))
-  const visibleFeedCount = tab === 'MINE' ? posts.length : events.length
+  const visiblePosts = dedupePosts(posts, recentIds)
+  const visibleEvents = dedupeActivityEvents(events, recentIds)
+  const visibleFeedCount = tab === 'MINE' ? visiblePosts.length : visibleEvents.length
   const showEmptyFeed = query.isSuccess && visibleFeedCount === 0 && recentPosts.length === 0
   async function refresh() {
     const nextSince = String(Date.now())
@@ -81,18 +112,14 @@ export default function FeedPage() {
         ) : null
       )}
       {tab === 'MINE'
-        ? posts
-            .filter((post) => !recentIds.has(post.post_id))
-            .map((post) => <PostCard key={post.post_id} post={post} />)
-        : events
-            .filter((item) => item.target_type !== 'POST' || !recentIds.has(item.target_id))
-            .map((item) => (
-              <ActivityFeedEntry key={item.feed_id} item={item} currentUser={currentUser} />
-            ))}
+        ? visiblePosts.map((post) => <PostCard key={post.post_id} post={post} />)
+        : visibleEvents.map((item) => (
+            <ActivityFeedEntry key={item.feed_id} item={item} currentUser={currentUser} />
+          ))}
       {showEmptyFeed ? (
         <p className="py-8 text-center text-text-muted">{t('social.emptyFeed')}</p>
       ) : null}
-      <LoadMore query={query} />
+      <LoadMore query={query} autoLoad />
       {creating ? (
         <CreatePostModal
           isOpen

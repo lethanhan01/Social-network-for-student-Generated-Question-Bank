@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
+import { act, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { BrowserRouter } from 'react-router-dom'
 import { renderWithQueryClient } from '@/test/query-test-utils'
@@ -54,8 +54,39 @@ vi.mock('@/services/relationship.service', () => ({
 }))
 
 describe('FeedPage Component', () => {
+  let intersectionCallbacks: IntersectionObserverCallback[] = []
+
+  function triggerIntersect(isIntersecting = true) {
+    act(() => {
+      for (const cb of [...intersectionCallbacks]) {
+        cb(
+          [{ isIntersecting } as IntersectionObserverEntry],
+          {} as IntersectionObserver
+        )
+      }
+    })
+  }
+
   beforeEach(() => {
     vi.clearAllMocks()
+    intersectionCallbacks = []
+    vi.stubGlobal(
+      'IntersectionObserver',
+      class {
+        private readonly cb: IntersectionObserverCallback
+        constructor(cb: IntersectionObserverCallback) {
+          this.cb = cb
+        }
+        observe = vi.fn(() => {
+          intersectionCallbacks.push(this.cb)
+        })
+        unobserve = vi.fn()
+        disconnect = vi.fn(() => {
+          intersectionCallbacks = intersectionCallbacks.filter((item) => item !== this.cb)
+        })
+        takeRecords = vi.fn(() => [])
+      }
+    )
     window.history.replaceState({}, '', '/feed')
     useAuthStore.setState({
       user: { user_id: 235, fullName: 'Nguyễn Văn An', roles: ['STUDENT'] },
@@ -117,11 +148,11 @@ describe('FeedPage Component', () => {
     expect(screen.queryByRole('button', { name: /Môn học của tôi/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Ghi chú Giảng viên/i })).not.toBeInTheDocument()
     expect(await screen.findByText(/Bài viết kiểm thử trên FeedPage/i)).toBeInTheDocument()
-    expect(screen.getByRole('navigation', { name: 'Lối tắt tính năng' })).toBeInTheDocument()
+    expect(screen.getByRole('navigation', { name: 'Lối tắt' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Tìm kiếm & Kết nối' })).toHaveAttribute('href', '/friends')
   })
 
-  it('displays posts across all subjects directly and loads more pages', async () => {
+  it('automatically loads more pages on scroll without a load more button', async () => {
     vi.mocked(feedService.getActivityFeeds)
       .mockResolvedValueOnce({
         items: [{ feed_id: 1, target_type: 'POST', target_id: 102 }],
@@ -136,15 +167,150 @@ describe('FeedPage Component', () => {
       subject_id: id === 103 ? 2 : 1,
       content: id === 103 ? 'Bài viết môn học thứ 2' : 'Bài viết môn học thứ 1',
     }))
-    const user = userEvent.setup()
     renderWithQueryClient(
       <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <FeedPage />
       </BrowserRouter>
     )
     expect(await screen.findByText('Bài viết môn học thứ 1')).toBeInTheDocument()
-    await user.click(await screen.findByRole('button', { name: 'Xem thêm' }))
+    expect(screen.queryByRole('button', { name: 'Xem thêm' })).not.toBeInTheDocument()
+
+    triggerIntersect(true)
+
     expect(await screen.findByText('Bài viết môn học thứ 2')).toBeInTheDocument()
+    expect(feedService.getActivityFeeds).toHaveBeenCalledTimes(2)
+  })
+
+  it('auto-loads next page on ?tab=MINE when scrolling near bottom', async () => {
+    window.history.replaceState({}, '', '/feed?tab=MINE')
+    vi.mocked(postService.getMyPosts)
+      .mockResolvedValueOnce({
+        items: [
+          {
+            post_id: 201,
+            content: 'Bài viết cá nhân trang 1',
+            author: { user_id: 235, full_name: 'Lê Thành An' },
+          },
+        ],
+        pagination: { has_next: true, after: 201 },
+      })
+      .mockResolvedValueOnce({
+        items: [
+          {
+            post_id: 202,
+            content: 'Bài viết cá nhân trang 2',
+            author: { user_id: 235, full_name: 'Lê Thành An' },
+          },
+        ],
+        pagination: { has_next: false },
+      })
+
+    renderWithQueryClient(
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <FeedPage />
+      </BrowserRouter>
+    )
+    expect(await screen.findByText('Bài viết cá nhân trang 1')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Xem thêm' })).not.toBeInTheDocument()
+
+    triggerIntersect(true)
+
+    expect(await screen.findByText('Bài viết cá nhân trang 2')).toBeInTheDocument()
+    expect(postService.getMyPosts).toHaveBeenCalledTimes(2)
+  })
+
+  it('deduplicates repeated posts across infinite scroll pages', async () => {
+    vi.mocked(feedService.getActivityFeeds)
+      .mockResolvedValueOnce({
+        items: [{ feed_id: 1, target_type: 'POST', target_id: 102 }],
+        pagination: { has_next: true, after: 1 },
+      })
+      .mockResolvedValueOnce({
+        items: [
+          { feed_id: 2, target_type: 'POST', target_id: 102 },
+          { feed_id: 3, target_type: 'POST', target_id: 103 },
+        ],
+        pagination: { has_next: false },
+      })
+    vi.mocked(postService.getPostById).mockImplementation(async (id) => ({
+      post_id: id,
+      content: id === 103 ? 'Bài viết mới không trùng' : 'Bài viết gốc 102',
+    }))
+
+    renderWithQueryClient(
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <FeedPage />
+      </BrowserRouter>
+    )
+    expect(await screen.findByText('Bài viết gốc 102')).toBeInTheDocument()
+
+    triggerIntersect(true)
+
+    expect(await screen.findByText('Bài viết mới không trùng')).toBeInTheDocument()
+    expect(screen.getAllByText('Bài viết gốc 102')).toHaveLength(1)
+  })
+
+  it('stops auto-loading on next-page network error and retries when clicking retry', async () => {
+    vi.mocked(feedService.getActivityFeeds)
+      .mockResolvedValueOnce({
+        items: [{ feed_id: 1, target_type: 'POST', target_id: 102 }],
+        pagination: { has_next: true, after: 1 },
+      })
+      .mockRejectedValueOnce(new Error('Network error'))
+      .mockResolvedValueOnce({
+        items: [{ feed_id: 2, target_type: 'POST', target_id: 103 }],
+        pagination: { has_next: false },
+      })
+    vi.mocked(postService.getPostById).mockImplementation(async (id) => ({
+      post_id: id,
+      content: id === 103 ? 'Bài viết sau khi thử lại' : 'Bài viết trang đầu',
+    }))
+    const user = userEvent.setup()
+
+    renderWithQueryClient(
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <FeedPage />
+      </BrowserRouter>
+    )
+    expect(await screen.findByText('Bài viết trang đầu')).toBeInTheDocument()
+
+    triggerIntersect(true)
+
+    const retryButton = await screen.findByRole('button', { name: 'Thử lại' })
+    expect(retryButton).toBeInTheDocument()
+    expect(feedService.getActivityFeeds).toHaveBeenCalledTimes(2)
+
+    await user.click(retryButton)
+
+    expect(await screen.findByText('Bài viết sau khi thử lại')).toBeInTheDocument()
+    expect(feedService.getActivityFeeds).toHaveBeenCalledTimes(3)
+  })
+
+  it('halts infinite pagination if the backend returns an empty page despite has_next=true', async () => {
+    vi.mocked(feedService.getActivityFeeds)
+      .mockResolvedValueOnce({
+        items: [{ feed_id: 1, target_type: 'POST', target_id: 102 }],
+        pagination: { has_next: true, after: 1 },
+      })
+      .mockResolvedValueOnce({
+        items: [],
+        pagination: { has_next: true, after: 2 },
+      })
+
+    renderWithQueryClient(
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <FeedPage />
+      </BrowserRouter>
+    )
+    expect(await screen.findByText(/Bài viết kiểm thử trên FeedPage/i)).toBeInTheDocument()
+
+    triggerIntersect(true)
+
+    await waitFor(() => {
+      expect(feedService.getActivityFeeds).toHaveBeenCalledTimes(2)
+    })
+    triggerIntersect(true)
+    expect(feedService.getActivityFeeds).toHaveBeenCalledTimes(2)
   })
 
   it('does not fire feed or sidebar API calls when unauthenticated or missing token', () => {
