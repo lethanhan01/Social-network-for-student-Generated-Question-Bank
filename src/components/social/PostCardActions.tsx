@@ -26,20 +26,23 @@ export function PostCardActions({
   const { t } = useTranslation()
 
   return (
-    /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Action buttons 3-column grid container] */
-    <div className="grid grid-cols-3 gap-1 pt-1 border-t border-line-subtle">
+    /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Inline action buttons group] */
+    <div className="flex items-center gap-1">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             disabled={disabled}
-            variant={localReacted ? 'secondary' : 'ghost'}
+            variant="ghost"
             size="sm"
-            className={`justify-center gap-2 text-xs min-h-11 ${
+            className={`justify-center gap-1.5 px-2.5 text-xs min-h-11 ${
               localReacted ? 'text-action-accent font-bold' : ''
             }`}
             leftIcon={<ThumbsUp size={16} />}
           >
-            {localReacted ? t('reaction.reacted') : t('reaction.like')}
+            {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Responsive label hidden on narrow mobile] */}
+            <span className="sr-only sm:not-sr-only">
+              {localReacted ? t('reaction.reacted') : t('reaction.like')}
+            </span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
@@ -74,20 +77,22 @@ export function PostCardActions({
         variant="ghost"
         size="sm"
         onClick={onToggleComments}
-        className="justify-center gap-2 text-xs min-h-11"
+        className="justify-center gap-1.5 px-2.5 text-xs min-h-11"
         leftIcon={<MessageSquare size={16} />}
       >
-        {t('post.comment')}
+        {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Responsive label hidden on narrow mobile] */}
+        <span className="sr-only sm:not-sr-only">{t('post.comment')}</span>
       </Button>
 
       <Button
         variant="ghost"
         size="sm"
         onClick={onShare}
-        className="justify-center gap-2 text-xs min-h-11"
+        className="justify-center gap-1.5 px-2.5 text-xs min-h-11"
         leftIcon={<Share2 size={16} />}
       >
-        {t('post.share')}
+        {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Responsive label hidden on narrow mobile] */}
+        <span className="sr-only sm:not-sr-only">{t('post.share')}</span>
       </Button>
     </div>
   )
