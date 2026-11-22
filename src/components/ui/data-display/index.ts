@@ -29,8 +29,3 @@ export {
   type ColumnDef,
   type ColumnDef as ResponsiveColumnDef,
 } from './ResponsiveTable'
-export {
-  VirtualDataTable,
-  type VirtualDataTableProps,
-  type ColumnDef as VirtualColumnDef,
-} from './VirtualDataTable'

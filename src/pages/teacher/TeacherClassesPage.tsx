@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { lazy, Suspense, useState, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Users, Plus } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -17,8 +17,13 @@ import { positiveId } from '@/types/academic.types'
 import type { CourseClassResponse } from '@/types'
 import { formatDate } from '@/utils/date'
 import { canManageCourseClass } from './classes/class-utils'
-import { CreateCourseClassModal } from './classes/CreateCourseClassModal'
-import { ClassStudentsModal } from './classes/ClassStudentsModal'
+
+const LazyCreateCourseClassModal = lazy(() =>
+  import('./classes/CreateCourseClassModal').then((m) => ({ default: m.CreateCourseClassModal }))
+)
+const LazyClassStudentsModal = lazy(() =>
+  import('./classes/ClassStudentsModal').then((m) => ({ default: m.ClassStudentsModal }))
+)
 
 export default function TeacherClassesPage() {
   const { t } = useTranslation('academic')
@@ -211,18 +216,24 @@ export default function TeacherClassesPage() {
 
       {classesContent}
 
-      <CreateCourseClassModal
-        open={createOpen}
-        subjects={subjects}
-        onClose={() => setCreateOpen(false)}
-      />
+      {createOpen ? (
+        <Suspense fallback={null}>
+          <LazyCreateCourseClassModal
+            open
+            subjects={subjects}
+            onClose={() => setCreateOpen(false)}
+          />
+        </Suspense>
+      ) : null}
 
       {selectedClass ? (
-        <ClassStudentsModal
-          key={selectedClass.course_class_id}
-          courseClass={selectedClass}
-          onClose={() => setSelectedClass(null)}
-        />
+        <Suspense fallback={null}>
+          <LazyClassStudentsModal
+            key={selectedClass.course_class_id}
+            courseClass={selectedClass}
+            onClose={() => setSelectedClass(null)}
+          />
+        </Suspense>
       ) : null}
     </section>
   )

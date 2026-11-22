@@ -2,7 +2,10 @@ import { Navigate } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
 
 export function RootRedirect() {
-  const { isAuthenticated, user, token, hasHydrated } = useAuthStore()
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
+  const user = useAuthStore((s) => s.user)
+  const token = useAuthStore((s) => s.token)
+  const hasHydrated = useAuthStore((s) => s.hasHydrated)
 
   if (!hasHydrated) {
     return null

@@ -1,17 +1,23 @@
-import { lazy } from 'react'
+import { lazy, type ComponentType } from 'react'
 import { Navigate, useParams, useSearchParams, type RouteObject } from 'react-router-dom'
 import { ProtectedRoute } from '@/components/shared/protected-route/ProtectedRoute'
+import { preloadNamespaces, type AppNamespace } from '@/lib/i18n'
+
+const lazyWithNs = <T extends { default: ComponentType }>(
+  loader: () => Promise<T>,
+  ns: AppNamespace[]
+) => lazy(() => Promise.all([loader(), preloadNamespaces(ns)]).then(([mod]) => mod))
 
 const DashboardLayout = lazy(() => import('@/layouts/DashboardLayout'))
 
 const DashboardPage = lazy(() => import('@/pages/student/dashboard/DashboardPage'))
-const PracticePage = lazy(() => import('@/pages/student/practice/PracticePage'))
-const ProposalsPage = lazy(() => import('@/pages/student/proposals/ProposalsPage'))
-const SubjectsPage = lazy(() => import('@/pages/student/subjects/SubjectsPage'))
-const QuestionAnalyticsPage = lazy(() => import('@/pages/student/questions/QuestionAnalyticsPage'))
-const LeaderboardPage = lazy(() => import('@/pages/student/gamification/LeaderboardPage'))
-const MinigamesPage = lazy(() => import('@/pages/student/gamification/MinigamesPage'))
-const ShopPage = lazy(() => import('@/pages/student/gamification/ShopPage'))
+const PracticePage = lazyWithNs(() => import('@/pages/student/practice/PracticePage'), ['academic', 'portal'])
+const ProposalsPage = lazyWithNs(() => import('@/pages/student/proposals/ProposalsPage'), ['academic', 'portal'])
+const SubjectsPage = lazyWithNs(() => import('@/pages/student/subjects/SubjectsPage'), ['academic', 'portal'])
+const QuestionAnalyticsPage = lazyWithNs(() => import('@/pages/student/questions/QuestionAnalyticsPage'), ['academic', 'portal'])
+const LeaderboardPage = lazyWithNs(() => import('@/pages/student/gamification/LeaderboardPage'), ['gamification'])
+const MinigamesPage = lazyWithNs(() => import('@/pages/student/gamification/MinigamesPage'), ['gamification'])
+const ShopPage = lazyWithNs(() => import('@/pages/student/gamification/ShopPage'), ['gamification'])
 
 function LegacyPracticeRootRedirect() {
   const [params] = useSearchParams()
@@ -70,4 +76,3 @@ export const studentRoutes: RouteObject[] = [
   { path: '/gamification/minigames', element: <Navigate to="/student/gamification/minigames" replace /> },
   { path: '/shop', element: <Navigate to="/student/shop" replace /> },
 ]
-

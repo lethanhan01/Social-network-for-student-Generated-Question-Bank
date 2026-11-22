@@ -188,15 +188,17 @@ export default function TeacherExamsPage() {
 
       {examsContent}
 
-      <GenerateExamModal
-        open={generateOpen}
-        subjects={subjects}
-        onGenerated={(examId) => {
-          setGenerateOpen(false)
-          if (examId) updateParam('preview', String(examId))
-        }}
-        onClose={() => setGenerateOpen(false)}
-      />
+      {generateOpen ? (
+        <GenerateExamModal
+          open
+          subjects={subjects}
+          onGenerated={(examId) => {
+            setGenerateOpen(false)
+            if (examId) updateParam('preview', String(examId))
+          }}
+          onClose={() => setGenerateOpen(false)}
+        />
+      ) : null}
 
       {previewExamId ? (
         <ExamPreviewModal
@@ -208,11 +210,13 @@ export default function TeacherExamsPage() {
         />
       ) : null}
 
-      <ExportQuestionBankModal
-        open={exportBankOpen}
-        subjects={subjects}
-        onClose={() => setExportBankOpen(false)}
-      />
+      {exportBankOpen ? (
+        <ExportQuestionBankModal
+          open
+          subjects={subjects}
+          onClose={() => setExportBankOpen(false)}
+        />
+      ) : null}
     </section>
   )
 }

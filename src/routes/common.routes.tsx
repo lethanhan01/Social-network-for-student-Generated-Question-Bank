@@ -1,18 +1,24 @@
-import { lazy } from 'react'
+import { lazy, type ComponentType } from 'react'
 import type { RouteObject } from 'react-router-dom'
 import { ProtectedRoute } from '@/components/shared/protected-route/ProtectedRoute'
+import { preloadNamespaces, type AppNamespace } from '@/lib/i18n'
+
+const lazyWithNs = <T extends { default: ComponentType }>(
+  loader: () => Promise<T>,
+  ns: AppNamespace[]
+) => lazy(() => Promise.all([loader(), preloadNamespaces(ns)]).then(([mod]) => mod))
 
 const SocialLayout = lazy(() => import('@/layouts/SocialLayout'))
 const DashboardLayout = lazy(() => import('@/layouts/DashboardLayout'))
 
-const FeedPage = lazy(() => import('@/pages/common/feed/FeedPage'))
-const PostDetailPage = lazy(() => import('@/pages/common/post/PostDetailPage'))
-const ProfilePage = lazy(() => import('@/pages/common/profile/ProfilePage'))
-const FriendsPage = lazy(() => import('@/pages/common/friends/FriendsPage'))
-const SearchPage = lazy(() => import('@/pages/common/search/SearchPage'))
-const ChatPage = lazy(() => import('@/pages/common/chat/ChatPage'))
-const SettingsPage = lazy(() => import('@/pages/common/settings/SettingsPage'))
-const NotificationsPage = lazy(() => import('@/pages/common/notifications/NotificationsPage'))
+const FeedPage = lazyWithNs(() => import('@/pages/common/feed/FeedPage'), ['portal'])
+const PostDetailPage = lazyWithNs(() => import('@/pages/common/post/PostDetailPage'), ['portal'])
+const ProfilePage = lazyWithNs(() => import('@/pages/common/profile/ProfilePage'), ['portal'])
+const FriendsPage = lazyWithNs(() => import('@/pages/common/friends/FriendsPage'), ['portal'])
+const SearchPage = lazyWithNs(() => import('@/pages/common/search/SearchPage'), ['portal'])
+const ChatPage = lazyWithNs(() => import('@/pages/common/chat/ChatPage'), ['chat', 'portal'])
+const SettingsPage = lazyWithNs(() => import('@/pages/common/settings/SettingsPage'), ['portal'])
+const NotificationsPage = lazyWithNs(() => import('@/pages/common/notifications/NotificationsPage'), ['portal'])
 
 export const commonRoutes: RouteObject[] = [
   {
@@ -41,4 +47,3 @@ export const commonRoutes: RouteObject[] = [
     ],
   },
 ]
-

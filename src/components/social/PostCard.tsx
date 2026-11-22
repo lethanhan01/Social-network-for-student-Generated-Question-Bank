@@ -1,14 +1,11 @@
-import { useState } from 'react'
+import { lazy, memo, Suspense, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ThumbsUp } from 'lucide-react'
-import { Card } from '@/components/ui/data-display'
-import { Button } from '@/components/ui/actions'
-import { Text } from '@/components/ui/typography'
+import { Card } from '@/components/ui/data-display/Card'
+import { Button } from '@/components/ui/actions/Button'
+import { Text } from '@/components/ui/typography/Text'
 import { useAuthStore } from '@/stores/authStore'
-import { PostCommentSection } from './PostCommentSection'
-import { ReportModal } from './ReportPostModal'
-import { LecturerNoteModal } from './LecturerNoteModal'
 import { PostMediaGrid } from './PostMediaGrid'
 import { PostCardHeader } from './PostCardHeader'
 import { PostCardActions } from './PostCardActions'
@@ -16,9 +13,21 @@ import { toast } from '@/lib/toast'
 import { useDeletePostMutation } from '@/hooks/queries/usePostsQuery'
 import { usePostReaction } from '@/hooks/usePostReaction'
 import { ConfirmDialog } from '@/components/ui/overlay/ConfirmDialog'
-import { EditPostModal } from './EditPostModal'
 import { getApiError } from '@/lib/api-error'
 import type { PostResponseDto } from '@/types'
+
+const LazyPostCommentSection = lazy(() =>
+  import('./PostCommentSection').then((m) => ({ default: m.PostCommentSection }))
+)
+const LazyReportModal = lazy(() =>
+  import('./ReportPostModal').then((m) => ({ default: m.ReportModal }))
+)
+const LazyEditPostModal = lazy(() =>
+  import('./EditPostModal').then((m) => ({ default: m.EditPostModal }))
+)
+const LazyLecturerNoteModal = lazy(() =>
+  import('./LecturerNoteModal').then((m) => ({ default: m.LecturerNoteModal }))
+)
 
 interface PostCardProps {
   post: PostResponseDto
@@ -27,7 +36,7 @@ interface PostCardProps {
   onToggleReact?: (postId: number, reactionType?: 'LIKE' | 'LOVE' | 'WOW') => Promise<unknown>
 }
 
-export function PostCard({
+export const PostCard = memo(function PostCard({
   post,
   currentUserAvatar,
   currentUserName,
@@ -155,42 +164,56 @@ export function PostCard({
 
       {/* Comments Drawer / Section */}
       {showComments && post.post_id ? (
-        <PostCommentSection
-          postId={post.post_id}
-          currentUserAvatar={currentUserAvatar}
-          currentUserName={currentUserName}
+        <Suspense fallback={null}>
+          <LazyPostCommentSection
+            postId={post.post_id}
+            currentUserAvatar={currentUserAvatar}
+            currentUserName={currentUserName}
+          />
+        </Suspense>
+      ) : null}
+
+      {isReportOpen ? (
+        <Suspense fallback={null}>
+          <LazyReportModal
+            isOpen
+            targetType="POST"
+            targetId={post.post_id}
+            onClose={() => setIsReportOpen(false)}
+          />
+        </Suspense>
+      ) : null}
+
+      {editing ? (
+        <Suspense fallback={null}>
+          <LazyEditPostModal post={post} onClose={() => setEditing(false)} />
+        </Suspense>
+      ) : null}
+
+      {deleting ? (
+        <ConfirmDialog
+          open
+          title={t('social.deletePost')}
+          description={t('social.deletePostConfirm')}
+          variant="danger"
+          loading={remove.isPending}
+          onClose={() => {
+            if (!remove.isPending) setDeleting(false)
+          }}
+          onConfirm={deletePost}
         />
       ) : null}
 
-      {/* Report Modal */}
-      <ReportModal
-        isOpen={isReportOpen}
-        targetType="POST"
-        targetId={post.post_id}
-        onClose={() => setIsReportOpen(false)}
-      />
-
-      {/* Lecturer Note Modal */}
-      {editing ? <EditPostModal post={post} onClose={() => setEditing(false)} /> : null}
-      <ConfirmDialog
-        open={deleting}
-        title={t('social.deletePost')}
-        description={t('social.deletePostConfirm')}
-        variant="danger"
-        loading={remove.isPending}
-        onClose={() => {
-          if (!remove.isPending) setDeleting(false)
-        }}
-        onConfirm={deletePost}
-      />
       {post.post_id && isLecturerNoteOpen ? (
-        <LecturerNoteModal
-          isOpen={isLecturerNoteOpen}
-          postId={post.post_id}
-          initialNote={post.lecturer_note}
-          onClose={() => setIsLecturerNoteOpen(false)}
-        />
+        <Suspense fallback={null}>
+          <LazyLecturerNoteModal
+            isOpen
+            postId={post.post_id}
+            initialNote={post.lecturer_note}
+            onClose={() => setIsLecturerNoteOpen(false)}
+          />
+        </Suspense>
       ) : null}
     </Card>
   )
-}
+})

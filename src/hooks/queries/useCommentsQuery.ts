@@ -2,7 +2,7 @@ import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tansta
 import { getNextCursor } from '@/lib/pagination'
 import { commentService } from '@/services/comment.service'
 import { queryKeys } from '@/lib/query-keys'
-import type { CreateCommentRequest, UpdateCommentRequest } from '@/types'
+import type { CreateCommentRequest, PostResponseDto, UpdateCommentRequest } from '@/types'
 
 export function usePostCommentsQuery(postId: number, parentCommentId?: number) {
   return useQuery({
@@ -49,20 +49,17 @@ export function useCreateCommentMutation(postId: number) {
   return useMutation({
     mutationFn: (payload: CreateCommentRequest) => commentService.createComment(payload),
     onSuccess: (_, variables) => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.comments.all })
-      void queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
-      void queryClient.invalidateQueries({ queryKey: queryKeys.feed.all })
       void queryClient.invalidateQueries({
-        queryKey: queryKeys.comments.byPost(postId),
+        queryKey: ['comments', 'post', postId],
       })
       if (variables.parent_comment_id) {
         void queryClient.invalidateQueries({
-          queryKey: queryKeys.comments.replies(postId, variables.parent_comment_id),
+          queryKey: ['comments', 'replies', postId, variables.parent_comment_id],
         })
       }
-      void queryClient.invalidateQueries({
-        queryKey: queryKeys.posts.detail(postId),
-      })
+      queryClient.setQueryData<PostResponseDto>(queryKeys.posts.detail(postId), (prev) =>
+        prev ? { ...prev, comment_count: (prev.comment_count ?? 0) + 1 } : prev
+      )
     },
   })
 }
@@ -73,13 +70,11 @@ export function useUpdateCommentMutation(postId: number) {
     mutationFn: ({ commentId, payload }: { commentId: number; payload: UpdateCommentRequest }) =>
       commentService.updateComment(commentId, payload),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.comments.all })
-      void queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
       void queryClient.invalidateQueries({
-        queryKey: queryKeys.comments.byPost(postId),
+        queryKey: ['comments', 'post', postId],
       })
       void queryClient.invalidateQueries({
-        queryKey: queryKeys.posts.detail(postId),
+        queryKey: ['comments', 'replies', postId],
       })
     },
   })
@@ -90,14 +85,15 @@ export function useDeleteCommentMutation(postId: number) {
   return useMutation({
     mutationFn: (commentId: number) => commentService.deleteComment(commentId),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.comments.all })
-      void queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
       void queryClient.invalidateQueries({
-        queryKey: queryKeys.comments.byPost(postId),
+        queryKey: ['comments', 'post', postId],
       })
       void queryClient.invalidateQueries({
-        queryKey: queryKeys.posts.detail(postId),
+        queryKey: ['comments', 'replies', postId],
       })
+      queryClient.setQueryData<PostResponseDto>(queryKeys.posts.detail(postId), (prev) =>
+        prev ? { ...prev, comment_count: Math.max(0, (prev.comment_count ?? 1) - 1) } : prev
+      )
     },
   })
 }

@@ -13,6 +13,13 @@
 
 .social-card {
   border-radius: 0.75rem;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 240px;
+}
+
+.chat-message-item {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 64px;
 }
 
 .social-post-copy {

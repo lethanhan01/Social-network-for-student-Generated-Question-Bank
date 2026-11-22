@@ -41,7 +41,7 @@ export default function ChatPage() {
     <div className="flex-1 flex w-full h-full min-h-0 overflow-hidden bg-surface-base">
       {/* Left Sidebar: visible on desktop always; on mobile only when no conversation is active */}
       <aside className={cn(
-        'h-full shrink-0 min-h-0 transition-all duration-200',
+        'h-full shrink-0 min-h-0 transition-colors duration-200',
         showConversation ? 'hidden md:flex' : 'flex w-full md:w-auto'
       )} aria-label={t('conversationList')}>
         <ChatSidebar
@@ -53,7 +53,7 @@ export default function ChatPage() {
 
       {/* Right Conversation View: visible on desktop always; on mobile only when conversation is active */}
       <section className={cn(
-        'relative flex-1 h-full min-w-0 min-h-0 flex transition-all duration-200',
+        'relative flex-1 h-full min-w-0 min-h-0 flex transition-colors duration-200',
         !showConversation ? 'hidden md:flex' : 'flex'
       )} aria-label={t('conversationContent')}>
         {targetId ? (

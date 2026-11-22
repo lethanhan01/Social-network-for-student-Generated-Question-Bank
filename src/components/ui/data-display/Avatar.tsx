@@ -68,6 +68,8 @@ function renderAvatarContent({
       <img
         src={src}
         alt={alt || name || 'Avatar'}
+        loading="lazy"
+        decoding="async"
         onError={() => setImageError(true)}
         className={cn('h-full w-full object-cover', roundedClass, imageClassName)}
       />

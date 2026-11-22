@@ -13,6 +13,7 @@ import { ChatConversationView } from './ChatConversationView'
 import { ChatSidebar } from './ChatSidebar'
 import { NewChatModal } from './NewChatModal'
 import { ChatMessageList } from './ChatMessageList'
+import { ChatComposer } from './ChatComposer'
 
 describe('Messenger Chat Components', () => {
   describe('ChatConversationView (EmptyState)', () => {
@@ -398,6 +399,76 @@ describe('Messenger Chat Components', () => {
       } finally {
         HTMLElement.prototype.scrollIntoView = origScrollIntoView
       }
+    })
+  })
+
+  describe('Performance Guards (Typing Throttle & Timer Cleanup)', () => {
+    afterEach(() => {
+      vi.useRealTimers()
+      vi.restoreAllMocks()
+    })
+
+    it('throttles typing frames in ChatComposer and stops typing after idle or clear', () => {
+      vi.useFakeTimers()
+      const onSendTyping = vi.fn()
+      render(
+        <ChatComposer
+          replyTo={null}
+          onClearReply={vi.fn()}
+          onSend={vi.fn().mockResolvedValue(true)}
+          onSendTyping={onSendTyping}
+        />
+      )
+      const input = screen.getByPlaceholderText('Nhập tin nhắn...')
+      fireEvent.change(input, { target: { value: 'h' } })
+      fireEvent.change(input, { target: { value: 'he' } })
+      fireEvent.change(input, { target: { value: 'hel' } })
+      fireEvent.change(input, { target: { value: 'hell' } })
+      fireEvent.change(input, { target: { value: 'hello' } })
+
+      // 5 rapid keystrokes emit only 1 throttled typing=true event
+      expect(onSendTyping).toHaveBeenCalledTimes(1)
+      expect(onSendTyping).toHaveBeenLastCalledWith(true)
+
+      // Idle timeout stops typing automatically
+      act(() => {
+        vi.advanceTimersByTime(2600)
+      })
+      expect(onSendTyping).toHaveBeenLastCalledWith(false)
+    })
+
+    it('cleans up pending subscribeTyping timers on unmount without firing stale callbacks', () => {
+      vi.useFakeTimers()
+      let emitTyping: ((payload: { conversation_id: number; user_id: number; username: string; is_typing: boolean }) => void) | undefined
+      vi.spyOn(websocketService, 'connect').mockImplementation(() => {})
+      vi.spyOn(websocketService, 'onStatusChange').mockImplementation((cb) => {
+        cb('CONNECTED')
+        return () => {}
+      })
+      vi.spyOn(websocketService, 'onMessage').mockImplementation(() => () => {})
+      vi.spyOn(websocketService, 'subscribeTyping').mockImplementation((_convId, cb) => {
+        emitTyping = cb
+        return () => {}
+      })
+
+      const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+      function TypingHarness() {
+        useChatRealtimeSync(42)
+        return null
+      }
+
+      const { unmount } = render(
+        <QueryClientProvider client={queryClient}>
+          <TypingHarness />
+        </QueryClientProvider>
+      )
+      act(() => {
+        emitTyping?.({ conversation_id: 42, user_id: 9, username: 'Lan', is_typing: true })
+      })
+      expect(vi.getTimerCount()).toBe(1)
+
+      unmount()
+      expect(vi.getTimerCount()).toBe(0)
     })
   })
 })
