@@ -52,7 +52,7 @@ describe('SocialLeftSidebar', () => {
       </MemoryRouter>
     )
 
-    const shortcutsNav = screen.getByRole('navigation', { name: /lối tắt tính năng/i })
+    const shortcutsNav = screen.getByRole('navigation', { name: /lối tắt/i })
     expect(shortcutsNav).toBeInTheDocument()
 
     expect(screen.queryByRole('link', { name: /tất cả bảng tin/i })).not.toBeInTheDocument()
