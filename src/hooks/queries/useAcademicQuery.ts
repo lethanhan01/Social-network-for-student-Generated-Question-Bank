@@ -14,12 +14,13 @@ export function useSubjectsQuery() {
 }
 
 export function useAcademicSessionsQuery(status?: string, enabled = true) {
+  const apiStatus = status === 'APPROVED' || status === 'REJECTED' ? 'RESOLVED' : status
   return useInfiniteQuery({
-    queryKey: queryKeys.sessions.mySubmissions({ status, infinite: true }),
+    queryKey: queryKeys.sessions.mySubmissions({ status: apiStatus, infinite: true }),
     enabled,
     initialPageParam: undefined as string | undefined,
     queryFn: ({ pageParam, signal }) => sessionService.getMySubmissions(
-      { status, cursor: pageParam, limit: 20 }, { signal }),
+      { status: apiStatus, cursor: pageParam, limit: 20 }, { signal }),
     getNextPageParam: (last) => last.pagination?.has_next && last.pagination.after != null
       ? String(last.pagination.after) : undefined,
   })

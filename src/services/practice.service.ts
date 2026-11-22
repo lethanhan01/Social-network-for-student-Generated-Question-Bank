@@ -24,8 +24,16 @@ export const practiceService = {
     questionId: number,
     payload: RateQuestionRequest
   ): Promise<RateQuestionResponse> {
+    if (payload.is_error && payload.comment?.trim()) {
+      await api.put<GlobalResponse<void>>(`/questions/${questionId}/report`, {
+        description: payload.comment.trim(),
+      })
+    }
     return requestData<RateQuestionResponse>(
-      api.post<GlobalResponse<RateQuestionResponse>>(`/questions/${questionId}/rate`, payload)
+      api.post<GlobalResponse<RateQuestionResponse>>(`/questions/${questionId}/rate`, {
+        rating: payload.rating,
+        ...(payload.comment?.trim() ? { comment: payload.comment.trim() } : {}),
+      })
     )
   },
 

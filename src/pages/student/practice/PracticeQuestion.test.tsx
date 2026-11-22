@@ -32,4 +32,23 @@ describe('Practice answer flow', () => {
     expect(await screen.findByText('Server explanation')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Đánh giá / Báo lỗi' })).toBeEnabled()
   })
+  it('renders existing answer result immediately when question was already answered on server', async () => {
+    renderWithQueryClient(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><PracticeQuestion sessionId={9} onNext={vi.fn()}
+      question={{
+        question_id: 15,
+        content: 'Already answered question',
+        options: [{ key: 'A', text: 'First' }, { key: 'B', text: 'Second' }],
+        my_interaction: { answered: true },
+        hidden_fields: {
+          correct_answer: 'A',
+          explanation: 'Existing explanation',
+          selected_options: [{ key: 'A' }],
+          was_correct: true,
+        } as never,
+      }} /></MemoryRouter>)
+    expect(await screen.findByText('Existing explanation')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'A. First' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.queryByRole('button', { name: 'Kiểm tra đáp án' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Tiếp tục' })).toBeInTheDocument()
+  })
 })

@@ -33,6 +33,18 @@ describe('Academic screen regressions', () => {
     expect(await screen.findByText(/Chưa có đề xuất phù hợp/)).toBeInTheDocument()
     expect(screen.queryByText('Rejected session')).not.toBeInTheDocument()
   })
+  it('queries RESOLVED from backend and classifies APPROVED vs REJECTED sessions by approved_question_count', async () => {
+    const getSubs = vi.spyOn(sessionService, 'getMySubmissions').mockResolvedValue({
+      contents: [
+        { session_id: 10, title: 'Approved session', status: 'RESOLVED', question_counts: 5, approved_question_count: 5 } as AcademicSession,
+        { session_id: 11, title: 'Rejected session', status: 'RESOLVED', question_counts: 2, approved_question_count: 0 } as AcademicSession,
+      ],
+    })
+    renderWithQueryClient(<MemoryRouter initialEntries={['/proposals?status=APPROVED']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><ProposalsPage /></MemoryRouter>)
+    expect(await screen.findByText('Approved session')).toBeInTheDocument()
+    expect(screen.queryByText('Rejected session')).not.toBeInTheDocument()
+    expect(getSubs).toHaveBeenCalledWith({ status: 'RESOLVED', cursor: undefined, limit: 20 }, expect.any(Object))
+  })
   it('rejects out-of-range question URLs instead of declaring completion', async () => {
     vi.spyOn(practiceService, 'getSessionQuestions').mockResolvedValue({ questions: [{ question_id: 3, content: 'Question' }] })
     const list = vi.spyOn(sessionService, 'getMySubmissions')
