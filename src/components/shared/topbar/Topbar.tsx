@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { Button, ButtonLink } from '@/components/ui/actions'
 import { BrandLogo } from '@/components/shared/BrandLogo'
 import { ThemeToggle } from '@/components/ui/navigation'
-import { LanguageSwitcher } from '@/components/ui/typography'
 import { TopbarNav } from './TopbarNav'
 import { TopbarSearch } from './TopbarSearch'
 import { TopbarAvatarDropdown } from './TopbarAvatarDropdown'
@@ -73,7 +72,6 @@ export function Topbar({
           <MessageCircle size={20} />
         </ButtonLink>
         <ThemeToggle className="min-h-11 min-w-11" />
-        <LanguageSwitcher />
         <TopbarAvatarDropdown />
       </div>
     </header>
