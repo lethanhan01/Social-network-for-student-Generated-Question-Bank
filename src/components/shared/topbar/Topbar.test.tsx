@@ -38,7 +38,8 @@ describe('Topbar', () => {
     expect(screen.getByRole('img', { name: /sqb hust/i })).toBeInTheDocument()
     expect(screen.queryByText('Question Bank')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: /menu người dùng/i })).toBeInTheDocument()
-    expect(screen.getByRole('searchbox', { name: /tìm kiếm/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /switch to (japanese|vietnamese)/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('searchbox', { name: /^tìm kiếm$/i })).toBeInTheDocument()
   })
 
   it('renders 5 primary navigation tabs in TopbarNav', () => {

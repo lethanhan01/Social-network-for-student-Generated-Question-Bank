@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/overlay'
 import { authService } from '@/services/auth.service'
+import { isTeacherRole, resolveUserRoles } from '@/config/navigation.config'
 import { toast } from '@/lib/toast'
 import { cn } from '@/utils/cn'
 
@@ -21,6 +22,7 @@ export function TopbarAvatarDropdown() {
   const [open, setOpen] = useState(false)
   const navigate = useNavigate()
   const { t: tCommon } = useTranslation('common')
+  const isTeacher = isTeacherRole(resolveUserRoles(user?.roles, user?.role))
 
   const initials = user?.fullName
     ? user.fullName.trim().charAt(0).toUpperCase()
@@ -33,7 +35,6 @@ export function TopbarAvatarDropdown() {
 
   function goDashboard() {
     setOpen(false)
-    const isTeacher = user?.roles?.some((r) => ['teacher', 'LECTURER', 'admin', 'ADMIN'].includes(r))
     navigate(isTeacher ? '/teacher/dashboard' : '/student/dashboard')
   }
 
@@ -85,11 +86,13 @@ export function TopbarAvatarDropdown() {
         {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [User info summary header in dropdown] */}
         <div className="px-3 py-2 border-b border-line-subtle">
           <p className="text-sm font-semibold truncate text-fg-primary">
-            {user?.fullName || 'Sinh viên HUST'}
+            {user?.fullName || tCommon('social.member')}
           </p>
-          <p className="text-xs text-fg-muted truncate">
-            {user?.email || 'student@sis.hust.edu.vn'}
-          </p>
+          {user?.email ? (
+            <p className="text-xs text-fg-muted truncate">
+              {user.email}
+            </p>
+          ) : null}
         </div>
 
         <DropdownMenuItem
@@ -105,7 +108,7 @@ export function TopbarAvatarDropdown() {
           className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-surface-card-hover cursor-pointer"
         >
           <LayoutDashboard size={16} />
-          <span>{tCommon('nav.dashboard', 'Tổng quan học tập')}</span>
+          <span>{isTeacher ? tCommon('nav.teacherDashboard') : tCommon('nav.dashboard')}</span>
         </DropdownMenuItem>
 
         <DropdownMenuItem

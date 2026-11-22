@@ -522,18 +522,25 @@ export function useChatRealtimeSync(activeConversationId?: number) {
   // Subscribe to typing indicators for active conversation
   useEffect(() => {
     if (!activeConversationId) return
+    const typingTimers = new Map<number, ReturnType<typeof setTimeout>>()
 
     const unsubTyping = websocketService.subscribeTyping(activeConversationId, (data) => {
+      const existing = typingTimers.get(data.user_id)
+      if (existing) {
+        clearTimeout(existing)
+        typingTimers.delete(data.user_id)
+      }
       if (data.is_typing) {
         setTypingUsers((prev) => ({ ...prev, [data.user_id]: data.username }))
         const timer = setTimeout(() => {
+          typingTimers.delete(data.user_id)
           setTypingUsers((prev) => {
             const next = { ...prev }
             delete next[data.user_id]
             return next
           })
         }, 3000)
-        return () => clearTimeout(timer)
+        typingTimers.set(data.user_id, timer)
       } else {
         setTypingUsers((prev) => {
           const next = { ...prev }
@@ -544,6 +551,8 @@ export function useChatRealtimeSync(activeConversationId?: number) {
     })
 
     return () => {
+      typingTimers.forEach((timer) => clearTimeout(timer))
+      typingTimers.clear()
       unsubTyping()
       setTypingUsers({})
     }
@@ -591,19 +600,10 @@ export function useAutoMarkAsRead(
       }
     )
 
-    // 2. Send STOMP markAsRead
+    // 2. Send STOMP markAsRead (optimistic cache update above already cleared unread badge)
     websocketService.markAsRead({
       conversation_id: conversationId,
       message_id: lastMessageId,
     })
-
-    // 3. Reconcile with server after 400ms
-    const timer = setTimeout(() => {
-      void queryClient.invalidateQueries({
-        queryKey: queryKeys.conversations.infiniteMessages(conversationId),
-      })
-    }, 400)
-
-    return () => clearTimeout(timer)
   }, [conversationId, unreadCount, lastMessageId, queryClient])
 }

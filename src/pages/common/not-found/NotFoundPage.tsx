@@ -7,7 +7,8 @@ import { useAuthStore } from '@/stores/authStore'
 
 export default function NotFoundPage() {
   const { t } = useTranslation('common')
-  const { user, isAuthenticated } = useAuthStore()
+  const user = useAuthStore((s) => s.user)
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
 
   const isTeacher = user?.roles?.some((r) =>
     ['teacher', 'LECTURER', 'admin', 'ADMIN'].includes(r)

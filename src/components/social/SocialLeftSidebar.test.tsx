@@ -52,16 +52,31 @@ describe('SocialLeftSidebar', () => {
       </MemoryRouter>
     )
 
-    const shortcutsNav = screen.getByRole('navigation', { name: /lối tắt/i })
+    const shortcutsNav = screen.getByRole('navigation', { name: /^lối tắt$/i })
     expect(shortcutsNav).toBeInTheDocument()
 
     expect(screen.queryByRole('link', { name: /tất cả bảng tin/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('region', { name: /môn học theo dõi/i })).not.toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /tổng quan học tập/i })).toHaveAttribute('href', '/student/dashboard')
-    expect(screen.getByRole('link', { name: /luyện đề thi/i })).toHaveAttribute('href', '/student/practice')
-    expect(screen.getByRole('link', { name: /đề xuất câu hỏi/i })).toHaveAttribute('href', '/student/proposals')
-    expect(screen.getByRole('link', { name: /điểm danh & vinh danh/i })).toHaveAttribute('href', '/student/gamification/leaderboard')
-    expect(screen.getByRole('link', { name: /tìm kiếm toàn cục/i })).toHaveAttribute('href', '/search')
+    expect(screen.getByRole('link', { name: /tổng quan học tập/i })).toHaveAttribute(
+      'href',
+      '/student/dashboard'
+    )
+    expect(screen.getByRole('link', { name: /luyện đề thi/i })).toHaveAttribute(
+      'href',
+      '/student/practice'
+    )
+    expect(screen.getByRole('link', { name: /đề xuất câu hỏi/i })).toHaveAttribute(
+      'href',
+      '/student/proposals'
+    )
+    expect(screen.getByRole('link', { name: /điểm danh & vinh danh/i })).toHaveAttribute(
+      'href',
+      '/student/gamification/leaderboard'
+    )
+    expect(screen.getByRole('link', { name: /tìm kiếm toàn cục/i })).toHaveAttribute(
+      'href',
+      '/search'
+    )
     expect(screen.queryByRole('link', { name: /báo cáo vi phạm/i })).not.toBeInTheDocument()
   })
 
@@ -73,9 +88,15 @@ describe('SocialLeftSidebar', () => {
     )
 
     expect(screen.queryByRole('link', { name: /tất cả bảng tin/i })).not.toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /tổng quan giảng dạy/i })).toHaveAttribute('href', '/teacher/dashboard')
-    expect(screen.getByRole('link', { name: /báo cáo vi phạm/i })).toHaveAttribute('href', '/teacher/reports')
-    expect(screen.getByRole('link', { name: /tìm kiếm toàn cục/i })).toHaveAttribute('href', '/search')
+    expect(screen.getByRole('link', { name: /tổng quan giảng dạy/i })).toHaveAttribute(
+      'href',
+      '/teacher/dashboard'
+    )
+    expect(screen.queryByRole('link', { name: /báo cáo vi phạm/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /tìm kiếm toàn cục/i })).toHaveAttribute(
+      'href',
+      '/search'
+    )
     expect(screen.queryByRole('link', { name: /điểm danh & vinh danh/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /luyện đề thi/i })).not.toBeInTheDocument()
   })
@@ -94,4 +115,3 @@ describe('SocialLeftSidebar', () => {
     expect(screen.getByRole('link', { name: '問題提案' })).toBeInTheDocument()
   })
 })
-

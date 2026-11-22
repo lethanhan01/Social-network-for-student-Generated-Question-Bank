@@ -58,11 +58,9 @@ export default function ProposalsPage() {
             onClick={() => { void sessions.fetchNextPage() }}>{t('loadMore')}</Button> : null}
         </section>
       )}
-      {creating ? <ProposalComposer subjects={enrolled.data ?? []} subjectId={subjectId}
-        subjectsPending={enrolled.isPending} subjectsError={enrolled.error} retrySubjects={enrolled.refetch}
-        onClose={() => setCreating(false)} /> : null}
+      {creating ? <ProposalComposer subjectId={subjectId} onClose={() => setCreating(false)} /> : null}
       {selectedId ? <ProposalDetailModal key={selectedId} sessionId={selectedId} onClose={() => update('session')}
-        summary={all.find((session) => session.session_id === selectedId)} subjects={enrolled.data ?? []} /> : null}
+        summary={all.find((session) => session.session_id === selectedId)} /> : null}
     </AcademicLayout>
   )
 }

@@ -1,4 +1,4 @@
-import { useRef, useState, type FormEvent } from 'react'
+import { useRef, useState, type SubmitEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Modal } from '@/components/ui/overlay/Modal'
 import { Form } from '@/components/ui/forms/Form'
@@ -27,7 +27,7 @@ export function EditPostModal({
   const mutation = useUpdatePostMutation(post.post_id!)
   const [uploading, setUploading] = useState(false)
   const busy = uploading || mutation.isPending
-  async function submit(event: FormEvent) {
+  async function submit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     if (busy) return
     if (!content.trim() && media.length === 0 && files.length === 0) {

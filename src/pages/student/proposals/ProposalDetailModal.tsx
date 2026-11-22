@@ -12,11 +12,10 @@ import { useManageProposalMutation } from '@/hooks/queries/useAcademicQuery'
 import { toast } from '@/lib/toast'
 import { getApiError } from '@/lib/api-error'
 import { readSessionStatus, type AcademicSession, type AcademicSessionDetail } from '@/types/academic.types'
-import type { SubjectResponse } from '@/types'
 import { ProposalComposer } from './ProposalComposer'
 
-export function ProposalDetailModal({ sessionId, summary, subjects, onClose }: Readonly<{
-  sessionId: number; summary?: AcademicSession; subjects: SubjectResponse[]; onClose: () => void
+export function ProposalDetailModal({ sessionId, summary, onClose }: Readonly<{
+  sessionId: number; summary?: AcademicSession; onClose: () => void
 }>) {
   const { t } = useTranslation('academic')
   const query = useMySubmissionDetailQuery(sessionId)
@@ -31,7 +30,7 @@ export function ProposalDetailModal({ sessionId, summary, subjects, onClose }: R
     catch (error) { toast.error(getApiError(error, t('saveError'))) }
   }
 
-  if (mode === 'edit' && detail && editable) return <ProposalComposer subjects={subjects} detail={detail} onClose={() => setMode('view')} />
+  if (mode === 'edit' && detail && editable) return <ProposalComposer detail={detail} onClose={() => setMode('view')} />
   return (
     <>
       <Modal open onClose={() => { if (!mutation.isPending) onClose() }} title={detail?.title ?? t('proposals.detail')} size="2xl"

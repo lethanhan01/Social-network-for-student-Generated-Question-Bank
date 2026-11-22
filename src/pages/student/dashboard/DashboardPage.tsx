@@ -1,6 +1,6 @@
 import { BookOpen, FileQuestion, MessageSquare, TrendingUp, Plus, Search } from 'lucide-react'
 import { Card, StatCard, Badge, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/data-display'
-import { Button, ButtonLink } from '@/components/ui/actions'
+import { Button } from '@/components/ui/actions'
 import { Heading, Text, Icon } from '@/components/ui/typography'
 import { Page } from '@/components/ui/layout'
 import { formatNumber } from '@/utils/formatters'
@@ -38,9 +38,6 @@ export default function DashboardPage() {
 
         {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Banner action buttons] */}
         <div className="flex items-center gap-3">
-          <ButtonLink to="/showcase" variant="outline" size="md">
-            UI Showcase
-          </ButtonLink>
           <Button variant="primary" size="md" leftIcon={<Icon icon={Plus} size="sm" />} aria-label="Đóng góp đề thi">
             Đóng góp đề thi
           </Button>

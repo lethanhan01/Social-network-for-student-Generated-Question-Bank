@@ -57,13 +57,13 @@ export function PostMediaGrid({ media }: Readonly<{ media?: MediaItem[] | null }
           </figure>
         ))}
       </section>
-      <Modal
-        open={selected !== undefined}
-        onClose={() => setSelected(undefined)}
-        title={t('social.imageDetail')}
-        size="xl"
-      >
-        {selected !== undefined ? (
+      {selected !== undefined ? (
+        <Modal
+          open
+          onClose={() => setSelected(undefined)}
+          title={t('social.imageDetail')}
+          size="xl"
+        >
           <section className="space-y-4">
             <Image
               src={items[selected]?.url}
@@ -93,8 +93,8 @@ export function PostMediaGrid({ media }: Readonly<{ media?: MediaItem[] | null }
               </Button>
             </nav>
           </section>
-        ) : null}
-      </Modal>
+        </Modal>
+      ) : null}
     </>
   )
 }

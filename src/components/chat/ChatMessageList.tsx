@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type RefObject } from 'react'
+import { memo, useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Reply, Trash2, AlertCircle, ArrowDown } from 'lucide-react'
 import { Avatar, Image, Badge } from '@/components/ui/data-display'
@@ -19,11 +19,11 @@ interface MessageItemRowProps {
   onReply: (msg: MessageDto) => void; onRecall: (msg: MessageDto) => void
 }
 
-function MessageItemRow({ msg, isMe, showUnreadDivider, unreadDividerRef, onReply, onRecall }: Readonly<MessageItemRowProps>) {
+const MessageItemRow = memo(function MessageItemRow({ msg, isMe, showUnreadDivider, unreadDividerRef, onReply, onRecall }: Readonly<MessageItemRowProps>) {
   const { t } = useTranslation('chat')
   return (
     /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Message item and optional divider fragment] */
-    <div className="space-y-3">
+    <div className="space-y-3 chat-message-item">
       {showUnreadDivider ? (
         /* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Unread messages divider bar] */
         <div ref={unreadDividerRef} className="flex items-center gap-3 my-4 py-1" role="separator">
@@ -70,9 +70,9 @@ function MessageItemRow({ msg, isMe, showUnreadDivider, unreadDividerRef, onRepl
       </div>
     </div>
   )
-}
+})
 
-export function ChatMessageList({
+export const ChatMessageList = memo(function ChatMessageList({
   allMessages, currentUserId, isLoading, isError, activeConv, typingNames,
   messagesEndRef, onReply, onRecall, onRetry, hasNextPage, isFetchingNextPage, onLoadMore, unreadCount,
 }: Readonly<ChatMessageListProps>) {
@@ -143,16 +143,16 @@ export function ChatMessageList({
     prevLengthRef.current = allMessages.length
   }, [allMessages, currentUserId, messagesEndRef])
 
-  function handleScroll(e: React.UIEvent<HTMLDivElement>) {
+  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const el = e.currentTarget
     const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 120
-    setShowScrollBottom(!isNearBottom)
-  }
+    setShowScrollBottom((prev) => (prev === !isNearBottom ? prev : !isNearBottom))
+  }, [])
 
-  function scrollToBottom() {
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView?.({ behavior: 'smooth' })
     setShowScrollBottom(false)
-  }
+  }, [messagesEndRef])
 
   if (isLoading && allMessages.length === 0) {
     return (
@@ -246,4 +246,4 @@ export function ChatMessageList({
       ) : null}
     </div>
   )
-}
+})

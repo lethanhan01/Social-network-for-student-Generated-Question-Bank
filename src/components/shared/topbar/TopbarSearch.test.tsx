@@ -22,7 +22,7 @@ describe('TopbarSearch', () => {
       </MemoryRouter>
     )
 
-    const searchInput = screen.getByRole('searchbox', { name: /tìm kiếm/i })
+    const searchInput = screen.getByRole('searchbox', { name: /^tìm kiếm$/i })
     expect(searchInput).toBeInTheDocument()
 
     fireEvent.change(searchInput, { target: { value: 'Giải tích 1' } })

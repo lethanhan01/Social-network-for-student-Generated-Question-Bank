@@ -7,10 +7,10 @@ export function QueryFeedback({ loading, error, retry }: { loading?: boolean; er
   const { t } = useTranslation('portal')
   if (loading)
     return (
-      <p role="status" className="flex items-center justify-center gap-2 p-4 sm:p-8 text-fg-secondary">
+      <output className="flex items-center justify-center gap-2 p-4 sm:p-8 text-fg-secondary">
         <LoaderCircle size={20} className="motion-safe:animate-spin" />
         {t('loading')}
-      </p>
+      </output>
     )
   if (!error) return null
   return (
