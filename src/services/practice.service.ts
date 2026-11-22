@@ -8,6 +8,7 @@ import type {
   SessionQuestionsResponse,
   QuestionStatisticsResponse,
   QuestionRatingsResponse,
+  MySubmissionDetailResponse,
 } from '@/types'
 
 export const practiceService = {
@@ -41,11 +42,42 @@ export const practiceService = {
     sessionId: number,
     options?: { signal?: AbortSignal }
   ): Promise<SessionQuestionsResponse> {
-    return requestData<SessionQuestionsResponse>(
-      api.get<GlobalResponse<SessionQuestionsResponse>>(`/sessions/${sessionId}/questions`, {
-        signal: options?.signal,
-      })
-    )
+    const [response, submissionDetail] = await Promise.all([
+      requestData<SessionQuestionsResponse>(
+        api.get<GlobalResponse<SessionQuestionsResponse>>(`/sessions/${sessionId}/questions`, {
+          signal: options?.signal,
+        })
+      ),
+      requestData<MySubmissionDetailResponse>(
+        api.get<GlobalResponse<MySubmissionDetailResponse>>(`/sessions/my-submissions/${sessionId}`, {
+          signal: options?.signal,
+        })
+      ).catch(() => undefined),
+    ])
+
+    const statusById = new Map<number, string>()
+    for (const q of submissionDetail?.questions ?? []) {
+      const qStatus = (q as { status?: string }).status
+      if (typeof q.question_id === 'number' && typeof qStatus === 'string') {
+        statusById.set(q.question_id, qStatus)
+      }
+    }
+
+    const filteredQuestions = (response.questions ?? []).filter((q) => {
+      const inlineStatus = (q as { status?: string }).status
+      const knownStatus = inlineStatus ?? (q.question_id != null ? statusById.get(q.question_id) : undefined)
+      return !knownStatus || knownStatus === 'APPROVED'
+    })
+
+    if (filteredQuestions.length === (response.questions ?? []).length) {
+      return response
+    }
+
+    return {
+      ...response,
+      total_questions: filteredQuestions.length,
+      questions: filteredQuestions,
+    }
   },
 
   async getQuestionStatistics(
