@@ -9,6 +9,11 @@ import { getApiError } from '@/lib/api-error'
 import type { AnswerQuestionResponse, PracticeQuestionDto } from '@/types'
 import { QuestionRatingModal } from './QuestionRatingModal'
 
+type BackendHiddenFields = PracticeQuestionDto['hidden_fields'] & {
+  selected_options?: Array<string | { key?: string }>
+  was_correct?: boolean
+}
+
 export function PracticeQuestion({
   question,
   sessionId,
@@ -22,15 +27,28 @@ export function PracticeQuestion({
 }>) {
   const { t } = useTranslation('academic')
   const client = useQueryClient()
+  const hidden = question.hidden_fields as BackendHiddenFields | undefined
+  const serverSelected = (hidden?.selected_options ?? [])
+    .map((item) => (typeof item === 'string' ? item : item?.key ?? ''))
+    .filter(Boolean)
+  const serverResult: AnswerQuestionResponse | undefined = question.my_interaction?.answered
+    ? {
+        is_correct:
+          hidden?.was_correct ??
+          (hidden?.correct_answer ? serverSelected.includes(hidden.correct_answer) : false),
+        correct_answer: hidden?.correct_answer,
+        explanation: hidden?.explanation,
+      }
+    : undefined
   const [saved] = useState(() =>
     client.getQueryData<{ result: AnswerQuestionResponse; selected: string[] }>(
       queryKeys.practice.answer(question.question_id ?? 0, question.updated_at)
     )
   )
-  const [selected, setSelected] = useState<string[]>(saved?.selected ?? [])
+  const [selected, setSelected] = useState<string[]>(saved?.selected ?? serverSelected)
   const [rating, setRating] = useState(false)
   const answer = useAnswerQuestionMutation(question.question_id ?? 0)
-  const result = answer.data ?? saved?.result
+  const result = answer.data ?? saved?.result ?? serverResult
   function toggle(key: string) {
     answer.reset()
     setSelected((previous) =>

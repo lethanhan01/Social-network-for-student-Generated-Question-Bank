@@ -9,7 +9,7 @@ import { useEnrolledSubjectsQuery } from '@/hooks/queries/useSessionsQuery'
 import { Button } from '@/components/ui/actions/Button'
 import { Card } from '@/components/ui/data-display/Card'
 import { Select } from '@/components/ui/forms/Select'
-import { positiveId, readSessionStatus, type AcademicSession } from '@/types/academic.types'
+import { matchesSessionFilter, positiveId, type AcademicSession } from '@/types/academic.types'
 import { ProposalCard } from './ProposalCard'
 import { ProposalDetailModal } from './ProposalDetailModal'
 import { ProposalComposer } from './ProposalComposer'
@@ -27,7 +27,7 @@ export default function ProposalsPage() {
   const enrolled = useEnrolledSubjectsQuery()
   const all: AcademicSession[] = sessions.data?.pages.flatMap((page) => page.contents ?? []) ?? []
   const visible = all.filter((session) => (!subjectId || session.subject_id === subjectId) &&
-    (status === 'ALL' || readSessionStatus(session) === 'UNKNOWN' || readSessionStatus(session) === status))
+    matchesSessionFilter(session, status))
 
   function update(key: string, value?: string) {
     setParams((previous) => { const next = new URLSearchParams(previous); if (value) next.set(key, value); else next.delete(key); return next })
