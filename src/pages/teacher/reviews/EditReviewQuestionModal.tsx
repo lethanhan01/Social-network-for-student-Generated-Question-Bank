@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type SubmitEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Modal } from '@/components/ui/overlay'
 import { Checkbox, Form, FormField, Input, RadioGroup, Textarea } from '@/components/ui/forms'
@@ -39,7 +39,7 @@ export function EditReviewQuestionModal({
   const [errors, setErrors] = useState<{ content?: string; options?: string; correct?: string }>({})
   const editMutation = useEditQuestionMutation()
 
-  async function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     const nextErrors: { content?: string; options?: string; correct?: string } = {}
     if (!content.trim()) {

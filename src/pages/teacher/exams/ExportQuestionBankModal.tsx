@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type SubmitEvent } from 'react'
 import { Download } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Modal } from '@/components/ui/overlay'
@@ -44,7 +44,7 @@ export function ExportQuestionBankModal({
     onClose()
   }
 
-  async function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     const parsedSubjectId = Number(subjectId)
     if (!Number.isInteger(parsedSubjectId) || parsedSubjectId <= 0) {
@@ -107,7 +107,7 @@ export function ExportQuestionBankModal({
         />
 
         {fallbackUrl ? (
-          <aside role="status" className="p-3 rounded-xl bg-surface-base border border-line-subtle space-y-2">
+          <output className="block p-3 rounded-xl bg-surface-base border border-line-subtle space-y-2">
             <Text size="xs" tone="muted">{t('teacher.exams.popupBlockedHint')}</Text>
             <ButtonAnchor
               href={fallbackUrl}
@@ -120,7 +120,7 @@ export function ExportQuestionBankModal({
             >
               {t('teacher.exams.manualDownload')}
             </ButtonAnchor>
-          </aside>
+          </output>
         ) : null}
 
         <footer className="flex items-center justify-end gap-2 pt-2 border-t border-line-subtle">

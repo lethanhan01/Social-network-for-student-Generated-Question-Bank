@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type SubmitEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Modal } from '@/components/ui/overlay'
 import { Checkbox, Form, FormField, Input, NumberInput, Select, Switch } from '@/components/ui/forms'
@@ -85,7 +85,7 @@ export function GenerateExamModal({
     setErrors((prev) => ({ ...prev, classIds: undefined }))
   }
 
-  async function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     const nextErrors: FormErrors = {}
     if (!Number.isInteger(parsedSubjectId) || parsedSubjectId <= 0) {

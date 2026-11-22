@@ -1,4 +1,4 @@
-import { useRef, useState, type FormEvent } from 'react'
+import { useRef, useState, type SubmitEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Camera, SendHorizontal } from 'lucide-react'
 import { Avatar } from '@/components/ui/data-display/Avatar'
@@ -31,7 +31,7 @@ export function CommentForm({
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const input = useRef<HTMLInputElement>(null)
-  async function submit(event: FormEvent) {
+  async function submit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     if (busy || (!text.trim() && !file)) return
     setBusy(true)

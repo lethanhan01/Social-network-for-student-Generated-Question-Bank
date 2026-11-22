@@ -1,4 +1,4 @@
-import { type FormEvent } from 'react'
+import { type SubmitEvent } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Heading } from '@/components/ui/typography/Heading'
@@ -31,7 +31,7 @@ function SearchBox({
   onChange: (value: string) => void
 }>) {
   const { t } = useTranslation()
-  function submit(event: FormEvent) {
+  function submit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     onSearch(keyword.trim())
   }

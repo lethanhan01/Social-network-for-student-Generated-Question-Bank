@@ -164,7 +164,7 @@ export default function TeacherExamsPage() {
       </section>
 
       {fallbackDownloadUrl ? (
-        <Card as="aside" role="status" className="p-4 rounded-xl bg-surface-card border border-line-subtle flex flex-wrap items-center justify-between gap-3">
+        <Card as="output" className="p-4 rounded-xl bg-surface-card border border-line-subtle flex flex-wrap items-center justify-between gap-3">
           <Text size="sm" tone="muted">{t('teacher.exams.popupBlockedHint')}</Text>
           {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Fallback download action buttons] */}
           <div className="flex items-center gap-2">

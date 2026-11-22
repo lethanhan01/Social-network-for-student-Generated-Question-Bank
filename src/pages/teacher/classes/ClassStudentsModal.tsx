@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type ReactNode } from 'react'
+import { useState, type ReactNode, type SubmitEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Modal } from '@/components/ui/overlay'
 import { Form, FormField, SearchInput, Textarea } from '@/components/ui/forms'
@@ -39,7 +39,7 @@ export function ClassStudentsModal({ courseClass, onClose }: Readonly<ClassStude
       )
     : allStudents
 
-  async function handleAssign(event: FormEvent) {
+  async function handleAssign(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     const codes = parseStudentCodes(rawCodes)
     if (codes.length === 0) {
@@ -129,7 +129,7 @@ export function ClassStudentsModal({ courseClass, onClose }: Readonly<ClassStude
           </Form>
 
           {assignResult ? (
-            <aside role="status" className="flex flex-wrap items-center gap-2 pt-2 border-t border-line-subtle">
+            <output className="flex flex-wrap items-center gap-2 pt-2 border-t border-line-subtle">
               <Badge tone="success" emphasis="subtle" size="sm">
                 {t('teacher.classes.studentsModal.resultEnrolled', { count: assignResult.total_enrolled ?? 0 })}
               </Badge>
@@ -144,7 +144,7 @@ export function ClassStudentsModal({ courseClass, onClose }: Readonly<ClassStude
                   })}
                 </Badge>
               ) : null}
-            </aside>
+            </output>
           ) : null}
         </Card>
 

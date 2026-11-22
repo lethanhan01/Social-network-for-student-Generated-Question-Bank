@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type SubmitEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Modal } from '@/components/ui/overlay'
 import { Form, FormField, Textarea } from '@/components/ui/forms'
@@ -21,7 +21,7 @@ export function RejectQuestionsModal({
   const [reason, setReason] = useState('')
   const [error, setError] = useState<string | undefined>()
 
-  async function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     const trimmed = reason.trim()
     if (!trimmed) {

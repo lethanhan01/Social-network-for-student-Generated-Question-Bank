@@ -20,4 +20,4 @@ export function AppRoutes() {
   return useRoutes(APP_ROUTES)
 }
 
-export * from './types'
+export type { RouteMeta, UserRole } from './types'

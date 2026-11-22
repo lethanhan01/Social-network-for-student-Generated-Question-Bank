@@ -10,7 +10,7 @@ export type CardVariant =
   | 'elevated'
 
 export type CardPadding = 'none' | 'xs' | 'sm' | 'md' | 'lg'
-export type CardSemanticTag = 'div' | 'article' | 'section' | 'li' | 'aside'
+export type CardSemanticTag = 'div' | 'article' | 'section' | 'li' | 'aside' | 'output'
 
 export const cardVariants = cva(
   'relative overflow-hidden text-fg-primary transition-all duration-200',

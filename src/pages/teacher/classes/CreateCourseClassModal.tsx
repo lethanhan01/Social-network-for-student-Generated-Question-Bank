@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type SubmitEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Modal } from '@/components/ui/overlay'
 import { Form, FormField, Input, Select } from '@/components/ui/forms'
@@ -39,7 +39,7 @@ export function CreateCourseClassModal({
     onClose()
   }
 
-  async function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     const nextErrors: { subjectId?: string; classCode?: string } = {}
     const parsedSubjectId = Number(subjectId)

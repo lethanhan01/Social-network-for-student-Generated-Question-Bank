@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type SubmitEvent } from 'react'
 import { Plus } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Modal } from '@/components/ui/overlay/Modal'
@@ -39,7 +39,7 @@ export function ProposalComposer({ subjectId, detail, onClose }: Readonly<{
   const [error, setError] = useState('')
   const busy = create.isPending || update.isPending
 
-  async function submit(event: FormEvent) {
+  async function submit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     if (busy) return
     if (!title.trim() || !eligible.some((item) => item.course_class_id === Number(selectedClass)) || !validDraftQuestions(questions)) {
