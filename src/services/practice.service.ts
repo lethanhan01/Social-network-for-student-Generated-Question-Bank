@@ -57,8 +57,9 @@ export const practiceService = {
 
     const statusById = new Map<number, string>()
     for (const q of submissionDetail?.questions ?? []) {
-      if (typeof q.question_id === 'number' && typeof q.status === 'string') {
-        statusById.set(q.question_id, q.status)
+      const qStatus = (q as { status?: string }).status
+      if (typeof q.question_id === 'number' && typeof qStatus === 'string') {
+        statusById.set(q.question_id, qStatus)
       }
     }
 
