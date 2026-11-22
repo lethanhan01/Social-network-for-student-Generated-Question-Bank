@@ -74,7 +74,7 @@ describe('SocialLeftSidebar', () => {
 
     expect(screen.queryByRole('link', { name: /tất cả bảng tin/i })).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: /tổng quan giảng dạy/i })).toHaveAttribute('href', '/teacher/dashboard')
-    expect(screen.getByRole('link', { name: /báo cáo vi phạm/i })).toHaveAttribute('href', '/teacher/reports')
+    expect(screen.queryByRole('link', { name: /báo cáo vi phạm/i })).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: /tìm kiếm toàn cục/i })).toHaveAttribute('href', '/search')
     expect(screen.queryByRole('link', { name: /điểm danh & vinh danh/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /luyện đề thi/i })).not.toBeInTheDocument()

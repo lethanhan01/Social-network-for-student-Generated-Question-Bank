@@ -1,94 +1,183 @@
+import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  Users,
-  CheckSquare,
-  BookOpen,
-  AlertTriangle,
-  GraduationCap,
-  Calendar,
-} from 'lucide-react'
+import { Users, CheckSquare, BookOpen, GraduationCap, Calendar } from 'lucide-react'
 import { Heading, Text } from '@/components/ui/typography'
 import { Card, Badge } from '@/components/ui/data-display'
-import { ButtonLink } from '@/components/ui/actions'
+import { Button, ButtonLink } from '@/components/ui/actions'
+import { AcademicFeedback } from '@/components/academic/AcademicFeedback'
+import { useMyClassesQuery } from '@/hooks/queries/useCourseQuery'
+import { usePendingSessionsQuery } from '@/hooks/queries/useReviewQuery'
+import { useMyExamsQuery } from '@/hooks/queries/useExamQuery'
+import { formatDateTime } from '@/utils/date'
+
+function formatCount(isPending: boolean, count: number, hasNext?: boolean): string {
+  if (isPending) return '—'
+  return hasNext ? `${count}+` : String(count)
+}
 
 export default function TeacherDashboardPage() {
   const { t } = useTranslation('academic')
+  const myClasses = useMyClassesQuery()
+  const pendingSessions = usePendingSessionsQuery({ limit: 5 })
+  const myExams = useMyExamsQuery({ limit: 5 })
+
+  const classesList = myClasses.data ?? []
+  const totalStudents = classesList.reduce((sum, item) => sum + (item.total_students ?? 0), 0)
+  const activeSemester = classesList.find((item) => item.semester_name)?.semester_name
+
+  const pendingItems = pendingSessions.data?.items ?? []
+  const pendingCountText = formatCount(
+    pendingSessions.isPending,
+    pendingItems.length,
+    pendingSessions.data?.pagination?.has_next
+  )
+
+  const examItems = myExams.data?.items ?? []
+  const examCountText = formatCount(
+    myExams.isPending,
+    examItems.length,
+    myExams.data?.pagination?.has_next
+  )
 
   const stats = [
     {
-      title: 'Lớp học phần phụ trách',
-      value: '4',
-      description: 'Học kỳ 2026.1',
+      key: 'classes',
+      title: t('teacher.dashboard.classesTitle'),
+      value: myClasses.isPending ? '—' : String(classesList.length),
+      description: t('teacher.dashboard.totalStudents', { count: totalStudents }),
       icon: <Users size={24} />,
       link: '/teacher/classes',
+      isError: myClasses.isError,
+      onRetry: myClasses.refetch,
     },
     {
-      title: 'Câu hỏi chờ thẩm định',
-      value: '18',
-      description: '3 phiên đề xuất mới',
+      key: 'reviews',
+      title: t('teacher.dashboard.reviewsTitle'),
+      value: pendingCountText,
+      description:
+        pendingItems.length > 0
+          ? t('teacher.dashboard.reviewsPendingHint')
+          : t('teacher.dashboard.reviewsEmptyHint'),
       icon: <CheckSquare size={24} />,
       link: '/teacher/reviews',
+      isError: pendingSessions.isError,
+      onRetry: pendingSessions.refetch,
     },
     {
-      title: 'Ngân hàng đề thi',
-      value: '12',
-      description: 'Đề thi đã khởi tạo',
+      key: 'exams',
+      title: t('teacher.dashboard.examsTitle'),
+      value: examCountText,
+      description: t('teacher.dashboard.examsHint'),
       icon: <BookOpen size={24} />,
       link: '/teacher/exams',
-    },
-    {
-      title: 'Báo cáo vi phạm',
-      value: '2',
-      description: 'Cần xác minh',
-      icon: <AlertTriangle size={24} />,
-      link: '/teacher/reports',
+      isError: myExams.isError,
+      onRetry: myExams.refetch,
     },
   ]
+
+  let priorityContent: ReactNode
+  if (pendingSessions.isPending) {
+    priorityContent = <AcademicFeedback pending />
+  } else if (pendingSessions.isError) {
+    priorityContent = <AcademicFeedback error={pendingSessions.error} onRetry={pendingSessions.refetch} />
+  } else if (pendingItems.length === 0) {
+    priorityContent = (
+      <Text size="sm" tone="muted" className="py-4">
+        {t('teacher.dashboard.priorityEmpty')}
+      </Text>
+    )
+  } else {
+    priorityContent = (
+      <ul className="space-y-3">
+        {pendingItems.slice(0, 3).map((item) => (
+          <li
+            key={item.session_id}
+            className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl bg-surface-base border border-line-subtle"
+          >
+            <section className="space-y-0.5 min-w-0">
+              <strong className="text-sm font-semibold text-fg-primary block truncate">
+                {item.title || t('teacher.dashboard.untitledSession', { id: item.session_id ?? 0 })}
+              </strong>
+              <Text size="xs" tone="muted">
+                {[item.topic, item.author?.full_name, item.created_at ? formatDateTime(item.created_at) : null]
+                  .filter(Boolean)
+                  .join(' · ')}
+              </Text>
+            </section>
+            <ButtonLink
+              to={`/teacher/reviews?session=${item.session_id ?? ''}`}
+              variant="secondary"
+              size="sm"
+              className="min-h-11 shrink-0 text-xs"
+            >
+              {t('teacher.dashboard.reviewNow')}
+            </ButtonLink>
+          </li>
+        ))}
+      </ul>
+    )
+  }
 
   return (
     <section className="max-w-7xl mx-auto space-y-6">
       <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-line-subtle">
-        <div className="space-y-1">
+        <section className="space-y-1">
+          {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Title icon and heading row] */}
           <div className="flex items-center gap-2">
             <GraduationCap className="text-action-accent" size={28} />
             <Heading level={1} className="text-2xl sm:text-3xl font-extrabold tracking-tight text-fg-primary">
-              Cổng Giảng Viên & Quản Trị
+              {t('teacher.dashboard.title')}
             </Heading>
           </div>
           <Text size="sm" tone="muted">
-            Tổng quan công tác giảng dạy, thẩm định học thuật và quản lý ngân hàng đề thi.
+            {t('teacher.dashboard.subtitle')}
           </Text>
-        </div>
-        <div className="flex items-center gap-2">
-          <Badge tone="accent" emphasis="subtle" size="md" className="gap-1.5 py-1 px-3">
+        </section>
+
+        {activeSemester ? (
+          <Badge tone="accent" emphasis="subtle" size="md" className="gap-1.5 py-1 px-3 self-start sm:self-auto">
             <Calendar size={14} />
-            Học kỳ 2026.1
+            {t('teacher.dashboard.semesterBadge', { name: activeSemester })}
           </Badge>
-        </div>
+        ) : null}
       </header>
 
-      {/* Grid of Key Stats */}
-      <section aria-label="Thống kê nhanh" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <section aria-label={t('teacher.dashboard.statsAria')} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {stats.map((stat) => (
-          <Card key={stat.title} as="article" className="p-5 rounded-2xl bg-surface-card border border-line-subtle shadow-card flex flex-col justify-between gap-4">
-            <header className="flex items-center justify-between">
+          <Card
+            key={stat.key}
+            as="article"
+            className="p-5 rounded-2xl bg-surface-card border border-line-subtle shadow-card flex flex-col justify-between gap-4"
+          >
+            <header className="flex items-center justify-between gap-2">
               <Text size="xs" className="font-semibold uppercase tracking-wider text-fg-muted">
                 {stat.title}
               </Text>
               {/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Stat icon container] */}
-              <div className="w-10 h-10 rounded-xl bg-surface-card-hover flex items-center justify-center text-action-accent">
+              <div className="w-10 h-10 rounded-xl bg-surface-card-hover flex items-center justify-center text-action-accent shrink-0">
                 {stat.icon}
               </div>
             </header>
-            <div>
-              <p className="text-3xl font-extrabold tracking-tight text-fg-primary">
-                {stat.value}
-              </p>
-              <Text size="xs" tone="muted" className="mt-1">
-                {stat.description}
-              </Text>
-            </div>
-            <nav aria-label={`Truy cập ${stat.title}`} className="pt-2 border-t border-line-subtle">
+
+            {stat.isError ? (
+              <section className="space-y-2">
+                <Text size="xs" tone="muted" role="alert">
+                  {t('loadError')}
+                </Text>
+                <Button variant="outline" size="sm" className="min-h-11" onClick={() => { void stat.onRetry() }}>
+                  {t('retry')}
+                </Button>
+              </section>
+            ) : (
+              <section>
+                <p className="text-3xl font-extrabold tracking-tight text-fg-primary">{stat.value}</p>
+                <Text size="xs" tone="muted" className="mt-1">
+                  {stat.description}
+                </Text>
+              </section>
+            )}
+
+            <nav aria-label={t('teacher.dashboard.accessAria', { title: stat.title })} className="pt-2 border-t border-line-subtle">
               <ButtonLink
                 to={stat.link}
                 variant="ghost"
@@ -102,94 +191,47 @@ export default function TeacherDashboardPage() {
         ))}
       </section>
 
-      {/* Quick Actions & Guidelines */}
-      <section aria-label="Lối tắt quản lý học thuật" className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <section aria-label={t('teacher.dashboard.shortcutsAria')} className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card as="section" className="p-6 rounded-2xl bg-surface-card border border-line-subtle shadow-card space-y-4">
           <header className="space-y-1">
             <Heading level={2} className="text-lg font-bold text-fg-primary">
-              Nhiệm vụ trọng tâm
+              {t('teacher.dashboard.priorityTitle')}
             </Heading>
             <Text size="sm" tone="muted">
-              Các quy trình học thuật cần Giảng viên ưu tiên xử lý trong tuần.
+              {t('teacher.dashboard.prioritySubtitle')}
             </Text>
           </header>
-          <ul className="space-y-3">
-            <li className="flex items-center justify-between p-3 rounded-xl bg-surface-base border border-line-subtle">
-              <div className="space-y-0.5">
-                <strong className="text-sm font-semibold text-fg-primary block">
-                  Duyệt phiên câu hỏi trắc nghiệm
-                </strong>
-                <Text size="xs" tone="muted">
-                  3 phiên câu hỏi môn IT4409 cần thẩm định chuyên môn
-                </Text>
-              </div>
-              <ButtonLink to="/teacher/reviews" variant="secondary" size="sm" className="min-h-11 shrink-0 text-xs">
-                Thẩm định ngay
-              </ButtonLink>
-            </li>
-            <li className="flex items-center justify-between p-3 rounded-xl bg-surface-base border border-line-subtle">
-              <div className="space-y-0.5">
-                <strong className="text-sm font-semibold text-fg-primary block">
-                  Soạn cấu trúc đề thi giữa kỳ
-                </strong>
-                <Text size="xs" tone="muted">
-                  Sinh đề tự động theo ma trận câu hỏi Bloom
-                </Text>
-              </div>
-              <ButtonLink to="/teacher/exams" variant="secondary" size="sm" className="min-h-11 shrink-0 text-xs">
-                Tạo đề thi
-              </ButtonLink>
-            </li>
-          </ul>
+
+          {priorityContent}
         </Card>
 
         <Card as="section" className="p-6 rounded-2xl bg-surface-card border border-line-subtle shadow-card space-y-4">
           <header className="space-y-1">
             <Heading level={2} className="text-lg font-bold text-fg-primary">
-              Cổng Quản Trị Hệ Thống
+              {t('teacher.dashboard.quickLinksTitle')}
             </Heading>
             <Text size="sm" tone="muted">
-              Công cụ quản lý danh mục môn học, học kỳ và xử lý báo cáo.
+              {t('teacher.dashboard.quickLinksSubtitle')}
             </Text>
           </header>
-          <div className="grid grid-cols-2 gap-3 pt-2">
-            <ButtonLink
-              to="/teacher/classes"
-              variant="outline"
-              size="md"
-              className="flex-col items-center justify-center min-h-[72px] rounded-xl text-center p-3 gap-2"
-            >
+          <nav aria-label={t('teacher.dashboard.quickLinksTitle')} className="grid grid-cols-2 gap-3 pt-2">
+            <ButtonLink to="/teacher/classes" variant="outline" size="md" className="flex-col items-center justify-center min-h-20 rounded-xl text-center p-3 gap-2">
               <Users size={20} className="text-action-accent" />
-              <strong className="text-xs font-semibold">Lớp học phần</strong>
+              <strong className="text-xs font-semibold">{t('teacher.dashboard.linkClasses')}</strong>
             </ButtonLink>
-            <ButtonLink
-              to="/teacher/academic"
-              variant="outline"
-              size="md"
-              className="flex-col items-center justify-center min-h-[72px] rounded-xl text-center p-3 gap-2"
-            >
+            <ButtonLink to="/teacher/reviews" variant="outline" size="md" className="flex-col items-center justify-center min-h-20 rounded-xl text-center p-3 gap-2">
+              <CheckSquare size={20} className="text-action-accent" />
+              <strong className="text-xs font-semibold">{t('teacher.dashboard.linkReviews')}</strong>
+            </ButtonLink>
+            <ButtonLink to="/teacher/exams" variant="outline" size="md" className="flex-col items-center justify-center min-h-20 rounded-xl text-center p-3 gap-2">
               <BookOpen size={20} className="text-action-accent" />
-              <strong className="text-xs font-semibold">Quản trị đào tạo</strong>
+              <strong className="text-xs font-semibold">{t('teacher.dashboard.linkExams')}</strong>
             </ButtonLink>
-            <ButtonLink
-              to="/teacher/reports"
-              variant="outline"
-              size="md"
-              className="flex-col items-center justify-center min-h-[72px] rounded-xl text-center p-3 gap-2"
-            >
-              <AlertTriangle size={20} className="text-action-accent" />
-              <strong className="text-xs font-semibold">Báo cáo vi phạm</strong>
-            </ButtonLink>
-            <ButtonLink
-              to="/feed"
-              variant="outline"
-              size="md"
-              className="flex-col items-center justify-center min-h-[72px] rounded-xl text-center p-3 gap-2"
-            >
+            <ButtonLink to="/feed" variant="outline" size="md" className="flex-col items-center justify-center min-h-20 rounded-xl text-center p-3 gap-2">
               <GraduationCap size={20} className="text-action-accent" />
-              <strong className="text-xs font-semibold">Mạng xã hội</strong>
+              <strong className="text-xs font-semibold">{t('teacher.dashboard.linkFeed')}</strong>
             </ButtonLink>
-          </div>
+          </nav>
         </Card>
       </section>
     </section>

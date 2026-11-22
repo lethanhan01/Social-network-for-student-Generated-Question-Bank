@@ -1,22 +1,27 @@
 import api, { requestData, type GlobalResponse } from './api'
 import type {
   PendingSessionsResponse,
-  SessionDetailReviewResponse,
   ApproveQuestionsRequest,
   ApproveQuestionsResponse,
   RejectQuestionsRequest,
   EditQuestionRequest,
   EditQuestionResponse,
 } from '@/types'
+import type { LiveSessionDetailReviewResponse } from '@/types/review.types'
 
 export const reviewService = {
   async getPendingSessions(
     params?: { cursor?: string; limit?: number; subject_id?: number },
     options?: { signal?: AbortSignal }
   ): Promise<PendingSessionsResponse> {
+    const queryParams: Record<string, string | number> = {}
+    if (params?.cursor) queryParams.after = params.cursor
+    if (params?.limit != null) queryParams.limit = params.limit
+    if (params?.subject_id != null) queryParams.subject_id = params.subject_id
+
     return requestData<PendingSessionsResponse>(
-      api.get<GlobalResponse<PendingSessionsResponse>>('/sessions/pending', {
-        params,
+      api.get<GlobalResponse<PendingSessionsResponse>>('/lecturer/sessions/reviewable', {
+        params: queryParams,
         signal: options?.signal,
       })
     )
@@ -25,9 +30,9 @@ export const reviewService = {
   async getSessionDetailForReview(
     sessionId: number,
     options?: { signal?: AbortSignal }
-  ): Promise<SessionDetailReviewResponse> {
-    return requestData<SessionDetailReviewResponse>(
-      api.get<GlobalResponse<SessionDetailReviewResponse>>(`/sessions/${sessionId}`, {
+  ): Promise<LiveSessionDetailReviewResponse> {
+    return requestData<LiveSessionDetailReviewResponse>(
+      api.get<GlobalResponse<LiveSessionDetailReviewResponse>>(`/lecturer/sessions/${sessionId}`, {
         signal: options?.signal,
       })
     )
@@ -35,21 +40,21 @@ export const reviewService = {
 
   async approveQuestions(payload: ApproveQuestionsRequest): Promise<ApproveQuestionsResponse> {
     return requestData<ApproveQuestionsResponse>(
-      api.post<GlobalResponse<ApproveQuestionsResponse>>('/sessions/approve', payload)
+      api.post<GlobalResponse<ApproveQuestionsResponse>>('/lecturer/sessions/approve', payload)
     )
   },
 
   async rejectQuestions(payload: RejectQuestionsRequest): Promise<void> {
-    await api.post<GlobalResponse<void>>('/sessions/reject', payload)
+    await api.post<GlobalResponse<void>>('/lecturer/sessions/reject', payload)
   },
 
   async editQuestion(questionId: number, payload: EditQuestionRequest): Promise<EditQuestionResponse> {
     return requestData<EditQuestionResponse>(
-      api.put<GlobalResponse<EditQuestionResponse>>(`/questions/${questionId}`, payload)
+      api.put<GlobalResponse<EditQuestionResponse>>(`/lecturer/questions/${questionId}`, payload)
     )
   },
 
   async completeSessionReview(sessionId: number): Promise<void> {
-    await api.post<GlobalResponse<void>>(`/sessions/${sessionId}/complete-review`)
+    await api.post<GlobalResponse<void>>(`/lecturer/sessions/${sessionId}/complete-review`)
   },
 }

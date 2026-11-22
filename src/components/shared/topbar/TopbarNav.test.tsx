@@ -56,7 +56,8 @@ describe('TopbarNav', () => {
     expect(screen.getByRole('link', { name: /lớp học phần/i })).toHaveAttribute('href', '/teacher/classes')
     expect(screen.getByRole('link', { name: /thẩm định câu hỏi/i })).toHaveAttribute('href', '/teacher/reviews')
     expect(screen.getByRole('link', { name: /ngân hàng đề thi/i })).toHaveAttribute('href', '/teacher/exams')
-    expect(screen.getByRole('link', { name: /quản trị đào tạo/i })).toHaveAttribute('href', '/teacher/academic')
+    expect(screen.getByRole('link', { name: /mạng xã hội học tập/i })).toHaveAttribute('href', '/feed')
+    expect(screen.queryByRole('link', { name: /quản trị đào tạo/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /đấu trường minigame/i })).not.toBeInTheDocument()
   })
 

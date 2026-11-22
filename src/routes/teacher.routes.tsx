@@ -8,8 +8,6 @@ const TeacherDashboardPage = lazy(() => import('@/pages/teacher/TeacherDashboard
 const TeacherClassesPage = lazy(() => import('@/pages/teacher/TeacherClassesPage'))
 const TeacherReviewsPage = lazy(() => import('@/pages/teacher/TeacherReviewsPage'))
 const TeacherExamsPage = lazy(() => import('@/pages/teacher/TeacherExamsPage'))
-const TeacherAcademicPage = lazy(() => import('@/pages/teacher/TeacherAcademicPage'))
-const TeacherReportsPage = lazy(() => import('@/pages/teacher/TeacherReportsPage'))
 
 export const teacherRoutes: RouteObject[] = [
   {
@@ -22,8 +20,8 @@ export const teacherRoutes: RouteObject[] = [
           { path: '/teacher/classes', element: <TeacherClassesPage /> },
           { path: '/teacher/reviews', element: <TeacherReviewsPage /> },
           { path: '/teacher/exams', element: <TeacherExamsPage /> },
-          { path: '/teacher/academic', element: <TeacherAcademicPage /> },
-          { path: '/teacher/reports', element: <TeacherReportsPage /> },
+          { path: '/teacher/academic', element: <Navigate to="/teacher/dashboard" replace /> },
+          { path: '/teacher/reports', element: <Navigate to="/teacher/dashboard" replace /> },
         ],
       },
     ],
