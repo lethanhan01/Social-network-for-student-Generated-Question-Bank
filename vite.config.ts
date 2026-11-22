@@ -68,13 +68,22 @@ export default defineConfig(({ mode }) => {
     build: {
       rollupOptions: {
         output: {
-          manualChunks: {
-            'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-            'vendor-query': ['@tanstack/react-query'],
-            'vendor-charts': ['recharts'],
-            'vendor-ui': ['lucide-react', 'clsx', 'tailwind-merge'],
-            'vendor-emoji': ['emoji-picker-react'],
-            'vendor-i18n': ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
+          manualChunks(id) {
+            if (!id.includes('node_modules')) return
+            if (/[\\/]node_modules[\\/](react|react-dom|scheduler|react-router|react-router-dom)[\\/]/.test(id)) {
+              return 'vendor-react'
+            }
+            if (id.includes('@tanstack/react-query')) return 'vendor-query'
+            if (id.includes('emoji-picker-react')) return 'vendor-emoji'
+            if (id.includes('@stomp/stompjs')) return 'vendor-stomp'
+            if (id.includes('zod')) return 'vendor-zod'
+            if (id.includes('radix-ui') || id.includes('@radix-ui')) return 'vendor-radix'
+            if (/[\\/]node_modules[\\/](i18next|react-i18next|i18next-browser-languagedetector)[\\/]/.test(id)) {
+              return 'vendor-i18n'
+            }
+            if (/[\\/]node_modules[\\/](lucide-react|clsx|tailwind-merge)[\\/]/.test(id)) {
+              return 'vendor-ui'
+            }
           },
         },
       },

@@ -10,8 +10,6 @@ import {
   CalendarCheck,
   Search,
   CheckSquare,
-  ShieldAlert,
-  Play,
   ShoppingBag,
   PenLine,
 } from 'lucide-react'
@@ -95,11 +93,11 @@ export const TEACHER_PRIMARY_NAV_ITEMS: NavItemConfig[] = [
     icon: <BookOpen size={24} />,
   },
   {
-    id: 'academic',
-    labelKey: 'nav.academic',
-    defaultLabel: 'Quản trị đào tạo',
-    to: '/teacher/academic',
-    icon: <Play size={24} />,
+    id: 'feed',
+    labelKey: 'nav.feed',
+    defaultLabel: 'Mạng xã hội học tập',
+    to: '/feed',
+    icon: <Home size={24} />,
   },
 ]
 
@@ -150,13 +148,6 @@ export const TEACHER_SECONDARY_SHORTCUT_ITEMS: NavItemConfig[] = [
     defaultLabel: 'Tổng quan giảng dạy',
     to: '/teacher/dashboard',
     icon: <LayoutDashboard size={18} className="text-action-accent shrink-0" />,
-  },
-  {
-    id: 'teacher-reports',
-    labelKey: 'nav.teacherReports',
-    defaultLabel: 'Báo cáo vi phạm',
-    to: '/teacher/reports',
-    icon: <ShieldAlert size={18} className="text-action-accent shrink-0" />,
   },
   {
     id: 'search',

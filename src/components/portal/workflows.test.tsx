@@ -18,7 +18,7 @@ const members: ConversationMemberDto[] = [
 ]
 function Location() {
   const location = useLocation()
-  return <p role="status">{location.pathname}</p>
+  return <output>{location.pathname}</output>
 }
 describe('Portal workflows', () => {
   beforeEach(async () => {

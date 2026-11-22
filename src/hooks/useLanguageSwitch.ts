@@ -23,6 +23,7 @@ export function useLanguageSwitch(): {
 
   const changeLanguage = useCallback(
     async (lang: SupportedLanguage) => {
+      await i18n.loadLanguages(lang)
       await i18n.changeLanguage(lang)
       setCurrentLanguage(lang)
       syncDocumentAttributes(lang)

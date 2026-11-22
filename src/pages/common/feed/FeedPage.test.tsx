@@ -350,5 +350,36 @@ describe('FeedPage Component', () => {
     await screen.findByText(/Bài viết kiểm thử trên FeedPage/i)
     expect(postService.getMyPosts).toHaveBeenCalled()
     expect(feedService.getActivityFeeds).not.toHaveBeenCalled()
+    expect(feedService.getNewFeedCount).not.toHaveBeenCalled()
+  })
+
+  it('defers post detail fetches for below-the-fold items until intersecting viewport', async () => {
+    vi.mocked(feedService.getActivityFeeds).mockResolvedValue({
+      items: [
+        { feed_id: 1, target_type: 'POST', target_id: 101 },
+        { feed_id: 2, target_type: 'POST', target_id: 102 },
+        { feed_id: 3, target_type: 'POST', target_id: 103 },
+        { feed_id: 4, target_type: 'POST', target_id: 104 },
+      ],
+      pagination: { has_next: false },
+    })
+    vi.mocked(postService.getPostById).mockImplementation(async (id) => ({
+      post_id: id,
+      content: `Bài viết số ${id}`,
+    }))
+
+    renderWithQueryClient(
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <FeedPage />
+      </BrowserRouter>
+    )
+
+    expect(await screen.findByText('Bài viết số 101')).toBeInTheDocument()
+    expect(await screen.findByText('Bài viết số 103')).toBeInTheDocument()
+    expect(postService.getPostById).not.toHaveBeenCalledWith(104, expect.anything())
+
+    triggerIntersect(true)
+
+    expect(await screen.findByText('Bài viết số 104')).toBeInTheDocument()
   })
 })

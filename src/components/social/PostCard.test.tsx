@@ -107,4 +107,13 @@ describe('PostCard Component', () => {
     await waitFor(() => expect(screen.getByText(/5 lượt/)).toBeInTheDocument())
     expect(screen.getByRole('button', { name: 'Thích' })).toBeEnabled()
   })
+
+  it('does not mount ReportModal or ConfirmDialog until opened', () => {
+    renderWithQueryClient(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <PostCard post={mockPost} />
+      </MemoryRouter>
+    )
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
 })

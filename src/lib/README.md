@@ -36,7 +36,7 @@ graph TD
         C3["Cụm 3: Internationalization Engine<br/>- i18n.ts (Khởi tạo i18next hỗ trợ vi/en)<br/>- notification-i18n.ts (Bản địa hóa thông báo học tập thời gian thực)"]
         C4["Cụm 4: Design Tokens & Styling Contract<br/>- variants.ts (Định nghĩa TONES, EMPHASES, SIZES)<br/>- tone-styles.ts (Ma trận ánh xạ toneClasses sang Semantic Tokens)"]
         C5["Cụm 5: Dynamic Import Resilience<br/>- lazyWithRetry.ts (Tự động tải lại chunk component khi mất kết nối)"]
-        C6["Cụm 6: Caching & System UI Adapters<br/>- query-keys.ts (TanStack Query Key Factory 10 domains)<br/>- toast.tsx (Sonner Toast Adapter trợ năng)<br/>- owner-constants.ts (Hằng số hệ thống SQB)"]
+        C6["Cụm 6: Caching & System UI Adapters<br/>- query-keys.ts (TanStack Query Key Factory 10 domains)<br/>- toast.tsx (Sonner Toast Adapter trợ năng)"]
     end
 ```
 
@@ -226,7 +226,6 @@ Khi nâng cấp hoặc mở rộng tầng thư viện, lập trình viên cần 
 | 9 | `lazyWithRetry.ts` | [`lazyWithRetry.ts`](lazyWithRetry.ts) | [`lazyWithRetry.test.tsx`](lazyWithRetry.test.tsx) | Bọc `React.lazy` với cơ chế tự động thử tải lại module khi gặp sự cố mạng hoặc bản build mới. | `lazyWithRetry` |
 | 10 | `query-keys.ts` | [`query-keys.ts`](query-keys.ts) | [`query-keys.test.ts`](query-keys.test.ts) | TanStack Query Key Factory quản lý tập trung toàn bộ khóa cache cho 10 domain nghiệp vụ SQB HUST. | `queryKeys` (auth, posts, chat, questions, exams, reviews, sessions...) |
 | 11 | `toast.tsx` | [`toast.tsx`](toast.tsx) | [`toast.test.tsx`](toast.test.tsx) | Adapter thông báo Sonner chuẩn Tone ngữ nghĩa, icon trợ năng và thời lượng hiển thị tối ưu. | `showToast`, `toastSuccess`, `toastError`, `toastWarning`, `toastInfo` |
-| 12 | `owner-constants.ts` | [`owner-constants.ts`](owner-constants.ts) | N/A | Hằng số cấu hình quản trị hệ thống, quyền hạn người dùng và giới hạn kích thước phân trang. | `SYSTEM_ROLES`, `PAGE_SIZES`, `DEFAULT_TIMEOUT_MS` |
 
 ---
 

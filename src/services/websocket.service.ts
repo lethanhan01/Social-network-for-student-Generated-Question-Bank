@@ -1,5 +1,5 @@
 import { Client, type IMessage, type StompSubscription } from '@stomp/stompjs'
-import { useAuthStore } from '@/stores/authStore'
+import { onLogout, useAuthStore } from '@/stores/authStore'
 import { logger } from '@/lib/logger'
 import type {
   SendWsMessageRequestDto,
@@ -247,3 +247,7 @@ class WebSocketService {
 
 export const webSocketService = new WebSocketService()
 export const websocketService = webSocketService
+
+onLogout(() => {
+  webSocketService.disconnect()
+})

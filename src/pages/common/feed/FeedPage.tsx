@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -9,8 +9,11 @@ import { SocialFeedLayout } from '@/components/social/SocialFeedLayout'
 import { SocialLeftSidebar } from '@/components/social/SocialLeftSidebar'
 import { SocialRightSidebar } from '@/components/social/SocialRightSidebar'
 import { CreatePostBox } from '@/components/social/CreatePostBox'
-import { CreatePostModal } from '@/components/social/CreatePostModal'
 import { PostCard } from '@/components/social/PostCard'
+
+const LazyCreatePostModal = lazy(() =>
+  import('@/components/social/CreatePostModal').then((m) => ({ default: m.CreatePostModal }))
+)
 import { QueryFeedback } from '@/components/social/QueryFeedback'
 import { ActivityFeedEntry, ActivityPost } from '@/components/social/ActivityFeedEntry'
 import { LoadMore } from '@/components/social/LoadMore'
@@ -62,7 +65,7 @@ export default function FeedPage() {
   const activity = useInfiniteActivityFeedQuery(10, tab !== 'MINE')
   const mine = useInfinitePostsFeedQuery(10, tab === 'MINE')
   const query = tab === 'MINE' ? mine : activity
-  const counter = useNewFeedCountQuery(since)
+  const counter = useNewFeedCountQuery(since, tab !== 'MINE')
   const recent = useQuery<PostResponseDto[]>({
     queryKey: queryKeys.posts.recentlyCreated(),
     queryFn: () => [],
@@ -108,26 +111,33 @@ export default function FeedPage() {
       ) : null}
       {recentPosts.map((post) =>
         post.post_id ? (
-          <ActivityPost key={post.post_id} postId={post.post_id} currentUser={currentUser} />
+          <ActivityPost key={post.post_id} postId={post.post_id} currentUser={currentUser} eager />
         ) : null
       )}
       {tab === 'MINE'
         ? visiblePosts.map((post) => <PostCard key={post.post_id} post={post} />)
-        : visibleEvents.map((item) => (
-            <ActivityFeedEntry key={item.feed_id} item={item} currentUser={currentUser} />
+        : visibleEvents.map((item, idx) => (
+            <ActivityFeedEntry
+              key={item.feed_id}
+              item={item}
+              currentUser={currentUser}
+              eager={idx < 3}
+            />
           ))}
       {showEmptyFeed ? (
         <p className="py-8 text-center text-text-muted">{t('social.emptyFeed')}</p>
       ) : null}
       <LoadMore query={query} autoLoad />
       {creating ? (
-        <CreatePostModal
-          isOpen
-          onClose={() => setCreating(false)}
-          onSubmit={createPost}
-          subjects={subjects}
-          authorRole={currentUser?.role}
-        />
+        <Suspense fallback={null}>
+          <LazyCreatePostModal
+            isOpen
+            onClose={() => setCreating(false)}
+            onSubmit={createPost}
+            subjects={subjects}
+            authorRole={currentUser?.role}
+          />
+        </Suspense>
       ) : null}
     </section>
   )

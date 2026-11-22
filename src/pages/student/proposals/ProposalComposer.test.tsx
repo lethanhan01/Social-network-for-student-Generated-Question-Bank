@@ -25,7 +25,7 @@ describe('Proposal submission', () => {
     vi.mocked(sessionService.getMyEnrolledCourseClasses).mockResolvedValue([
       { course_class_id: 201, subject_id: 1, can_propose: false, active_semester: false },
     ])
-    renderWithQueryClient(<ProposalComposer subjects={[]} onClose={vi.fn()} />)
+    renderWithQueryClient(<ProposalComposer onClose={vi.fn()} />)
     expect(await screen.findByText('Bạn chưa có lớp học phần được phép gửi đề xuất trong học kỳ hiện tại.')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Gửi đề xuất' })).not.toBeInTheDocument()
     expect(send).not.toHaveBeenCalled()
@@ -34,7 +34,7 @@ describe('Proposal submission', () => {
     const send = vi.spyOn(sessionService, 'proposeSession').mockResolvedValue({ session_id: 99 })
     const close = vi.fn()
     const user = userEvent.setup()
-    renderWithQueryClient(<ProposalComposer subjects={[{ subject_id: 1, code: 'IT', name: 'Course' }]} onClose={close} />)
+    renderWithQueryClient(<ProposalComposer onClose={close} />)
     const select = await screen.findByRole('combobox', { name: 'Lớp học phần' })
     fireEvent.keyDown(select, { key: 'ArrowDown' })
     fireEvent.click(await screen.findByRole('option', { name: 'IT · Course · 123 · 20261' }))
@@ -57,7 +57,7 @@ describe('Proposal submission', () => {
     vi.mocked(sessionService.getMyEnrolledCourseClasses).mockResolvedValue([
       { course_class_id: 101, subject_id: 1, subject_code: 'IT', subject_name: 'Course', can_propose: true },
     ])
-    renderWithQueryClient(<ProposalComposer subjects={[{ subject_id: 1, code: 'IT', name: 'Course' }]} subjectId={1} onClose={close} />)
+    renderWithQueryClient(<ProposalComposer subjectId={1} onClose={close} />)
     await user.type(await screen.findByLabelText(/Tiêu đề phiên/), 'My proposal')
     await user.type(screen.getByLabelText(/Nội dung câu hỏi/), 'A question')
     for (const key of ['A', 'B', 'C', 'D']) await user.type(screen.getByLabelText(new RegExp(`Phương án ${key}`)), `Option ${key}`)

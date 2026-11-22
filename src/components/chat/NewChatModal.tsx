@@ -1,4 +1,4 @@
-import { useState, useMemo, type FormEvent } from 'react'
+import { useState, useMemo, type SyntheticEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Users, User, Check } from 'lucide-react'
 import { Modal } from '@/components/ui/overlay/Modal'
@@ -61,7 +61,7 @@ export function NewChatModal({ open, onClose, onCreated }: Readonly<NewChatModal
     }
   }
 
-  async function handleCreateGroup(e: FormEvent) {
+  async function handleCreateGroup(e: SyntheticEvent) {
     e.preventDefault()
     if (!groupName.trim()) {
       toast.error(t('groupNamePlaceholder'))

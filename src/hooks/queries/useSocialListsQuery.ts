@@ -46,8 +46,8 @@ export function useFollowMutation() {
   return useMutation({
     mutationFn: ({ id, following }: { id: number; following: boolean }) =>
       following ? relationshipService.unfollowUser(id) : relationshipService.followUser(id),
-    onSuccess: () => {
-      void client.invalidateQueries({ queryKey: queryKeys.users.all })
+    onSuccess: (_, { id }) => {
+      void client.invalidateQueries({ queryKey: queryKeys.users.relationshipStats(id) })
       void client.invalidateQueries({ queryKey: queryKeys.relationships.all })
       void client.invalidateQueries({ queryKey: queryKeys.feed.all })
     },

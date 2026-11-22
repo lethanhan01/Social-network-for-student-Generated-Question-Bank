@@ -1,15 +1,19 @@
-import { lazy } from 'react'
+import { lazy, type ComponentType } from 'react'
 import { Navigate, type RouteObject } from 'react-router-dom'
 import { ProtectedRoute } from '@/components/shared/protected-route/ProtectedRoute'
+import { preloadNamespaces, type AppNamespace } from '@/lib/i18n'
+
+const lazyWithNs = <T extends { default: ComponentType }>(
+  loader: () => Promise<T>,
+  ns: AppNamespace[]
+) => lazy(() => Promise.all([loader(), preloadNamespaces(ns)]).then(([mod]) => mod))
 
 const DashboardLayout = lazy(() => import('@/layouts/DashboardLayout'))
 
-const TeacherDashboardPage = lazy(() => import('@/pages/teacher/TeacherDashboardPage'))
-const TeacherClassesPage = lazy(() => import('@/pages/teacher/TeacherClassesPage'))
-const TeacherReviewsPage = lazy(() => import('@/pages/teacher/TeacherReviewsPage'))
-const TeacherExamsPage = lazy(() => import('@/pages/teacher/TeacherExamsPage'))
-const TeacherAcademicPage = lazy(() => import('@/pages/teacher/TeacherAcademicPage'))
-const TeacherReportsPage = lazy(() => import('@/pages/teacher/TeacherReportsPage'))
+const TeacherDashboardPage = lazyWithNs(() => import('@/pages/teacher/TeacherDashboardPage'), ['academic'])
+const TeacherClassesPage = lazyWithNs(() => import('@/pages/teacher/TeacherClassesPage'), ['academic'])
+const TeacherReviewsPage = lazyWithNs(() => import('@/pages/teacher/TeacherReviewsPage'), ['academic'])
+const TeacherExamsPage = lazyWithNs(() => import('@/pages/teacher/TeacherExamsPage'), ['academic'])
 
 export const teacherRoutes: RouteObject[] = [
   {
@@ -22,8 +26,8 @@ export const teacherRoutes: RouteObject[] = [
           { path: '/teacher/classes', element: <TeacherClassesPage /> },
           { path: '/teacher/reviews', element: <TeacherReviewsPage /> },
           { path: '/teacher/exams', element: <TeacherExamsPage /> },
-          { path: '/teacher/academic', element: <TeacherAcademicPage /> },
-          { path: '/teacher/reports', element: <TeacherReportsPage /> },
+          { path: '/teacher/academic', element: <Navigate to="/teacher/dashboard" replace /> },
+          { path: '/teacher/reports', element: <Navigate to="/teacher/dashboard" replace /> },
         ],
       },
     ],
@@ -34,4 +38,3 @@ export const teacherRoutes: RouteObject[] = [
   { path: '/lecturer/reviews', element: <Navigate to="/teacher/reviews" replace /> },
   { path: '/lecturer/exams', element: <Navigate to="/teacher/exams" replace /> },
 ]
-

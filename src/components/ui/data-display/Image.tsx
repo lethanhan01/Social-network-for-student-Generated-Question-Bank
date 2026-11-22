@@ -88,6 +88,7 @@ export const Image = forwardRef<HTMLImageElement, ImageProps>(
               src={src ?? undefined}
               alt={alt}
               loading={loading}
+              decoding="async"
               onLoad={handleLoad}
               onError={handleError}
               className={cn(

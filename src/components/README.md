@@ -3,7 +3,7 @@
 > **Tiêu chuẩn Kỹ thuật Frontend Doanh nghiệp SQB HUST (src/components/)**  
 > *Phiên bản:* 2.0.0 (Strict Enterprise Standard, Semantic Tokens & W3C A11y APG)  
 > *Cập nhật lần cuối:* 2026-10-25  
-> *Phạm vi áp dụng:* Toàn bộ lập trình viên frontend khi tạo mới, chỉnh sửa, hoặc tái cấu trúc giao diện trong hệ thống Mạng xã hội Ngân hàng Đề thi SQB HUST. Phục vụ chuyên biệt cho ba phân hệ cốt lõi: UI Primitives ([`ui/`](ui/)), Shared Application Composites ([`shared/`](shared/)) và Layout Templates ([`layouts/`](layouts/)).  
+> *Phạm vi áp dụng:* Toàn bộ lập trình viên frontend khi tạo mới, chỉnh sửa, hoặc tái cấu trúc giao diện trong hệ thống Mạng xã hội Ngân hàng Đề thi SQB HUST. Phục vụ chuyên biệt cho ba phân hệ cốt lõi: UI Primitives ([`ui/`](ui/)), Shared Application Composites ([`shared/`](shared/)) và Layout Primitives ([`ui/layout/`](ui/layout/)).  
 > *Tài liệu liên quan:* [Cổng Quy Chuẩn Master Frontend](../../FRONTEND_CONVENTIONS.md) | [Chuyên Đề 01: Kiến Trúc & Cấu Trúc Thư Mục](../../docs/01-architecture-and-structure.md) | [Chuyên Đề 04: Component Patterns](../../docs/04-component-patterns.md) | [Chuyên Đề 06: Styling & Design Tokens](../../docs/06-styling-and-design-tokens.md) | [Chuyên Đề 08: Hệ Thống Thiết Kế Ngữ Nghĩa](../../docs/08-semantic-design-system.md)
 
 ---
@@ -84,7 +84,7 @@ graph TD
 ### 1.1 Nguyên Tắc Vàng về Tái Sử Dụng Nội Bộ Tối Đa (Internal Maximum Reusability)
 
 1. **Tuyệt đối không tái phát minh bánh xe (Never Re-invent Primitives):**  
-   - Bất kỳ thành phần nào trong `shared/` (như [`Topbar`](shared/topbar/Topbar.tsx), [`Sidebar`](shared/sidebar/Sidebar.tsx), `NotificationBell`) khi cần hiển thị nút bấm, avatar, huy hiệu số, menu thả nổi hay popover **BẮT BUỘC PHẢI TÁI SỬ DỤNG** các component từ `ui/` ([`Button`](ui/actions/Button.tsx), [`Avatar`](ui/data-display/Avatar.tsx), [`Badge`](ui/data-display/Badge.tsx), [`DropdownMenu`](ui/overlay/DropdownMenu.tsx), [`Popover`](ui/overlay/Popover.tsx)).
+   - Bất kỳ thành phần nào trong `shared/` (như [`Topbar`](shared/topbar/Topbar.tsx), [`MobileNavDrawer`](shared/navigation/MobileNavDrawer.tsx), `NotificationBell`) khi cần hiển thị nút bấm, avatar, huy hiệu số, menu thả nổi hay popover **BẮT BUỘC PHẢI TÁI SỬ DỤNG** các component từ `ui/` ([`Button`](ui/actions/Button.tsx), [`Avatar`](ui/data-display/Avatar.tsx), [`Badge`](ui/data-display/Badge.tsx), [`DropdownMenu`](ui/overlay/DropdownMenu.tsx), [`Popover`](ui/overlay/Popover.tsx)).
    - Tuyệt đối cấm viết lại thẻ HTML trần (`<button>`, `<span>`, `<div>`) hay tự viết các sự kiện click-outside thủ công trong `shared/`.
 
 2. **Tái sử dụng nội bộ ngay trong chính `ui/` (Molecular Composition):**  
@@ -131,7 +131,7 @@ Nhằm loại bỏ tính mơ hồ khi phát triển giao diện, bảng quy chu�
 | **08** | `<div>` (Khối bài viết / item danh sách) | Nonsemantic Layout | `<article>` hoặc [`Card as="article">`](ui/data-display/Card.tsx) | Đại diện cho một đơn vị dữ liệu hoàn chỉnh. |
 | **09** | `<div>` (Header / Footer của card/vùng) | Nonsemantic Layout | `<header>`, `<footer>` hoặc [`CardHeader`](ui/data-display/Card.tsx), [`CardFooter`](ui/data-display/Card.tsx) | Cấu trúc phân cấp ngữ nghĩa chuẩn W3C. |
 | **10** | `<div>` (Thanh điều hướng / tabs bar) | Nonsemantic Layout | `<nav aria-label="...">` hoặc [`Tabs`](ui/navigation/Tabs.tsx), [`Breadcrumb`](ui/navigation/Breadcrumb.tsx) | Đảm bảo khả năng điều hướng bằng phím và screen reader. |
-| **11** | `<div>` (Sidebar / Cột thông tin phụ) | Nonsemantic Layout | `<aside>` hoặc [`Sidebar`](shared/sidebar/Sidebar.tsx) | Phân tách nội dung phụ trợ khỏi luồng chính. |
+| **11** | `<div>` (Sidebar / Cột thông tin phụ) | Nonsemantic Layout | `<aside>` hoặc [`MobileNavDrawer`](shared/navigation/MobileNavDrawer.tsx) | Phân tách nội dung phụ trợ khỏi luồng chính. |
 | **12** | `<div>` (Đường kẻ phân cách) | Nonsemantic Layout | [`Separator`](ui/layout/Separator.tsx) hoặc `<hr>` | Import từ `@/components/ui`. Hỗ trợ label chữ ở giữa. |
 | **13** | `<div>` (Chỉ để flexbox/grid layout) | Nonsemantic Layout | Bọc trực tiếp bằng thẻ ngữ nghĩa (`<section>`, `<fieldset>`, `<ul/ol>`) | **Nếu bắt buộc dùng div**: Dùng chú thích ngoại lệ `{/* rogym-convention-exempt: NO_NONSEMANTIC_TAGS [Lý do] */}`. |
 | **14** | `<span>` (Nhãn trạng thái / tag) | Nonsemantic Text | [`Badge`](ui/data-display/Badge.tsx), [`StatusBadge`](ui/data-display/StatusBadge.tsx), [`Chip`](ui/data-display/Chip.tsx) | Import từ `@/components/ui`. Chuẩn hóa tone màu semantic. |
@@ -515,7 +515,7 @@ graph TD
 | Giai Đoạn | Component Mục Tiêu | Vị Trí File | Component Nội Bộ Cần Tái Sử Dụng | Mục Tiêu & Lợi Ích Đo Lường Được |
 | :---: | :--- | :--- | :--- | :--- |
 | **P0** | **`Topbar`** | [`shared/topbar/Topbar.tsx`](shared/topbar/Topbar.tsx) | [`DropdownMenu`](ui/overlay/DropdownMenu.tsx), [`Avatar`](ui/data-display/Avatar.tsx), [`Button`](ui/actions/Button.tsx) | Xóa bỏ `mousedown` listener thủ công, loại bỏ raw `<button>`, chuẩn hóa APG focus. |
-| **P0** | **`Sidebar`** | [`shared/sidebar/Sidebar.tsx`](shared/sidebar/Sidebar.tsx) | [`Badge`](ui/data-display/Badge.tsx), [`Accordion`](ui/data-display/Accordion.tsx) | Giảm từ 461 dòng xuống < 250 dòng (`SEM-ARCH-001`), loại bỏ hardcoded badge classes. |
+| **P0** | **`MobileNavDrawer`** | [`shared/navigation/MobileNavDrawer.tsx`](shared/navigation/MobileNavDrawer.tsx) | [`Badge`](ui/data-display/Badge.tsx), [`Button`](ui/actions/Button.tsx) | Thay thế `Sidebar` legacy, thu gọn dưới 250 dòng (`SEM-ARCH-001`), loại bỏ hardcoded badge classes. |
 | **P0** | **`NotificationBell`** | `shared/notification/NotificationBell.tsx` | [`Popover`](ui/overlay/Popover.tsx), [`Button`](ui/actions/Button.tsx), [`Badge`](ui/data-display/Badge.tsx) | Xóa bỏ `useEffect` direct fetch (`SEM-STATE-001`), giảm từ 416 dòng xuống < 200 dòng. |
 | **P1** | **`ResponsiveTable`** | [`ui/ResponsiveTable.tsx`](ui/data-display/ResponsiveTable.tsx) | [`Table`](ui/data-display/Table.tsx), [`Card`](ui/data-display/Card.tsx), [`Skeleton`](ui/feedback/Skeleton.tsx) | Thống nhất padding, border tokens giữa Desktop và Mobile card view. |
 | **P1** | **`ConfirmDialog`** | [`ui/ConfirmDialog.tsx`](ui/overlay/ConfirmDialog.tsx) | [`Modal`](ui/overlay/Modal.tsx), [`Button`](ui/actions/Button.tsx) | Loại bỏ trùng lặp Radix Dialog logic, hỗ trợ đầy đủ variant danger/warning. |
@@ -1310,7 +1310,7 @@ Tất cả các thành phần trong `src/components/shared/` phục vụ mục �
 
 | Component | File nguồn | Vai trò chính | Cách áp dụng chuẩn |
 | :--- | :--- | :--- | :--- |
-| **`Sidebar`** | [`shared/sidebar/Sidebar.tsx`](shared/sidebar/Sidebar.tsx) | Shell thanh điều hướng cạnh bên màn hình lớn cho Sinh viên & Giảng viên | Đặt trong Layout chính của Desktop |
+| **`MobileNavDrawer`** | [`shared/navigation/MobileNavDrawer.tsx`](shared/navigation/MobileNavDrawer.tsx) | Ngăn kéo điều hướng phụ cho thiết bị di động (thay thế `Sidebar` legacy) | Đặt trong `DashboardLayout` |
 | **`Topbar`** | [`shared/topbar/Topbar.tsx`](shared/topbar/Topbar.tsx) | Shell thanh tiêu đề đỉnh ứng dụng chứa Avatar, ThemeToggle, Chuông thông báo | Đặt trên cùng của mọi trang Dashboard |
 | **`ProtectedRoute`** | [`shared/protected-route/ProtectedRoute.tsx`](shared/protected-route/ProtectedRoute.tsx) | Bọc bảo vệ Route: Kiểm tra hydrate store, vai trò `allowedRoles` (`STUDENT`, `LECTURER`, `ADMIN`) và chuyển hướng an toàn | `<ProtectedRoute allowedRoles={['STUDENT', 'LECTURER']}><Page /></ProtectedRoute>` |
 | **`NotificationUI`** | [`shared/notification/NotificationUI.tsx`](shared/notification/NotificationUI.tsx) | Hệ thống thành phần hiển thị thông báo: `NotificationToast`, `NotificationAlert`, `NotificationPanel` | Sử dụng trong hệ thống Toast & Notification Dropdown |

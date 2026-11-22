@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type SubmitEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Modal } from '@/components/ui/overlay/Modal'
 import { Form } from '@/components/ui/forms/Form'
@@ -18,7 +18,7 @@ export function QuestionRatingModal({ questionId, onClose }: Readonly<{ question
   const [isError, setIsError] = useState(false)
   const [comment, setComment] = useState('')
   const [error, setError] = useState('')
-  async function submit(event: FormEvent) {
+  async function submit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     if (mutation.isPending) return
     if (isError && !comment.trim()) { setError(t('rating.needComment')); return }

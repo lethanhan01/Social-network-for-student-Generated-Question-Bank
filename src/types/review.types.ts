@@ -1,6 +1,8 @@
 /**
  * Domain Types: review
  */
+import type { SessionDetailReviewResponse, SessionQuestionReviewDto } from './api.generated'
+
 export type {
   EditQuestionRequest,
   EditQuestionResponse,
@@ -9,5 +11,16 @@ export type {
   ApproveQuestionsResponse,
   ReviewErrorRequest,
   SessionDetailReviewResponse,
-  SessionQuestionReviewDto
+  SessionQuestionReviewDto,
 } from './api.generated'
+
+export type QuestionDifficulty = 'UNCLASSIFIED' | 'EASY' | 'MEDIUM' | 'HARD'
+
+export interface LiveSessionQuestionReviewDto extends SessionQuestionReviewDto {
+  difficulty?: QuestionDifficulty
+}
+
+export interface LiveSessionDetailReviewResponse extends Omit<SessionDetailReviewResponse, 'items'> {
+  session_status?: 'PENDING' | 'REVIEWING' | 'RESOLVED'
+  items?: LiveSessionQuestionReviewDto[]
+}
