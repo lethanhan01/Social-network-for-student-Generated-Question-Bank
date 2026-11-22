@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { Modal } from '@/components/ui/overlay'
 import { Badge, Card, Image } from '@/components/ui/data-display'
 import { Button } from '@/components/ui/actions'
-import { Text } from '@/components/ui/typography'
 import { AcademicFeedback } from '@/components/academic/AcademicFeedback'
 import { useExamDetailQuery } from '@/hooks/queries/useExamQuery'
 import type { ExamExportFormat } from '@/services/exam.service'
@@ -87,11 +86,6 @@ export function ExamPreviewModal({
                     )}
                   >
                     <strong>{opt.key}.</strong> {opt.text}
-                    {opt.is_correct ? (
-                      <Text size="xs" className="text-action-accent font-semibold mt-0.5">
-                        {t('teacher.exams.previewModal.correctBadge')}
-                      </Text>
-                    ) : null}
                   </li>
                 ))}
               </ul>

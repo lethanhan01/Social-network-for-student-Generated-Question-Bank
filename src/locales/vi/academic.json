@@ -457,7 +457,6 @@
       "previewModal": {
         "title": "Xem trước đề thi",
         "questionLabel": "Câu {{order}}",
-        "correctBadge": "Đáp án đúng",
         "emptyQuestions": "Đề thi chưa có danh sách câu hỏi."
       },
       "exportBankModal": {

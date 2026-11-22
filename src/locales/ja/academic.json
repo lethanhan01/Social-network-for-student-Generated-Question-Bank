@@ -457,7 +457,6 @@
       "previewModal": {
         "title": "試験プレビュー",
         "questionLabel": "問 {{order}}",
-        "correctBadge": "正解",
         "emptyQuestions": "この試験には問題が含まれていません。"
       },
       "exportBankModal": {

@@ -251,7 +251,7 @@ describe('Teacher Portal pages', () => {
     })
   })
 
-  it('handles TeacherExamsPage list, preview, PDF/Excel export with answer key, and generate exam', async () => {
+  it('handles TeacherExamsPage list, preview without correctBadge text, PDF/Excel export with answer key, and generate exam', async () => {
     const user = userEvent.setup()
     const openSpy = vi.spyOn(window, 'open').mockReturnValue({} as Window)
     mockedExam.getExamDetail.mockResolvedValue({
@@ -290,10 +290,14 @@ describe('Teacher Portal pages', () => {
       expect(openSpy).toHaveBeenCalledWith('https://r2.example/exam_103_ans_true.xlsx', '_blank', 'noopener,noreferrer')
     })
 
-    // Preview modal renders ordered questions
+    // Preview modal renders ordered questions with green highlight and without "Đáp án đúng" text
     await user.click(screen.getByRole('button', { name: /xem trước/i }))
-    expect(await screen.findByText('Ba cây cấu trúc Flutter là gì?')).toBeInTheDocument()
-    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: /đóng/i }))
+    const previewDialog = await screen.findByRole('dialog')
+    expect(await within(previewDialog).findByText('Ba cây cấu trúc Flutter là gì?')).toBeInTheDocument()
+    const correctOption = within(previewDialog).getByText('Widget, Element, RenderObject').closest('li')
+    expect(correctOption).toHaveClass('bg-action-accent-soft', 'border-action-accent')
+    expect(within(previewDialog).queryByText(/đáp án đúng/i)).not.toBeInTheDocument()
+    await user.click(within(previewDialog).getByRole('button', { name: /đóng/i }))
 
     // Generate modal validates required subject before submit
     await user.click(screen.getByRole('button', { name: /cấu hình sinh đề mới/i }))
